@@ -1,12 +1,12 @@
-"use client";
+import prisma from "@/lib/prisma";
+import { CreateLinkForm } from "@/components/CreateLinkForm";
 
-import { Button } from '../../components/ui/button'
-import { signIn, signOut } from 'next-auth/react'
+export default async function Home() {
+  const foo = await prisma.link.findMany();
 
-export default function Home() {
   return (
     <main>
-      <Button onClick={() => { signIn() }}>Sign In</Button>
+      <CreateLinkForm />
     </main>
-  )
+  );
 }

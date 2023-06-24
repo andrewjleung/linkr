@@ -60,10 +60,10 @@ model VerificationToken {
 model Link {
   id Int @id @default(autoincrement())
   title String
-  description String
+  description String?
   url String
   parent Collection? @relation(fields: [parentId], references: [id])
-  parentId Int
+  parentId Int?
 }
 
 model Tag {
@@ -75,7 +75,7 @@ model Collection {
   id Int @id @default(autoincrement())
   name String
   parent Collection? @relation("CollectionHierarchy", fields: [parentId], references: [id])
-  parentId Int
+  parentId Int?
   collections Collection[] @relation("CollectionHierarchy")
   links Link[]
 }
