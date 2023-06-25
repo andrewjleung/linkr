@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import { createLink } from "../app/actions";
 
 const linkSchema = z.object({
   title: z.string(),
@@ -42,7 +43,19 @@ export function CreateLinkForm() {
   });
 
   function onSubmit(values: z.infer<typeof linkSchema>) {
-    console.log(values);
+    createLink({
+      title: values.title,
+      description: values.description,
+      url: values.url,
+    })
+      .then((link) => {
+        console.log(link);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    // TODO: create tags as well...
   }
 
   return (
