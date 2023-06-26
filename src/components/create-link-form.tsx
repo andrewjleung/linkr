@@ -23,6 +23,8 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { createLink } from "../app/actions";
+import { useState } from "react";
+import { Loader2, Plus } from "lucide-react";
 
 const linkSchema = z.object({
   title: z.string(),
@@ -32,6 +34,9 @@ const linkSchema = z.object({
 });
 
 export function CreateLinkForm() {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
   const form = useForm<z.infer<typeof linkSchema>>({
     resolver: zodResolver(linkSchema),
     defaultValues: {
@@ -42,8 +47,11 @@ export function CreateLinkForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof linkSchema>) {
-    createLink({
+  async function onSubmit(values: z.infer<typeof linkSchema>) {
+    setLoading(true);
+
+    // TODO: handle failure case
+    await createLink({
       title: values.title,
       description: values.description,
       url: values.url,
@@ -55,13 +63,18 @@ export function CreateLinkForm() {
         console.log(e);
       });
 
+    setOpen(false);
+    setLoading(false);
+    form.reset();
     // TODO: create tags as well...
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">+</Button>
+        <Button variant="outline" size="icon">
+          <Plus className="h-4 w-4" />
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -109,7 +122,16 @@ export function CreateLinkForm() {
               )}
             />
             <DialogFooter>
-              <Button type="submit">Create</Button>
+              <Button disabled={loading} type="submit">
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating link
+                  </>
+                ) : (
+                  "Create"
+                )}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

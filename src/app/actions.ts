@@ -2,15 +2,22 @@
 
 import { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function createLink(link: Prisma.LinkCreateInput) {
-  return prisma.link.create({ data: link });
+  const result = await prisma.link.create({ data: link });
+  revalidatePath("/");
+
+  return result;
 }
 
 export async function deleteLink(id: number) {
-  return prisma.link.delete({
+  const result = await prisma.link.delete({
     where: {
       id,
     },
   });
+  revalidatePath("/");
+
+  return result;
 }
