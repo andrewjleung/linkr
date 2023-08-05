@@ -12,43 +12,35 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createLink } from "../app/actions";
+import { createCollection } from "../app/actions";
 import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 
-const linkSchema = z.object({
-  title: z.optional(z.string()),
-  description: z.optional(z.string()),
-  url: z.string().url(),
-  tags: z.array(z.string()),
+const collectionSchema = z.object({
+  name: z.string(),
 });
 
 const DEFAULT_FORM_VALUES = {
-  url: "",
-  tags: [],
+  name: "",
 };
 
-export function CreateLinkForm({ parentId }: { parentId: number | null }) {
+export function CreateCollectionForm() {
   const [loading, setLoading] = useState(false);
-  console.log(parentId);
 
-  const form = useForm<z.infer<typeof linkSchema>>({
-    resolver: zodResolver(linkSchema),
+  const form = useForm<z.infer<typeof collectionSchema>>({
+    resolver: zodResolver(collectionSchema),
     defaultValues: DEFAULT_FORM_VALUES,
   });
 
-  async function onSubmit(values: z.infer<typeof linkSchema>) {
+  async function onSubmit(values: z.infer<typeof collectionSchema>) {
     setLoading(true);
 
     // TODO: handle failure case
-    await createLink({
-      title: values.title,
-      description: values.description,
-      url: values.url,
-      parentId: parentId,
+    await createCollection({
+      name: values.name,
     })
-      .then((link) => {
-        console.log(link);
+      .then((collection) => {
+        console.log(collection);
       })
       .catch((e) => {
         console.log(e);
@@ -56,7 +48,6 @@ export function CreateLinkForm({ parentId }: { parentId: number | null }) {
 
     setLoading(false);
     form.reset(DEFAULT_FORM_VALUES);
-    // TODO: create tags as well...
   }
 
   return (
@@ -67,7 +58,7 @@ export function CreateLinkForm({ parentId }: { parentId: number | null }) {
       >
         <FormField
           control={form.control}
-          name="url"
+          name="name"
           render={({ field }) => (
             <FormItem className="w-full">
               <FormControl>

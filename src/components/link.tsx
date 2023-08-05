@@ -7,7 +7,7 @@ export default function LinkComponent({ link }: { link: LinkModel }) {
     <span className="flex flex-row items-center gap-4">
       <DeleteLinkButton link={link} />
       <Link className="hover:underline" href={link.url}>
-        {link.title}
+        {link.url}
       </Link>
     </span>
   );
