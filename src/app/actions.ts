@@ -31,13 +31,70 @@ export async function createCollection(
   return result;
 }
 
-export async function deleteCollection(id: number) {
-  const result = await prisma.collection.delete({
+export async function safeDeleteCollection(id: number) {
+  const updatedCollections = await prisma.collection.updateMany({
+    where: {
+      parentId: id,
+    },
+    data: {
+      parentId: undefined,
+    },
+  });
+
+  const updatedLinks = await prisma.link.updateMany({
+    where: {
+      parentId: id,
+    },
+    data: {
+      parentId: undefined,
+    },
+  });
+
+  const deletedCollection = await prisma.collection.delete({
     where: {
       id,
     },
   });
+
   revalidatePath("/");
 
-  return result;
+  return {
+    updatedCollections,
+    updatedLinks,
+    deletedCollection,
+  };
+}
+
+export async function unsafeDeleteCollection(id: number) {
+  const nestedCollections = await prisma.collection.findMany({
+    where: {
+      parentId: id,
+    },
+  });
+
+  const deletedNestedCollections = await Promise.all(
+    nestedCollections.map((collection) => {
+      unsafeDeleteCollection(collection.id);
+    })
+  );
+
+  const deletedLinks = await prisma.link.deleteMany({
+    where: {
+      parentId: id,
+    },
+  });
+
+  const deletedCollection = await prisma.collection.delete({
+    where: {
+      id,
+    },
+  });
+
+  revalidatePath("/");
+
+  return {
+    deletedNestedCollections,
+    deletedLinks,
+    deletedCollection,
+  };
 }
