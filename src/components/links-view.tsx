@@ -25,7 +25,16 @@ async function Links({ parentId }: { parentId: CollectionModel["parentId"] }) {
 function LinksSkeleton() {
   return (
     <div className="mt-4 space-y-2">
-      <Skeleton className="h-10 w-full" />
+      {Array(10)
+        .fill(0)
+        .map((_, i) => (
+          <div
+            key={`links-skeleton-${i}`}
+            className="flex h-10 w-full items-center justify-center"
+          >
+            <Skeleton className="h-6 w-full" />
+          </div>
+        ))}
     </div>
   );
 }
