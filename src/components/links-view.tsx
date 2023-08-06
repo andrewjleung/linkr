@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { CreateLinkForm } from "@/components/create-link-form";
 import LinkComponent from "@/components/link";
 import { Collection as CollectionModel } from "@prisma/client";
+import { Skeleton } from "./ui/skeleton";
 
 async function Links({ parentId }: { parentId: CollectionModel["parentId"] }) {
   const links = await prisma.link.findMany({ where: { parentId } });
@@ -21,6 +22,14 @@ async function Links({ parentId }: { parentId: CollectionModel["parentId"] }) {
   );
 }
 
+function LinksSkeleton() {
+  return (
+    <div className="mt-4 space-y-2">
+      <Skeleton className="h-10 w-full" />
+    </div>
+  );
+}
+
 export default function LinksView({
   parentId,
   loading,
@@ -32,7 +41,7 @@ export default function LinksView({
     <>
       <div className="col-span-3">
         <CreateLinkForm parentId={parentId} />
-        {loading ? null : <Links parentId={parentId} />}
+        {loading ? <LinksSkeleton /> : <Links parentId={parentId} />}
       </div>
     </>
   );
