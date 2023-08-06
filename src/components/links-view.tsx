@@ -16,7 +16,12 @@ async function Links({ parentId }: { parentId: CollectionModel["parentId"] }) {
           ))}
         </ul>
       ) : (
-        <h2>There&apos;s nothing here!</h2>
+        <div className="flex h-1/4 w-full flex-col items-center justify-center gap-2">
+          <h1 className="text-4xl">There&apos;s nothing here! 🙀</h1>
+          <p className="text-sm">
+            The world is your oyster. Go find some links!
+          </p>
+        </div>
       )}
     </>
   );
