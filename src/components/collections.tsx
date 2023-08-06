@@ -1,13 +1,16 @@
+"use client";
+
 import Collection from "@/components/collection";
-import prisma from "@/lib/prisma";
 import { Collection as CollectionModel } from "@prisma/client";
+import { useParams } from "next/navigation";
 
 export async function Collections({
-  parentId,
+  collections,
 }: {
-  parentId: CollectionModel["parentId"];
+  collections: CollectionModel[];
 }) {
-  const collections = await prisma.collection.findMany();
+  const { id } = useParams();
+  const parentId = Number(id) || null;
 
   return (
     <>

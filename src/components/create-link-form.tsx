@@ -30,7 +30,6 @@ const DEFAULT_FORM_VALUES = {
 
 export function CreateLinkForm({ parentId }: { parentId: number | null }) {
   const [loading, setLoading] = useState(false);
-  console.log(parentId);
 
   const form = useForm<z.infer<typeof linkSchema>>({
     resolver: zodResolver(linkSchema),
