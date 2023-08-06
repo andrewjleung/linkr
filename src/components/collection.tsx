@@ -27,15 +27,19 @@ export default function Collection({
 
   if (isSelected) {
     return (
-      <Button variant="outline" asChild>
-        <Link href={`/collections/${id}`}>{name}</Link>
+      <Button variant="ghost" asChild>
+        <Link href={`/collections/${id}`}>
+          <div className="h-full w-full underline">{name}</div>
+        </Link>
       </Button>
     );
   }
 
   return (
     <Button variant="ghost" asChild>
-      <Link href={`/collections/${id}`}>{name}</Link>
+      <Link href={`/collections/${id}`}>
+        <div className="h-full w-full">{name}</div>
+      </Link>
     </Button>
   );
 }
