@@ -17,7 +17,7 @@ import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 
 const collectionSchema = z.object({
-  name: z.string(),
+  name: z.string().nonempty(),
 });
 
 const DEFAULT_FORM_VALUES = {
