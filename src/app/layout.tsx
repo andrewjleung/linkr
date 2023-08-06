@@ -114,8 +114,8 @@ export default function RootLayout({
                 <CreateCollectionForm />
                 <Collections parentId={parentId} />
               </div>
+              {children}
             </div>
-            {children}
           </main>
         </ThemeProvider>
       </body>
