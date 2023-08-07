@@ -1,6 +1,8 @@
 import { Collection } from "@prisma/client";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type CollectionProps = HomeCollection | NonHomeCollection;
 
@@ -25,21 +27,23 @@ export default function Collection({
       ? ["", "Home"]
       : [collection.collection.id, collection.collection.name];
 
-  if (isSelected) {
-    return (
-      <Button variant="secondary" asChild>
-        <Link href={`/collections/${id}`}>
-          <div className="h-full w-full">{name}</div>
-        </Link>
-      </Button>
-    );
-  }
+  const variant = isSelected ? "secondary" : "ghost";
 
   return (
-    <Button variant="ghost" asChild>
-      <Link href={`/collections/${id}`}>
-        <div className="h-full w-full">{name}</div>
+    <div className="group flex flex-row gap-4">
+      <Link
+        href={`/collections/${id}`}
+        className={cn(buttonVariants({ variant: variant }), "w-full")}
+      >
+        <div className="w-full">{name}</div>
       </Link>
-    </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="invisible text-neutral-400 transition-all duration-100 group-hover:visible group-hover:ease-in dark:text-neutral-600"
+      >
+        <MoreHorizontal />
+      </Button>
+    </div>
   );
 }
