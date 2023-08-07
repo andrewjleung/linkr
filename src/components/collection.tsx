@@ -27,6 +27,7 @@ import {
   forwardRef,
   useEffect,
   useCallback,
+  useContext,
 } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,6 +43,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { safeDeleteCollection, unsafeDeleteCollection } from "@/app/actions";
+import { KEYPRESSES, KeyboardContext } from "@/hooks/use-keyboard";
 
 const renameFormSchema = z.object({
   name: z.string().nonempty(),
@@ -108,6 +110,7 @@ export default function Collection({
   isSelected: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const { addMapping, removeMapping } = useContext(KeyboardContext);
 
   const [id, name] =
     collection.type === "home"
@@ -118,6 +121,10 @@ export default function Collection({
 
   function onClickRename() {
     setIsEditing(true);
+    addMapping(KEYPRESSES.escape, () => {
+      setIsEditing(false);
+      removeMapping(KEYPRESSES.escape);
+    });
   }
 
   async function onClickDelete() {

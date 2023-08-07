@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { CreateCollectionForm } from "@/components/create-collection-form";
 import { Collections } from "@/components/collections";
 import prisma from "@/lib/prisma";
+import { KeyboardProvider } from "@/components/keyboard-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,22 +32,24 @@ export default async function RootLayout({
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <main className="h-full w-full">
-            <div className="container flex max-w-7xl flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
-              <h2 className="text-lg font-semibold">linkr</h2>
-              <div className="ml-auto flex w-full space-x-2 sm:justify-end">
-                <ThemeToggle />
+          <KeyboardProvider>
+            <main className="h-full w-full">
+              <div className="container flex max-w-7xl flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
+                <h2 className="text-lg font-semibold">linkr</h2>
+                <div className="ml-auto flex w-full space-x-2 sm:justify-end">
+                  <ThemeToggle />
+                </div>
               </div>
-            </div>
-            <Separator />
-            <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-4 gap-8 p-8">
-              <div className="col-span-1">
-                <CreateCollectionForm />
-                <Collections collections={collections} />
+              <Separator />
+              <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-4 gap-8 p-8">
+                <div className="col-span-1">
+                  <CreateCollectionForm />
+                  <Collections collections={collections} />
+                </div>
+                {children}
               </div>
-              {children}
-            </div>
-          </main>
+            </main>
+          </KeyboardProvider>
         </ThemeProvider>
       </body>
     </html>
