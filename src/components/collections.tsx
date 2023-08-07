@@ -13,7 +13,7 @@ export function Collections({
   const [editingCollection, setEditingCollection] = useState<number | null>(
     null
   );
-  const { addMapping, removeMapping } = useContext(KeyboardContext);
+  const { addTempMapping } = useContext(KeyboardContext);
 
   return (
     <div className="mt-4 flex flex-col space-y-2">
@@ -25,9 +25,8 @@ export function Collections({
           isEditing={editingCollection === c.id}
           onRename={() => {
             setEditingCollection(c.id);
-            addMapping(KEYPRESSES.escape, () => {
+            addTempMapping(KEYPRESSES.escape, () => {
               setEditingCollection(null);
-              removeMapping(KEYPRESSES.escape);
             });
           }}
         />

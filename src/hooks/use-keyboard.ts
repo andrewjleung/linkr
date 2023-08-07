@@ -21,6 +21,10 @@ export type KeyboardContext = {
     keyPress: KeyPress,
     callback: (() => void) | (() => Promise<void>)
   ) => () => void;
+  addTempMapping: (
+    keyPress: KeyPress,
+    callback: (() => void) | (() => Promise<void>)
+  ) => void;
   removeMapping: (keyPress: KeyPress) => void;
 };
 
@@ -28,6 +32,10 @@ export const KeyboardContext = createContext<KeyboardContext>({
   addMapping:
     (keyPress: KeyPress, callback: (() => void) | (() => Promise<void>)) =>
     () => {},
+  addTempMapping: (
+    keyPress: KeyPress,
+    callback: (() => void) | (() => Promise<void>)
+  ) => {},
   removeMapping: () => {},
 });
 
@@ -83,8 +91,24 @@ export function useKeyboard(): KeyboardContext {
     [removeMapping]
   );
 
+  const addTempMapping = useCallback(
+    (keyPress: KeyPress, callback: (() => void) | (() => Promise<void>)) => {
+      const keypressString = JSON.stringify(keyPress);
+
+      setMappings((mappings) => ({
+        ...mappings,
+        [keypressString]: () => {
+          callback();
+          removeMapping(keyPress);
+        },
+      }));
+    },
+    [removeMapping]
+  );
+
   return {
     addMapping,
+    addTempMapping,
     removeMapping,
   };
 }
