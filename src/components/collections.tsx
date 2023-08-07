@@ -1,30 +1,37 @@
 "use client";
 
-import Collection from "@/components/collection";
+import { Collection, HomeCollection } from "@/components/collection";
+import { KEYPRESSES, KeyboardContext } from "@/hooks/use-keyboard";
 import { Collection as CollectionModel } from "@prisma/client";
-import { useParams } from "next/navigation";
+import { useContext, useState } from "react";
 
-export async function Collections({
+export function Collections({
   collections,
 }: {
   collections: CollectionModel[];
 }) {
-  const { id } = useParams();
-  const parentId = Number(id) || null;
+  const [editingCollection, setEditingCollection] = useState<number | null>(
+    null
+  );
+  const { addMapping, removeMapping } = useContext(KeyboardContext);
 
   return (
-    <ul className="mt-4 flex flex-col space-y-2">
-      <Collection
-        collection={{ type: "home" }}
-        isSelected={parentId === null}
-      />
+    <div className="mt-4 flex flex-col space-y-2">
+      <HomeCollection />
       {collections.map((c) => (
         <Collection
           key={`collection-${c.id}`}
-          collection={{ type: "non-home", collection: c }}
-          isSelected={c.id === parentId}
+          collection={c}
+          isEditing={editingCollection === c.id}
+          onRename={() => {
+            setEditingCollection(c.id);
+            addMapping(KEYPRESSES.escape, () => {
+              setEditingCollection(null);
+              removeMapping(KEYPRESSES.escape);
+            });
+          }}
         />
       ))}
-    </ul>
+    </div>
   );
 }

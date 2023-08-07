@@ -1,5 +1,3 @@
-"use client";
-
 import { Collection } from "@prisma/client";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
@@ -28,6 +26,8 @@ import {
   useEffect,
   useCallback,
   useContext,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,20 +44,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { safeDeleteCollection, unsafeDeleteCollection } from "@/app/actions";
 import { KEYPRESSES, KeyboardContext } from "@/hooks/use-keyboard";
+import { useParams } from "next/navigation";
 
 const renameFormSchema = z.object({
   name: z.string().nonempty(),
 });
 
-type CollectionProps = HomeCollection | NonHomeCollection;
-
-type HomeCollection = {
-  type: "home";
-};
-
-type NonHomeCollection = {
-  type: "non-home";
+type CollectionProps = {
   collection: Collection;
+  isEditing: boolean;
+  onRename: () => void;
 };
 
 function RenameForm({ name }: { name: string }) {
@@ -102,30 +98,31 @@ function RenameForm({ name }: { name: string }) {
   );
 }
 
-export default function Collection({
+export function HomeCollection() {
+  const { id } = useParams();
+  const parentId = Number(id) || null;
+  const variant = parentId === null ? "secondary" : "ghost";
+
+  return (
+    <Link
+      href="/collections"
+      className={cn(buttonVariants({ variant: variant }), "w-full")}
+    >
+      <div className="w-full">Home</div>
+    </Link>
+  );
+}
+
+export function Collection({
   collection,
-  isSelected,
-}: {
-  collection: CollectionProps;
-  isSelected: boolean;
-}) {
-  const [isEditing, setIsEditing] = useState(false);
+  isEditing,
+  onRename,
+}: CollectionProps) {
+  const { id } = useParams();
+  const parentId = Number(id) || null;
   const { addMapping, removeMapping } = useContext(KeyboardContext);
 
-  const [id, name] =
-    collection.type === "home"
-      ? [null, "Home"]
-      : [collection.collection.id, collection.collection.name];
-
-  const variant = isSelected ? "secondary" : "ghost";
-
-  function onClickRename() {
-    setIsEditing(true);
-    addMapping(KEYPRESSES.escape, () => {
-      setIsEditing(false);
-      removeMapping(KEYPRESSES.escape);
-    });
-  }
+  const variant = parentId === collection.id ? "secondary" : "ghost";
 
   async function onClickDelete() {
     if (id === null) {
@@ -133,33 +130,31 @@ export default function Collection({
     }
 
     // TODO: Ask dialog to determine unsafe/safe deletion.
-    unsafeDeleteCollection(id);
+    await unsafeDeleteCollection(collection.id);
   }
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
         {isEditing ? (
-          <RenameForm name={name} />
+          <RenameForm name={collection.name} />
         ) : (
           <Link
-            href={`/collections/${id === null ? "" : id}`}
+            href={`/collections/${collection.id}`}
             className={cn(buttonVariants({ variant: variant }), "w-full")}
           >
-            <div className="w-full">{name}</div>
+            <div className="w-full">{collection.name}</div>
           </Link>
         )}
       </ContextMenuTrigger>
-      {collection.type === "home" ? null : (
-        <ContextMenuContent className="w-48">
-          <ContextMenuItem inset onClick={onClickRename}>
-            Rename
-          </ContextMenuItem>
-          <ContextMenuItem inset onClick={onClickDelete}>
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
-      )}
+      <ContextMenuContent className="w-48">
+        <ContextMenuItem inset onClick={onRename}>
+          Rename
+        </ContextMenuItem>
+        <ContextMenuItem inset onClick={onClickDelete}>
+          Delete
+        </ContextMenuItem>
+      </ContextMenuContent>
     </ContextMenu>
   );
 }

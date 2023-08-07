@@ -1,4 +1,10 @@
-import { useEffect, createContext, useState, useCallback } from "react";
+import {
+  useEffect,
+  createContext,
+  useState,
+  useCallback,
+  useContext,
+} from "react";
 
 export type KeyPress = {
   metaKey: KeyboardEvent["metaKey"];
