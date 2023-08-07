@@ -31,6 +31,21 @@ export async function createCollection(
   return result;
 }
 
+export async function renameCollection(id: number, name: string) {
+  const updatedCollection = await prisma.collection.update({
+    where: {
+      id,
+    },
+    data: {
+      name,
+    },
+  });
+
+  revalidatePath("/");
+
+  return updatedCollection;
+}
+
 export async function safeDeleteCollection(id: number) {
   const updatedCollections = await prisma.collection.updateMany({
     where: {
