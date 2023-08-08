@@ -11,9 +11,11 @@ async function Links({ parentId }: { parentId: CollectionModel["parentId"] }) {
     <>
       {links.length > 0 ? (
         <ul className="mt-4 space-y-2">
-          {links.map((l) => (
-            <LinkComponent key={`link-${l.id}`} link={l} />
-          ))}
+          {links
+            .sort((a, b) => a.url.localeCompare(b.url))
+            .map((l) => (
+              <LinkComponent key={`link-${l.id}`} link={l} />
+            ))}
         </ul>
       ) : (
         <div className="flex h-1/4 w-full flex-col items-center justify-center gap-2">
