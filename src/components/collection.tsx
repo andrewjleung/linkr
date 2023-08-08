@@ -144,6 +144,15 @@ export function HomeCollection() {
   );
 }
 
+function LoadingIndicator() {
+  return (
+    <div className="flex items-center justify-center">
+      <div className="h-3 w-3 animate-pulse rounded-full bg-orange-500 blur-sm"></div>
+      <div className="absolute h-2 w-2 animate-pulse rounded-full bg-orange-500"></div>
+    </div>
+  );
+}
+
 export function Collection({
   collection,
   isEditing,
@@ -170,7 +179,9 @@ export function Collection({
 
     setLoading(true);
     await unsafeDeleteCollection(collection.id);
-    setLoading(false);
+    // TODO: Don't set loading to false so that it lasts as long as the
+    // component still remains. This could cause a bug but seems okay for now.
+    // Change this when you figure out how to do things optimistically.
   }
 
   function onRename() {
@@ -199,9 +210,13 @@ export function Collection({
           ) : (
             <Link
               href={`/collections/${collection.id}`}
-              className={cn(buttonVariants({ variant: variant }), "w-full")}
+              className={cn(
+                buttonVariants({ variant: variant }),
+                "relative w-full"
+              )}
             >
               <div className="w-full">{collection.name}</div>
+              {loading ? <LoadingIndicator /> : null}
             </Link>
           )}
         </ContextMenuTrigger>
