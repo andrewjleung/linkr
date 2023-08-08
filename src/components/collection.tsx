@@ -43,7 +43,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { safeDeleteCollection, unsafeDeleteCollection } from "@/app/actions";
+import {
+  renameCollection,
+  safeDeleteCollection,
+  unsafeDeleteCollection,
+} from "@/app/actions";
 import { KEYPRESSES, KeyboardContext } from "@/hooks/use-keyboard";
 import { useParams } from "next/navigation";
 import {
@@ -167,6 +171,11 @@ export function Collection({
   const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { addTempMapping } = useContext(KeyboardContext);
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    setDisplayName(collection.name);
+  }, [setDisplayName, collection.name]);
 
   const variant = parentId === collection.id ? "secondary" : "ghost";
 
@@ -191,7 +200,13 @@ export function Collection({
 
   async function onRenameSubmit(newName: string) {
     if (newName !== collection.name) {
-      // TODO: rename it!
+      setIsEditing(false);
+      setDisplayName(newName);
+      setLoading(true);
+      // TODO: Handle error case
+      await renameCollection(collection.id, newName);
+      setLoading(false);
+      return;
     }
 
     setIsEditing(false);
@@ -215,7 +230,7 @@ export function Collection({
                 "relative w-full"
               )}
             >
-              <div className="w-full">{collection.name}</div>
+              <div className="w-full">{displayName}</div>
               {loading ? <LoadingIndicator /> : null}
             </Link>
           )}
