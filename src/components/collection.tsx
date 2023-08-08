@@ -28,6 +28,7 @@ import {
   useContext,
   Dispatch,
   SetStateAction,
+  KeyboardEventHandler,
 } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,9 +55,16 @@ type CollectionProps = {
   collection: Collection;
   isEditing: boolean;
   onRename: () => void;
+  onRenameSubmit: (newName: string) => Promise<void>;
 };
 
-function RenameForm({ name }: { name: string }) {
+function RenameForm({
+  name,
+  onRenameSubmit,
+}: {
+  name: string;
+  onRenameSubmit: (newName: string) => Promise<void>;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -76,8 +84,17 @@ function RenameForm({ name }: { name: string }) {
       return;
     }
 
-    console.log(values);
+    onRenameSubmit(values.name);
   }
+
+  const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (
+    event: React.KeyboardEvent
+  ) => {
+    console.log(event);
+    if (event.code === "Enter") {
+      onSubmit(form.getValues());
+    }
+  };
 
   return (
     <Form {...form}>
@@ -88,7 +105,12 @@ function RenameForm({ name }: { name: string }) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input {...field} ref={inputRef} className="px-4 py-2" />
+                <Input
+                  {...field}
+                  ref={inputRef}
+                  onKeyDown={onKeyDown}
+                  className="px-4 py-2"
+                />
               </FormControl>
             </FormItem>
           )}
@@ -117,10 +139,10 @@ export function Collection({
   collection,
   isEditing,
   onRename,
+  onRenameSubmit,
 }: CollectionProps) {
   const { id } = useParams();
   const parentId = Number(id) || null;
-  const { addMapping, removeMapping } = useContext(KeyboardContext);
 
   const variant = parentId === collection.id ? "secondary" : "ghost";
 
@@ -137,7 +159,7 @@ export function Collection({
     <ContextMenu>
       <ContextMenuTrigger>
         {isEditing ? (
-          <RenameForm name={collection.name} />
+          <RenameForm name={collection.name} onRenameSubmit={onRenameSubmit} />
         ) : (
           <Link
             href={`/collections/${collection.id}`}

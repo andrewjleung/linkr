@@ -39,10 +39,14 @@ export const KeyboardContext = createContext<KeyboardContext>({
   removeMapping: () => {},
 });
 
-export const KEYPRESSES: Record<"new" | "escape" | "command", KeyPress> = {
+export const KEYPRESSES: Record<
+  "new" | "escape" | "command" | "enter",
+  KeyPress
+> = {
   new: { metaKey: true, code: "KeyN" },
   escape: { metaKey: false, code: "Escape" },
   command: { metaKey: true, code: "KeyK" },
+  enter: { metaKey: false, code: "Enter" },
 };
 
 export function useKeyboard(): KeyboardContext {
