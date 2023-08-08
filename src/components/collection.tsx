@@ -46,24 +46,30 @@ import { Button } from "@/components/ui/button";
 import { safeDeleteCollection, unsafeDeleteCollection } from "@/app/actions";
 import { KEYPRESSES, KeyboardContext } from "@/hooks/use-keyboard";
 import { useParams } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const renameFormSchema = z.object({
   name: z.string().nonempty(),
 });
 
-type CollectionProps = {
-  collection: Collection;
-  isEditing: boolean;
-  onRename: () => void;
-  onRenameSubmit: (newName: string) => Promise<void>;
-};
-
 function RenameForm({
   name,
   onRenameSubmit,
+  setIsEditing,
 }: {
   name: string;
   onRenameSubmit: (newName: string) => Promise<void>;
+  setIsEditing: (isEditing: boolean) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -80,21 +86,21 @@ function RenameForm({
   });
 
   function onSubmit(values: z.infer<typeof renameFormSchema>) {
-    if (values.name === name) {
-      return;
-    }
-
     onRenameSubmit(values.name);
   }
 
   const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (
     event: React.KeyboardEvent
   ) => {
-    console.log(event);
     if (event.code === "Enter") {
       onSubmit(form.getValues());
+      return;
     }
   };
+
+  function onBlur() {
+    setIsEditing(false);
+  }
 
   return (
     <Form {...form}>
@@ -109,6 +115,9 @@ function RenameForm({
                   {...field}
                   ref={inputRef}
                   onKeyDown={onKeyDown}
+                  // TODO: uncomment this when you figure out how to focus this
+                  // input on mount.
+                  // onBlur={onBlur}
                   className="px-4 py-2"
                 />
               </FormControl>
@@ -138,11 +147,17 @@ export function HomeCollection() {
 export function Collection({
   collection,
   isEditing,
-  onRename,
-  onRenameSubmit,
-}: CollectionProps) {
+  setIsEditing,
+}: {
+  collection: Collection;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
+}) {
   const { id } = useParams();
   const parentId = Number(id) || null;
+  const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { addTempMapping } = useContext(KeyboardContext);
 
   const variant = parentId === collection.id ? "secondary" : "ghost";
 
@@ -152,31 +167,72 @@ export function Collection({
     }
 
     // TODO: Ask dialog to determine unsafe/safe deletion.
+
+    setLoading(true);
     await unsafeDeleteCollection(collection.id);
+    setLoading(false);
+  }
+
+  function onRename() {
+    setIsEditing(true);
+    addTempMapping(KEYPRESSES.escape, () => setIsEditing(false));
+  }
+
+  async function onRenameSubmit(newName: string) {
+    if (newName !== collection.name) {
+      // TODO: rename it!
+    }
+
+    setIsEditing(false);
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        {isEditing ? (
-          <RenameForm name={collection.name} onRenameSubmit={onRenameSubmit} />
-        ) : (
-          <Link
-            href={`/collections/${collection.id}`}
-            className={cn(buttonVariants({ variant: variant }), "w-full")}
-          >
-            <div className="w-full">{collection.name}</div>
-          </Link>
-        )}
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-48">
-        <ContextMenuItem inset onClick={onRename}>
-          Rename
-        </ContextMenuItem>
-        <ContextMenuItem inset onClick={onClickDelete}>
-          Delete
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          {isEditing ? (
+            <RenameForm
+              name={collection.name}
+              onRenameSubmit={onRenameSubmit}
+              setIsEditing={setIsEditing}
+            />
+          ) : (
+            <Link
+              href={`/collections/${collection.id}`}
+              className={cn(buttonVariants({ variant: variant }), "w-full")}
+            >
+              <div className="w-full">{collection.name}</div>
+            </Link>
+          )}
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-48">
+          <ContextMenuItem inset onClick={onRename}>
+            Rename
+          </ContextMenuItem>
+          <ContextMenuItem inset onClick={() => setDeleteAlertIsOpen(true)}>
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+      <AlertDialog open={deleteAlertIsOpen} onOpenChange={setDeleteAlertIsOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete {collection.name}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Deleting this collection will delete all nested collections and
+              links. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onClickDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
