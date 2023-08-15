@@ -10,13 +10,13 @@ async function Links({ parentId }: { parentId: CollectionModel["parentId"] }) {
   return (
     <>
       {links.length > 0 ? (
-        <ul className="mt-4 space-y-2">
+        <div className="mt-4 flex flex-col gap-4">
           {links
             .sort((a, b) => a.url.localeCompare(b.url))
             .map((l) => (
               <LinkComponent key={`link-${l.id}`} link={l} />
             ))}
-        </ul>
+        </div>
       ) : (
         <div className="flex h-1/4 w-full flex-col items-center justify-center gap-2">
           <h1 className="text-4xl">There&apos;s nothing here! 🙀</h1>
@@ -55,10 +55,8 @@ export default function LinksView({
 }) {
   return (
     <>
-      <div className="col-span-3">
-        <CreateLinkForm parentId={parentId} />
-        {loading ? <LinksSkeleton /> : <Links parentId={parentId} />}
-      </div>
+      <CreateLinkForm parentId={parentId} />
+      {loading ? <LinksSkeleton /> : <Links parentId={parentId} />}
     </>
   );
 }

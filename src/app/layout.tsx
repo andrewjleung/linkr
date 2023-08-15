@@ -41,12 +41,12 @@ export default async function RootLayout({
                 </div>
               </div>
               <Separator />
-              <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-4 gap-8 p-8">
+              <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-3 gap-8 p-8">
                 <div className="col-span-1">
                   <CreateCollectionForm />
                   <Collections collections={collections} />
                 </div>
-                {children}
+                <div className="col-span-2">{children}</div>
               </div>
             </main>
           </KeyboardProvider>
