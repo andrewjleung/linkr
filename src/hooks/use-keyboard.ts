@@ -1,118 +1,46 @@
-import {
-  useEffect,
-  createContext,
-  useState,
-  useCallback,
-  useContext,
-} from "react";
+import { useEffect, useCallback, useRef, useLayoutEffect } from "react";
 
 export type KeyPress = {
   metaKey: KeyboardEvent["metaKey"];
   code: KeyboardEvent["code"];
 };
 
-export type KeyboardMapping = Record<
-  string,
-  (() => void) | (() => Promise<void>)
->;
+export const useKeyPress = (
+  keyPress: KeyPress,
+  callback: (event: KeyboardEvent) => void,
+  disabled: boolean = false,
+  node = null
+) => {
+  // implement the callback ref pattern
+  const callbackRef = useRef(callback);
+  useLayoutEffect(() => {
+    callbackRef.current = callback;
+  });
 
-export type KeyboardContext = {
-  addMapping: (
-    keyPress: KeyPress,
-    callback: (() => void) | (() => Promise<void>)
-  ) => () => void;
-  addTempMapping: (
-    keyPress: KeyPress,
-    callback: (() => void) | (() => Promise<void>)
-  ) => void;
-  removeMapping: (keyPress: KeyPress) => void;
-};
-
-export const KeyboardContext = createContext<KeyboardContext>({
-  addMapping:
-    (keyPress: KeyPress, callback: (() => void) | (() => Promise<void>)) =>
-    () => {},
-  addTempMapping: (
-    keyPress: KeyPress,
-    callback: (() => void) | (() => Promise<void>)
-  ) => {},
-  removeMapping: () => {},
-});
-
-export const KEYPRESSES: Record<
-  "new" | "escape" | "command" | "enter",
-  KeyPress
-> = {
-  new: { metaKey: true, code: "KeyN" },
-  escape: { metaKey: false, code: "Escape" },
-  command: { metaKey: true, code: "KeyK" },
-  enter: { metaKey: false, code: "Enter" },
-};
-
-export function useKeyboard(): KeyboardContext {
-  const [mappings, setMappings] = useState<KeyboardMapping>({});
-  console.log(mappings);
+  // handle what happens on key press
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      // check if one of the key is part of the ones we want
+      if (event.metaKey === keyPress.metaKey && event.code === keyPress.code) {
+        callbackRef.current(event);
+      }
+    },
+    [keyPress]
+  );
 
   useEffect(() => {
-    const callback = (event: KeyboardEvent) => {
-      const keypressString = JSON.stringify({
-        metaKey: event.metaKey,
-        code: event.code,
-      });
+    if (disabled) {
+      return;
+    }
 
-      if (keypressString in mappings) {
-        mappings[keypressString]();
-      }
-    };
+    // target is either the provided node or the document
+    const targetNode = node ?? document;
+    // attach the event listener
+    targetNode && targetNode.addEventListener("keydown", handleKeyPress);
 
-    document.addEventListener("keydown", callback);
-
+    // remove the event listener
     return () => {
-      document.removeEventListener("keydown", callback);
+      targetNode && targetNode.removeEventListener("keydown", handleKeyPress);
     };
-  }, [mappings]);
-
-  const removeMapping = useCallback((keyPress: KeyPress) => {
-    const keypressString = JSON.stringify(keyPress);
-
-    setMappings((mappings) =>
-      Object.keys(mappings)
-        .filter((k) => k !== keypressString)
-        .reduce<KeyboardMapping>((acc, k) => ({ ...acc, [k]: mappings[k] }), {})
-    );
-  }, []);
-
-  const addMapping = useCallback(
-    (keyPress: KeyPress, callback: (() => void) | (() => Promise<void>)) => {
-      const keypressString = JSON.stringify(keyPress);
-
-      setMappings((mappings) => ({ ...mappings, [keypressString]: callback }));
-
-      return () => {
-        removeMapping(keyPress);
-      };
-    },
-    [removeMapping]
-  );
-
-  const addTempMapping = useCallback(
-    (keyPress: KeyPress, callback: (() => void) | (() => Promise<void>)) => {
-      const keypressString = JSON.stringify(keyPress);
-
-      setMappings((mappings) => ({
-        ...mappings,
-        [keypressString]: () => {
-          callback();
-          removeMapping(keyPress);
-        },
-      }));
-    },
-    [removeMapping]
-  );
-
-  return {
-    addMapping,
-    addTempMapping,
-    removeMapping,
-  };
-}
+  }, [disabled, handleKeyPress, node]);
+};

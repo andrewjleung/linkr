@@ -1,5 +1,3 @@
-"use client";
-
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,6 +13,15 @@ import { Input } from "@/components/ui/input";
 import { createLink } from "../app/actions";
 import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const linkSchema = z.object({
   title: z.optional(z.string()),
@@ -28,7 +35,15 @@ const DEFAULT_FORM_VALUES = {
   tags: [],
 };
 
-export function CreateLinkForm({ parentId }: { parentId: number | null }) {
+export function CreateLinkForm({
+  parentId,
+  open,
+  setOpen,
+}: {
+  parentId: number | null;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof linkSchema>>({
@@ -55,42 +70,50 @@ export function CreateLinkForm({ parentId }: { parentId: number | null }) {
 
     setLoading(false);
     form.reset(DEFAULT_FORM_VALUES);
+    setOpen(false);
     // TODO: create tags as well...
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-row items-center justify-center"
-      >
-        <FormField
-          control={form.control}
-          name="url"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* TODO: this button isn't the right width for some reason... */}
-        <Button
-          disabled={loading}
-          variant="outline"
-          size="icon"
-          type="submit"
-          className="mb-auto ml-4"
-        >
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Plus className="h-4 w-4" />
-          )}
-        </Button>
-      </form>
-    </Form>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Link</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-row items-center justify-center"
+          >
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+        <DialogFooter>
+          <Button
+            disabled={loading}
+            size="icon"
+            className="mb-auto ml-4"
+            onClick={form.handleSubmit(onSubmit)}
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

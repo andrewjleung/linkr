@@ -48,7 +48,7 @@ import {
   safeDeleteCollection,
   unsafeDeleteCollection,
 } from "@/app/actions";
-import { KEYPRESSES, KeyboardContext } from "@/hooks/use-keyboard";
+import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParams } from "next/navigation";
 import {
   AlertDialog,
@@ -61,6 +61,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useParentCollection } from "@/hooks/use-parent-collection";
 
 const renameFormSchema = z.object({
   name: z.string().nonempty(),
@@ -134,8 +135,7 @@ function RenameForm({
 }
 
 export function HomeCollection() {
-  const { id } = useParams();
-  const parentId = Number(id) || null;
+  const parentId = useParentCollection();
   const variant = parentId === null ? "secondary" : "ghost";
 
   return (
@@ -170,12 +170,15 @@ export function Collection({
   const parentId = Number(id) || null;
   const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { addTempMapping } = useContext(KeyboardContext);
   const [displayName, setDisplayName] = useState("");
 
   useEffect(() => {
     setDisplayName(collection.name);
   }, [setDisplayName, collection.name]);
+
+  useKeyPress({ metaKey: false, code: "Escape" }, () => {
+    setIsEditing(false);
+  });
 
   const variant = parentId === collection.id ? "secondary" : "ghost";
 
@@ -195,7 +198,6 @@ export function Collection({
 
   function onRename() {
     setIsEditing(true);
-    addTempMapping(KEYPRESSES.escape, () => setIsEditing(false));
   }
 
   async function onRenameSubmit(newName: string) {

@@ -49,7 +49,6 @@ import {
   safeDeleteCollection,
   unsafeDeleteCollection,
 } from "@/app/actions";
-import { KEYPRESSES, KeyboardContext } from "@/hooks/use-keyboard";
 import { useParams } from "next/navigation";
 import {
   AlertDialog,
@@ -75,6 +74,8 @@ import Link from "next/link";
 export default function LinkComponent({ link }: { link: LinkModel }) {
   const [loading, setLoading] = useState(false);
 
+  function onClickEdit() {}
+
   async function onClickDelete() {
     setLoading(true);
     await deleteLink(link.id);
@@ -82,25 +83,32 @@ export default function LinkComponent({ link }: { link: LinkModel }) {
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <Link href={link.url}>
-          <Card className="hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-50">
-            <CardHeader>
-              {link.title === null ? null : <CardTitle>{link.title}</CardTitle>}
-              <CardDescription>{link.url}</CardDescription>
-            </CardHeader>
-            {link.description === null ? null : (
-              <CardContent>{link.description}</CardContent>
-            )}
-          </Card>
-        </Link>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem inset onClick={onClickDelete}>
-          Delete
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <Link href={link.url}>
+            <Card className="ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
+              <CardHeader>
+                {link.title === null ? null : (
+                  <CardTitle>{link.title}</CardTitle>
+                )}
+                <CardDescription>{link.url}</CardDescription>
+              </CardHeader>
+              {link.description === null ? null : (
+                <CardContent>{link.description}</CardContent>
+              )}
+            </Card>
+          </Link>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem inset onClick={onClickEdit}>
+            Edit
+          </ContextMenuItem>
+          <ContextMenuItem inset onClick={onClickDelete}>
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    </>
   );
 }
