@@ -44,6 +44,7 @@ specifiers:
   date-fns: ^2.30.0
   eslint: 8.43.0
   eslint-config-next: 13.4.7
+  jotai: ^2.4.1
   lucide-react: ^0.249.0
   next: 13.4.7
   next-auth: ^4.22.1
@@ -105,6 +106,7 @@ dependencies:
   date-fns: 2.30.0
   eslint: 8.43.0
   eslint-config-next: 13.4.7_7yfldhli4vs6yywnkyiujhawka
+  jotai: 2.4.1_kipdvjt52frzxcrtuwg5whlwdi
   lucide-react: 0.249.0_react@18.2.0
   next: 13.4.7_biqbaboplfbrettd7655fr4n2y
   next-auth: 4.22.1_5v7kwk6wz2hvmegftnptprfjvm
@@ -3381,6 +3383,22 @@ packages:
 
   /jose/4.14.4:
     resolution: {integrity: sha512-j8GhLiKmUAh+dsFXlX1aJCbt5KMibuKb+d7j1JaOJG6s2UjX1PQlW+OKB/sD4a/5ZYF4RcmYmLSndOoU3Lt/3g==}
+    dev: false
+
+  /jotai/2.4.1_kipdvjt52frzxcrtuwg5whlwdi:
+    resolution: {integrity: sha512-S4CTLpsZV+LABBXL5PgkMl+5jK3ljfbWmcLqtN7CQ2vio/Hrg3T6IKk/vf2/9hnp1imTPDsaFv7D54de/7Sa+w==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      '@types/react': 18.2.13
+      react: 18.2.0
     dev: false
 
   /js-tokens/4.0.0:

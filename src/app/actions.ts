@@ -1,9 +1,13 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
+import { Prisma, Link } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
+export async function getLinks(parentId?: number): Promise<Link[]> {
+  return prisma.link.findMany({ where: { parentId: parentId || null } });
+}
 
 export async function createLink(link: Prisma.LinkUncheckedCreateInput) {
   const result = await prisma.link.create({ data: link });

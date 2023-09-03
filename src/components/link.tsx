@@ -1,5 +1,4 @@
 import { Link as LinkModel } from "@prisma/client";
-import { cn } from "@/lib/utils";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -70,20 +69,13 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
-export default function LinkComponent({
-  link,
-  deleteLink,
-}: {
-  link: LinkModel;
-  deleteLink: (id: number) => Promise<void>;
-}) {
+export default function LinkComponent({ link }: { link: LinkModel }) {
   const [loading, setLoading] = useState(false);
 
   function onClickEdit() {}
 
   async function onClickDelete() {
     setLoading(true);
-    await deleteLink(link.id);
     setLoading(false);
   }
 
