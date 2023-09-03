@@ -7,6 +7,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -24,10 +25,10 @@ import {
 } from "@/components/ui/dialog";
 
 const linkSchema = z.object({
-  title: z.optional(z.string()),
+  title: z.optional(z.string().trim()),
   description: z.optional(z.string()),
-  url: z.string().url(),
-  tags: z.array(z.string()),
+  url: z.string().trim().url(),
+  tags: z.array(z.string().trim()),
 });
 
 const DEFAULT_FORM_VALUES = {
@@ -81,15 +82,26 @@ export function CreateLinkForm({
           <DialogTitle>Create Link</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-row items-center justify-center"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="url"
               render={({ field }) => (
                 <FormItem className="w-full">
+                  <FormLabel>URL</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

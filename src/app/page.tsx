@@ -1,12 +1,13 @@
 import { Links } from "@/components/links";
 import LinksView from "@/components/links-view";
+import prisma from "@/lib/prisma";
 
-export default async function Home({ params }: { params: { id: string } }) {
-  const parentId = Number(params.id) || null;
+export default async function Home() {
+  const links = await prisma.link.findMany({ where: { parentId: null } });
 
   return (
     <LinksView>
-      <Links parentId={parentId} />
+      <Links links={links} />
     </LinksView>
   );
 }

@@ -1,23 +1,55 @@
-import prisma from "@/lib/prisma";
-import LinkComponent from "@/components/link";
-import { Collection as CollectionModel } from "@prisma/client";
-import { Skeleton } from "./ui/skeleton";
+"use client";
 
-export async function Links({
-  parentId,
-}: {
-  parentId: CollectionModel["parentId"];
-}) {
-  const links = await prisma.link.findMany({ where: { parentId } });
+import LinkComponent from "@/components/link";
+import {
+  Collection as CollectionModel,
+  Link as LinkModel,
+} from "@prisma/client";
+import { Skeleton } from "./ui/skeleton";
+import { experimental_useOptimistic as useOptimistic } from "react";
+import { deleteLink } from "@/app/actions";
+
+type OptimisticLinkAdd = {
+  type: "add";
+  link: LinkModel;
+};
+
+type OptimisticLinkDelete = {
+  type: "delete";
+  id: LinkModel["id"];
+};
+
+type OptimisticLinkUpdate = OptimisticLinkAdd | OptimisticLinkDelete;
+
+export async function Links({ links }: { links: LinkModel[] }) {
+  const [optimisticLinks, updateOptimisticLinks] = useOptimistic<
+    LinkModel[],
+    OptimisticLinkUpdate
+  >(links, (state: LinkModel[], update: OptimisticLinkUpdate) => {
+    if (update.type === "add") {
+      return [...state, update.link];
+    }
+
+    return state.filter((l) => l.id !== update.id);
+  });
+
+  async function deleteLinkWithOptimistic(id: number) {
+    updateOptimisticLinks({ type: "delete", id });
+    await deleteLink(id);
+  }
 
   return (
     <>
-      {links.length > 0 ? (
+      {optimisticLinks.length > 0 ? (
         <div className="flex flex-col gap-4">
-          {links
+          {optimisticLinks
             .sort((a, b) => a.url.localeCompare(b.url))
             .map((l) => (
-              <LinkComponent key={`link-${l.id}`} link={l} />
+              <LinkComponent
+                key={`link-${l.id}`}
+                link={l}
+                deleteLink={deleteLinkWithOptimistic}
+              />
             ))}
         </div>
       ) : (

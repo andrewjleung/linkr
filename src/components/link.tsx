@@ -1,5 +1,3 @@
-"use client";
-
 import { Link as LinkModel } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +27,7 @@ import {
   Dispatch,
   SetStateAction,
   KeyboardEventHandler,
+  experimental_useOptimistic as useOptimistic,
 } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,7 +70,13 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
-export default function LinkComponent({ link }: { link: LinkModel }) {
+export default function LinkComponent({
+  link,
+  deleteLink,
+}: {
+  link: LinkModel;
+  deleteLink: (id: number) => Promise<void>;
+}) {
   const [loading, setLoading] = useState(false);
 
   function onClickEdit() {}
