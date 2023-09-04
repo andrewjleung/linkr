@@ -1,20 +1,14 @@
-"use client";
-
 import LinkComponent from "@/components/link";
-import {
-  Collection as CollectionModel,
-  Link as LinkModel,
-} from "@prisma/client";
+import { Link as LinkModel } from "@prisma/client";
 import { Skeleton } from "./ui/skeleton";
-import { useOptimisticLinks } from "@/hooks/use-optimistic-links";
 
 export async function Links({
-  links: unoptimisticLinks,
+  links,
+  removeLink,
 }: {
   links: LinkModel[];
+  removeLink: (id: number) => Promise<void>;
 }) {
-  const { links } = useOptimisticLinks(unoptimisticLinks);
-
   return (
     <>
       {links.length > 0 ? (
@@ -22,7 +16,11 @@ export async function Links({
           {links
             .sort((a, b) => a.url.localeCompare(b.url))
             .map((l) => (
-              <LinkComponent key={`link-${l.id}`} link={l} />
+              <LinkComponent
+                key={`link-${l.id}`}
+                link={l}
+                removeLink={removeLink}
+              />
             ))}
         </div>
       ) : (

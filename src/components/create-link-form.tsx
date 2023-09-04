@@ -23,6 +23,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useParentCollection } from "@/hooks/use-parent-collection";
+import { Link } from "@prisma/client";
+import { useKeyPress } from "@/hooks/use-keyboard";
 
 const linkSchema = z.object({
   title: z.optional(z.string().trim()),
@@ -37,15 +40,43 @@ const DEFAULT_FORM_VALUES = {
 };
 
 export function CreateLinkForm({
-  parentId,
+  addLink,
+}: {
+  addLink: (link: Link) => Promise<void>;
+}) {
+  const [createLinkFormIsOpen, setCreateLinkFormIsOpen] = useState(false);
+  const parentId = useParentCollection();
+
+  useKeyPress(
+    { metaKey: false, code: "KeyQ" },
+    (event) => {
+      event.preventDefault();
+      setCreateLinkFormIsOpen(true);
+    },
+    createLinkFormIsOpen
+  );
+
+  return (
+    <CreateLinkFormInner
+      key={`${parentId}-${createLinkFormIsOpen}`}
+      open={createLinkFormIsOpen}
+      setOpen={setCreateLinkFormIsOpen}
+      addLink={addLink}
+    />
+  );
+}
+
+function CreateLinkFormInner({
   open,
   setOpen,
+  addLink,
 }: {
-  parentId: number | null;
   open: boolean;
   setOpen: (open: boolean) => void;
+  addLink: (link: Link) => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
+  const parentId = useParentCollection();
 
   const form = useForm<z.infer<typeof linkSchema>>({
     resolver: zodResolver(linkSchema),

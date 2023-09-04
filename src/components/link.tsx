@@ -1,4 +1,7 @@
+"use client";
+
 import { Link as LinkModel } from "@prisma/client";
+import { cn } from "@/lib/utils";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -40,14 +43,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import {
-  deleteLink,
-  renameCollection,
-  safeDeleteCollection,
-  unsafeDeleteCollection,
-} from "@/app/actions";
-import { useParams } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,13 +64,20 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
-export default function LinkComponent({ link }: { link: LinkModel }) {
+export default function LinkComponent({
+  link,
+  removeLink,
+}: {
+  link: LinkModel;
+  removeLink: (id: number) => Promise<void>;
+}) {
   const [loading, setLoading] = useState(false);
 
   function onClickEdit() {}
 
   async function onClickDelete() {
     setLoading(true);
+    await removeLink(link.id);
     setLoading(false);
   }
 

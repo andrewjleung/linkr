@@ -1,4 +1,4 @@
-import { createLink } from "@/app/actions";
+import { createLink, deleteLink } from "@/app/actions";
 import { Link } from "@prisma/client";
 import { experimental_useOptimistic as useOptimistic } from "react";
 
@@ -17,7 +17,7 @@ type OptimisticLinkUpdate = OptimisticLinkAdd | OptimisticLinkDelete;
 type OptimisticLinks = {
   links: Link[];
   addLink: (link: Link) => Promise<void>;
-  deleteLink: (id: number) => Promise<void>;
+  removeLink: (id: number) => Promise<void>;
 };
 
 export function useOptimisticLinks(links: Link[]): OptimisticLinks {
@@ -37,7 +37,7 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
     await createLink(link);
   }
 
-  async function deleteLink(id: number) {
+  async function removeLink(id: number) {
     updateOptimisticLinks({ type: "delete", id });
     await deleteLink(id);
   }
@@ -45,6 +45,6 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
   return {
     links: optimisticLinks,
     addLink,
-    deleteLink,
+    removeLink,
   };
 }
