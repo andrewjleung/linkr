@@ -27,10 +27,35 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { Link } from "@prisma/client";
 import { useKeyPress } from "@/hooks/use-keyboard";
 
+function isUrl(s: string): boolean {
+  try {
+    new URL(s);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 const linkSchema = z.object({
   title: z.optional(z.string().trim()),
   description: z.optional(z.string()),
-  url: z.string().trim().url(),
+  url: z
+    .string()
+    .trim()
+    .transform((val) => {
+      if (isUrl(val)) {
+        return val;
+      }
+
+      const valWithSchemePrefix = `https://${val}`;
+
+      if (isUrl(valWithSchemePrefix)) {
+        return valWithSchemePrefix;
+      }
+
+      return val;
+    })
+    .pipe(z.string().url()),
   tags: z.array(z.string().trim()),
 });
 
@@ -140,22 +165,22 @@ function CreateLinkFormInner({
                 </FormItem>
               )}
             />
+            <div className="flex justify-end">
+              <Button
+                disabled={loading}
+                size="icon"
+                className="mt-4"
+                type="submit"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </form>
         </Form>
-        <DialogFooter>
-          <Button
-            disabled={loading}
-            size="icon"
-            className="mb-auto ml-4"
-            onClick={form.handleSubmit(onSubmit)}
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4" />
-            )}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
