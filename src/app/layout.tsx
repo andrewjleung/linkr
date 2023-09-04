@@ -27,7 +27,7 @@ export default async function RootLayout({
       <body
         className={clsx(
           inter.className,
-          "flex h-screen w-screen items-center justify-center dark:bg-neutral-950"
+          "flex items-center justify-center dark:bg-neutral-950"
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

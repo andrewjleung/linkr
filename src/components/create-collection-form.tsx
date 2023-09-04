@@ -15,6 +15,17 @@ import { Input } from "@/components/ui/input";
 import { createCollection } from "../app/actions";
 import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useKeyPress } from "@/hooks/use-keyboard";
+import { useParentCollection } from "@/hooks/use-parent-collection";
 
 const collectionSchema = z.object({
   name: z.string().nonempty(),
@@ -25,6 +36,34 @@ const DEFAULT_FORM_VALUES = {
 };
 
 export function CreateCollectionForm() {
+  const [formIsOpen, setFormIsOpen] = useState(false);
+  const parentId = useParentCollection();
+
+  useKeyPress(
+    { shiftKey: true, metaKey: false, code: "KeyQ" },
+    (event) => {
+      event.preventDefault();
+      setFormIsOpen(true);
+    },
+    formIsOpen
+  );
+
+  return (
+    <CreateCollectionFormInner
+      key={`create-collection-form-${parentId}-${formIsOpen}`}
+      open={formIsOpen}
+      setOpen={setFormIsOpen}
+    />
+  );
+}
+
+function CreateCollectionFormInner({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof collectionSchema>>({
@@ -48,41 +87,48 @@ export function CreateCollectionForm() {
 
     setLoading(false);
     form.reset(DEFAULT_FORM_VALUES);
+    setOpen(false);
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-row items-center justify-center"
-      >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* TODO: this button isn't the right width for some reason... */}
-        <Button
-          disabled={loading}
-          variant="outline"
-          size="icon"
-          type="submit"
-          className="mb-auto ml-4"
-        >
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Plus className="h-4 w-4" />
-          )}
-        </Button>
-      </form>
-    </Form>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add a new collection</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-row items-center justify-center"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              disabled={loading}
+              variant="outline"
+              size="icon"
+              type="submit"
+              className="mb-auto ml-4"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+            </Button>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,9 +1,6 @@
 import { useEffect, useCallback, useRef, useLayoutEffect } from "react";
 
-export type KeyPress = {
-  metaKey: KeyboardEvent["metaKey"];
-  code: KeyboardEvent["code"];
-};
+export type KeyPress = Pick<KeyboardEvent, "shiftKey" | "metaKey" | "code">;
 
 export const useKeyPress = (
   keyPress: KeyPress,
@@ -21,7 +18,11 @@ export const useKeyPress = (
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       // check if one of the key is part of the ones we want
-      if (event.metaKey === keyPress.metaKey && event.code === keyPress.code) {
+      if (
+        event.shiftKey === keyPress.shiftKey &&
+        event.metaKey === keyPress.metaKey &&
+        event.code === keyPress.code
+      ) {
         callbackRef.current(event);
       }
     },

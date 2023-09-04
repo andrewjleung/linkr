@@ -26,6 +26,7 @@ import {
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { Link } from "@prisma/client";
 import { useKeyPress } from "@/hooks/use-keyboard";
+import { Textarea } from "@/components/ui/textarea";
 
 function isUrl(s: string): boolean {
   try {
@@ -73,7 +74,7 @@ export function CreateLinkForm({
   const parentId = useParentCollection();
 
   useKeyPress(
-    { metaKey: false, code: "KeyQ" },
+    { shiftKey: false, metaKey: false, code: "KeyQ" },
     (event) => {
       event.preventDefault();
       setCreateLinkFormIsOpen(true);
@@ -135,10 +136,23 @@ function CreateLinkFormInner({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Link</DialogTitle>
+          <DialogTitle>Add a new link</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>URL</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="title"
@@ -154,12 +168,12 @@ function CreateLinkFormInner({
             />
             <FormField
               control={form.control}
-              name="url"
+              name="description"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>URL</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Textarea {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -169,7 +183,7 @@ function CreateLinkFormInner({
               <Button
                 disabled={loading}
                 size="icon"
-                className="mt-4"
+                className="mt-2"
                 type="submit"
               >
                 {loading ? (

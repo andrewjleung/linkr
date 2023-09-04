@@ -15,7 +15,7 @@ export function Collections({
   );
 
   return (
-    <div className="mt-4 flex flex-col space-y-2">
+    <div className="flex flex-col space-y-2">
       <HomeCollection />
       <Separator />
       {collections
