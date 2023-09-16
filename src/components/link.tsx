@@ -94,7 +94,9 @@ export default function LinkComponent({
                 <CardDescription>{link.url}</CardDescription>
               </CardHeader>
               {link.description === null ? null : (
-                <CardContent>{link.description}</CardContent>
+                <CardContent className="whitespace-pre-wrap">
+                  {link.description}
+                </CardContent>
               )}
             </Card>
           </Link>

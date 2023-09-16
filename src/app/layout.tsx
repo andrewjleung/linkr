@@ -4,9 +4,8 @@ import clsx from "clsx";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Separator } from "@/components/ui/separator";
-import { CreateCollectionForm } from "@/components/create-collection-form";
-import { Collections } from "@/components/collections";
 import prisma from "@/lib/prisma";
+import { CollectionsView } from "@/components/collections-view";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +19,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const collections = await prisma.collection.findMany();
+  const unoptimisticCollections = await prisma.collection.findMany();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -41,8 +40,9 @@ export default async function RootLayout({
             <Separator />
             <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-3 gap-8 p-8">
               <div className="col-span-1">
-                <CreateCollectionForm />
-                <Collections collections={collections} />
+                <CollectionsView
+                  unoptimisticCollections={unoptimisticCollections}
+                />
               </div>
               <div className="col-span-2">{children}</div>
             </div>

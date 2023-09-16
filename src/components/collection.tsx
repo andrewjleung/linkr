@@ -1,4 +1,4 @@
-import { Collection } from "@prisma/client";
+import { Collection, Prisma } from "@prisma/client";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,11 +43,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import {
-  renameCollection,
-  safeDeleteCollection,
-  unsafeDeleteCollection,
-} from "@/app/actions";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParams } from "next/navigation";
 import {
@@ -62,6 +57,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
+import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
 
 const renameFormSchema = z.object({
   name: z.string().nonempty(),
@@ -158,16 +154,67 @@ function LoadingIndicator() {
 }
 
 export function Collection({
+  optimisticCollection,
+  editingCollection,
+  setEditingCollection,
+  unsafeRemoveCollection,
+  renameCollection,
+}: {
+  optimisticCollection: OptimisticCollection;
+  editingCollection: number | null;
+  setEditingCollection: (editingCollection: number | null) => void;
+  unsafeRemoveCollection: (id: number) => Promise<void>;
+  renameCollection: (id: number, newName: string) => Promise<void>;
+}) {
+  if (optimisticCollection.type === "abstract") {
+    return <AbstractCollection collection={optimisticCollection.collection} />;
+  }
+
+  const concreteCollectionProps: React.ComponentProps<
+    typeof ConcreteCollection
+  > = {
+    collection: optimisticCollection.collection,
+    isEditing: editingCollection === optimisticCollection.collection.id,
+    setIsEditing: (isEditing: boolean) =>
+      isEditing
+        ? setEditingCollection(optimisticCollection.collection.id)
+        : setEditingCollection(null),
+    unsafeRemoveCollection,
+    renameCollection,
+  };
+
+  return <ConcreteCollection {...concreteCollectionProps} />;
+}
+
+function AbstractCollection({
+  collection,
+}: {
+  collection: Prisma.CollectionCreateInput;
+}) {
+  return (
+    <Button
+      className={cn(buttonVariants({ variant: "ghost" }), "relative w-full")}
+    >
+      <div className="w-full">{collection.name}</div>
+      <LoadingIndicator />
+    </Button>
+  );
+}
+
+function ConcreteCollection({
   collection,
   isEditing,
   setIsEditing,
+  unsafeRemoveCollection,
+  renameCollection,
 }: {
   collection: Collection;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  unsafeRemoveCollection: (id: number) => Promise<void>;
+  renameCollection: (id: number, newName: string) => Promise<void>;
 }) {
-  const { id } = useParams();
-  const parentId = Number(id) || null;
+  const parentId = useParentCollection();
   const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [displayName, setDisplayName] = useState("");
@@ -176,21 +223,17 @@ export function Collection({
     setDisplayName(collection.name);
   }, [setDisplayName, collection.name]);
 
-  useKeyPress({ metaKey: false, code: "Escape" }, () => {
+  useKeyPress({ shiftKey: false, metaKey: false, code: "Escape" }, () => {
     setIsEditing(false);
   });
 
   const variant = parentId === collection.id ? "secondary" : "ghost";
 
   async function onClickDelete() {
-    if (id === null) {
-      return;
-    }
-
     // TODO: Ask dialog to determine unsafe/safe deletion.
 
     setLoading(true);
-    await unsafeDeleteCollection(collection.id);
+    await unsafeRemoveCollection(collection.id);
     // TODO: Don't set loading to false so that it lasts as long as the
     // component still remains. This could cause a bug but seems okay for now.
     // Change this when you figure out how to do things optimistically.

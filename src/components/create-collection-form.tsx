@@ -1,5 +1,3 @@
-"use client";
-
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -12,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createCollection } from "../app/actions";
 import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import {
@@ -26,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParentCollection } from "@/hooks/use-parent-collection";
+import { Prisma } from "@prisma/client";
 
 const collectionSchema = z.object({
   name: z.string().nonempty(),
@@ -35,7 +33,11 @@ const DEFAULT_FORM_VALUES = {
   name: "",
 };
 
-export function CreateCollectionForm() {
+export function CreateCollectionForm({
+  addCollection,
+}: {
+  addCollection: (collection: Prisma.CollectionCreateInput) => Promise<void>;
+}) {
   const [formIsOpen, setFormIsOpen] = useState(false);
   const parentId = useParentCollection();
 
@@ -53,6 +55,7 @@ export function CreateCollectionForm() {
       key={`create-collection-form-${parentId}-${formIsOpen}`}
       open={formIsOpen}
       setOpen={setFormIsOpen}
+      addCollection={addCollection}
     />
   );
 }
@@ -60,9 +63,11 @@ export function CreateCollectionForm() {
 function CreateCollectionFormInner({
   open,
   setOpen,
+  addCollection,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
+  addCollection: (collection: Prisma.CollectionCreateInput) => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -75,7 +80,7 @@ function CreateCollectionFormInner({
     setLoading(true);
 
     // TODO: handle failure case
-    await createCollection({
+    await addCollection({
       name: values.name,
     })
       .then((collection) => {

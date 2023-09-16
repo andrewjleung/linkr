@@ -1,14 +1,16 @@
-"use client";
-
 import { Collection, HomeCollection } from "@/components/collection";
-import { Collection as CollectionModel } from "@prisma/client";
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
+import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
 
 export function Collections({
-  collections,
+  optimisticCollections,
+  unsafeRemoveCollection,
+  renameCollection,
 }: {
-  collections: CollectionModel[];
+  optimisticCollections: OptimisticCollection[];
+  unsafeRemoveCollection: (id: number) => Promise<void>;
+  renameCollection: (id: number, newName: string) => Promise<void>;
 }) {
   const [editingCollection, setEditingCollection] = useState<number | null>(
     null
@@ -18,16 +20,20 @@ export function Collections({
     <div className="flex flex-col space-y-2">
       <HomeCollection />
       <Separator />
-      {collections
-        .sort((a, b) => a.name.localeCompare(b.name))
+      {optimisticCollections
+        .sort((a, b) => a.collection.name.localeCompare(b.collection.name))
         .map((c) => (
           <Collection
-            key={`collection-${c.id}`}
-            collection={c}
-            isEditing={editingCollection === c.id}
-            setIsEditing={(isEditing: boolean) =>
-              setEditingCollection(isEditing ? c.id : null)
+            key={
+              c.type === "abstract"
+                ? `abstract-collection-${c.tempId}`
+                : `concrete-collection-${c.collection.id}`
             }
+            optimisticCollection={c}
+            editingCollection={editingCollection}
+            setEditingCollection={setEditingCollection}
+            unsafeRemoveCollection={unsafeRemoveCollection}
+            renameCollection={renameCollection}
           />
         ))}
     </div>
