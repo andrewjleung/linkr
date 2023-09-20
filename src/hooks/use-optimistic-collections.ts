@@ -47,6 +47,49 @@ type OptimisticCollections = {
   renameCollection: (id: number, newName: string) => Promise<void>;
 };
 
+function handleAdd(
+  state: OptimisticCollection[]
+): (add: CollectionAdd) => OptimisticCollection[] {
+  return ({ collection }) => [
+    ...state,
+    {
+      type: "abstract",
+      tempId: crypto.randomUUID(),
+      collection,
+    } satisfies AbstractCollection,
+  ];
+}
+
+function handleDelete(
+  state: OptimisticCollection[]
+): (del: CollectionDelete) => OptimisticCollection[] {
+  return ({ id }) =>
+    state.filter((c) => c.type === "abstract" || c.collection.id !== id);
+}
+
+function handleRename(
+  state: OptimisticCollection[]
+): (rename: CollectionRename) => OptimisticCollection[] {
+  return ({ id, newName }) =>
+    state.map((c) => {
+      if (c.type === "abstract") {
+        return c;
+      }
+
+      if (c.collection.id === id) {
+        return {
+          ...c,
+          collection: {
+            ...c.collection,
+            name: newName,
+          },
+        };
+      }
+
+      return c;
+    });
+}
+
 export function useOptimisticCollections(
   collections: Collection[]
 ): OptimisticCollections {
@@ -64,36 +107,9 @@ export function useOptimisticCollections(
     concreteCollections,
     (state: OptimisticCollection[], update: CollectionUpdate) =>
       match(update)
-        .with({ type: "add" }, ({ collection }) => [
-          ...state,
-          {
-            type: "abstract",
-            tempId: crypto.randomUUID(),
-            collection,
-          } satisfies AbstractCollection,
-        ])
-        .with({ type: "delete" }, ({ id }) =>
-          state.filter((c) => c.type === "abstract" || c.collection.id !== id)
-        )
-        .with({ type: "rename" }, ({ id, newName }) =>
-          state.map((c) => {
-            if (c.type === "abstract") {
-              return c;
-            }
-
-            if (c.collection.id === id) {
-              return {
-                ...c,
-                collection: {
-                  ...c.collection,
-                  name: newName,
-                },
-              };
-            }
-
-            return c;
-          })
-        )
+        .with({ type: "add" }, handleAdd(state))
+        .with({ type: "delete" }, handleDelete(state))
+        .with({ type: "rename" }, handleRename(state))
         .exhaustive()
   );
 

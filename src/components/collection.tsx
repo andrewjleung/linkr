@@ -170,20 +170,19 @@ export function Collection({
     return <AbstractCollection collection={optimisticCollection.collection} />;
   }
 
-  const concreteCollectionProps: React.ComponentProps<
-    typeof ConcreteCollection
-  > = {
-    collection: optimisticCollection.collection,
-    isEditing: editingCollection === optimisticCollection.collection.id,
-    setIsEditing: (isEditing: boolean) =>
-      isEditing
-        ? setEditingCollection(optimisticCollection.collection.id)
-        : setEditingCollection(null),
-    unsafeRemoveCollection,
-    renameCollection,
-  };
-
-  return <ConcreteCollection {...concreteCollectionProps} />;
+  return (
+    <ConcreteCollection
+      collection={optimisticCollection.collection}
+      isEditing={editingCollection === optimisticCollection.collection.id}
+      setIsEditing={(isEditing: boolean) =>
+        isEditing
+          ? setEditingCollection(optimisticCollection.collection.id)
+          : setEditingCollection(null)
+      }
+      unsafeRemoveCollection={unsafeRemoveCollection}
+      renameCollection={renameCollection}
+    />
+  );
 }
 
 function AbstractCollection({
@@ -192,10 +191,8 @@ function AbstractCollection({
   collection: Prisma.CollectionCreateInput;
 }) {
   return (
-    <Button
-      className={cn(buttonVariants({ variant: "ghost" }), "relative w-full")}
-    >
-      <div className="w-full">{collection.name}</div>
+    <Button variant="ghost" className="w-full">
+      <div className="mr-auto">{collection.name}</div>
       <LoadingIndicator />
     </Button>
   );
