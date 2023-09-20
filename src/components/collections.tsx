@@ -20,22 +20,20 @@ export function Collections({
     <div className="flex flex-col space-y-2">
       <HomeCollection />
       <Separator />
-      {optimisticCollections
-        .sort((a, b) => a.collection.name.localeCompare(b.collection.name))
-        .map((c) => (
-          <Collection
-            key={
-              c.type === "abstract"
-                ? `abstract-collection-${c.tempId}`
-                : `concrete-collection-${c.collection.id}`
-            }
-            optimisticCollection={c}
-            editingCollection={editingCollection}
-            setEditingCollection={setEditingCollection}
-            unsafeRemoveCollection={unsafeRemoveCollection}
-            renameCollection={renameCollection}
-          />
-        ))}
+      {optimisticCollections.map((c) => (
+        <Collection
+          key={
+            c.type === "abstract"
+              ? `abstract-collection-${c.tempId}`
+              : `concrete-collection-${c.collection.id}`
+          }
+          optimisticCollection={c}
+          editingCollection={editingCollection}
+          setEditingCollection={setEditingCollection}
+          unsafeRemoveCollection={unsafeRemoveCollection}
+          renameCollection={renameCollection}
+        />
+      ))}
     </div>
   );
 }
