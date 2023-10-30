@@ -1,24 +1,24 @@
 import LinkComponent from "@/components/link";
-import { Link as LinkModel } from "@prisma/client";
 import { Skeleton } from "./ui/skeleton";
+import { OptimisticLink } from "@/hooks/use-optimistic-links";
 
 export async function Links({
-  links,
+  optimisticLinks,
   removeLink,
 }: {
-  links: LinkModel[];
-  removeLink: (id: number) => Promise<void>;
+  optimisticLinks: OptimisticLink[];
+  removeLink: (id: OptimisticLink["id"]) => Promise<void>;
 }) {
   return (
     <>
-      {links.length > 0 ? (
+      {optimisticLinks.length > 0 ? (
         <div className="flex flex-col gap-4">
-          {links
-            .sort((a, b) => a.url.localeCompare(b.url))
+          {optimisticLinks
+            .sort((a, b) => a.link.url.localeCompare(b.link.url))
             .map((l) => (
               <LinkComponent
                 key={`link-${l.id}`}
-                link={l}
+                optimisticLink={l}
                 removeLink={removeLink}
               />
             ))}

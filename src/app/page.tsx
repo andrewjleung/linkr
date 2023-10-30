@@ -2,7 +2,7 @@ import LinksView from "@/components/links-view";
 import { getLinks } from "./actions";
 
 export default async function Home() {
-  const links = await getLinks();
+  const unoptimisticLinks = await getLinks();
 
-  return <LinksView links={links} />;
+  return <LinksView unoptimisticLinks={unoptimisticLinks} />;
 }

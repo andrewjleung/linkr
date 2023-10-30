@@ -6,15 +6,16 @@ import { Links } from "@/components/links";
 import { useOptimisticLinks } from "@/hooks/use-optimistic-links";
 
 export default function LinksView({
-  links: unoptimisticLinks,
+  unoptimisticLinks,
 }: {
-  links: Link[];
+  unoptimisticLinks: Link[];
 }) {
-  const { links, addLink, removeLink } = useOptimisticLinks(unoptimisticLinks);
+  const { optimisticLinks, addLink, removeLink } =
+    useOptimisticLinks(unoptimisticLinks);
 
   return (
     <>
-      <Links links={links} removeLink={removeLink} />
+      <Links optimisticLinks={optimisticLinks} removeLink={removeLink} />
       <CreateLinkForm addLink={addLink} />
     </>
   );

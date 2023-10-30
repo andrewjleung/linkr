@@ -58,6 +58,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
+import LoadingIndicator from "./loading-indicator";
+import { redirect } from "next/navigation";
 
 const renameFormSchema = z.object({
   name: z.string().nonempty(),
@@ -144,15 +146,6 @@ export function HomeCollection() {
   );
 }
 
-function LoadingIndicator() {
-  return (
-    <div className="flex items-center justify-center">
-      <div className="h-3 w-3 animate-pulse rounded-full bg-orange-400 blur-sm dark:bg-orange-500"></div>
-      <div className="absolute h-2 w-2 animate-pulse rounded-full bg-orange-400 dark:bg-orange-500"></div>
-    </div>
-  );
-}
-
 export function Collection({
   optimisticCollection,
   editingCollection,
@@ -234,6 +227,7 @@ function ConcreteCollection({
     // TODO: Don't set loading to false so that it lasts as long as the
     // component still remains. This could cause a bug but seems okay for now.
     // Change this when you figure out how to do things optimistically.
+    setLoading(false);
   }
 
   function onRename() {

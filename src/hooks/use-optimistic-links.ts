@@ -1,49 +1,93 @@
 import { createLink, deleteLink } from "@/app/actions";
-import { Link } from "@prisma/client";
-import { experimental_useOptimistic as useOptimistic } from "react";
+import { Prisma, Link } from "@prisma/client";
+import { useOptimistic } from "react";
+import { match } from "ts-pattern";
 
-type OptimisticLinkAdd = {
+type LinkAdd = {
   type: "add";
+  link: Prisma.LinkCreateInput;
+};
+
+type LinkDelete = {
+  type: "delete";
+  id: string | number;
+};
+
+type LinkUpdate = LinkAdd | LinkDelete;
+
+type AbstractLink = {
+  type: "abstract";
+  id: string;
+  link: Prisma.LinkCreateInput;
+};
+
+type ConcreteLink = {
+  type: "concrete";
+  id: number;
   link: Link;
 };
 
-type OptimisticLinkDelete = {
-  type: "delete";
-  id: Link["id"];
-};
-
-type OptimisticLinkUpdate = OptimisticLinkAdd | OptimisticLinkDelete;
+export type OptimisticLink = AbstractLink | ConcreteLink;
 
 type OptimisticLinks = {
-  links: Link[];
-  addLink: (link: Link) => Promise<void>;
-  removeLink: (id: number) => Promise<void>;
+  optimisticLinks: OptimisticLink[];
+  addLink: (link: Prisma.LinkCreateInput) => Promise<void>;
+  removeLink: (id: number | string) => Promise<void>;
 };
 
+function handleAdd(
+  state: OptimisticLink[]
+): (add: LinkAdd) => OptimisticLink[] {
+  return ({ link }) => [
+    ...state,
+    {
+      type: "abstract",
+      id: crypto.randomUUID(),
+      link,
+    } satisfies AbstractLink,
+  ];
+}
+
+function handleDelete(
+  state: OptimisticLink[]
+): (del: LinkDelete) => OptimisticLink[] {
+  return ({ id }) => state.filter((l) => l.id !== id);
+}
+
 export function useOptimisticLinks(links: Link[]): OptimisticLinks {
+  const concreteLinks: OptimisticLink[] = links.map((link) => ({
+    type: "concrete",
+    id: link.id,
+    link,
+  }));
+
   const [optimisticLinks, updateOptimisticLinks] = useOptimistic<
-    Link[],
-    OptimisticLinkUpdate
-  >(links, (state: Link[], update: OptimisticLinkUpdate) => {
-    if (update.type === "add") {
-      return [...state, update.link];
-    }
+    OptimisticLink[],
+    LinkUpdate
+  >(concreteLinks, (state: OptimisticLink[], update: LinkUpdate) =>
+    match(update)
+      .with({ type: "add" }, handleAdd(state))
+      .with({ type: "delete" }, handleDelete(state))
+      .exhaustive()
+  );
 
-    return state.filter((l) => l.id !== update.id);
-  });
-
-  async function addLink(link: Link) {
+  async function addLink(link: Prisma.LinkCreateInput) {
     updateOptimisticLinks({ type: "add", link });
+    console.log("yay");
     await createLink(link);
+    console.log("nooo");
   }
 
-  async function removeLink(id: number) {
+  async function removeLink(id: number | string) {
     updateOptimisticLinks({ type: "delete", id });
-    await deleteLink(id);
+
+    if (typeof id === "number") {
+      await deleteLink(id);
+    }
   }
 
   return {
-    links: optimisticLinks,
+    optimisticLinks,
     addLink,
     removeLink,
   };

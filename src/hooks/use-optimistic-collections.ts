@@ -5,7 +5,7 @@ import {
   renameCollection as renameCollectionAction,
 } from "@/app/actions";
 import { Prisma, Collection } from "@prisma/client";
-import { experimental_useOptimistic as useOptimistic } from "react";
+import { useOptimistic } from "react";
 import { match } from "ts-pattern";
 
 type CollectionAdd = {

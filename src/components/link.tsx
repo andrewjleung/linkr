@@ -1,6 +1,4 @@
-"use client";
-
-import { Link as LinkModel } from "@prisma/client";
+import { Link as LinkModel, Prisma } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import {
   ContextMenu,
@@ -29,7 +27,7 @@ import {
   Dispatch,
   SetStateAction,
   KeyboardEventHandler,
-  experimental_useOptimistic as useOptimistic,
+  useOptimistic,
 } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -63,17 +61,36 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { OptimisticLink } from "@/hooks/use-optimistic-links";
 
-export default function LinkComponent({
+function AbstractLink({ link }: { link: Prisma.LinkCreateInput }) {
+  return (
+    <Link href={link.url} className="animate-pulse">
+      <Card className="ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
+        <CardHeader>
+          {link.title === null ? null : <CardTitle>{link.title}</CardTitle>}
+          <CardDescription>{link.url}</CardDescription>
+        </CardHeader>
+        {link.description === null ? null : (
+          <CardContent className="whitespace-pre-wrap">
+            {link.description}
+          </CardContent>
+        )}
+      </Card>
+    </Link>
+  );
+}
+
+function ConcreteLink({
   link,
   removeLink,
 }: {
   link: LinkModel;
-  removeLink: (id: number) => Promise<void>;
+  removeLink: (id: OptimisticLink["id"]) => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
 
-  function onClickEdit() {}
+  function onClickEdit() { }
 
   async function onClickDelete() {
     setLoading(true);
@@ -112,4 +129,18 @@ export default function LinkComponent({
       </ContextMenu>
     </>
   );
+}
+
+export default function LinkComponent({
+  optimisticLink,
+  removeLink,
+}: {
+  optimisticLink: OptimisticLink;
+  removeLink: (id: OptimisticLink["id"]) => Promise<void>;
+}) {
+  if (optimisticLink.type === "abstract") {
+    return <AbstractLink link={optimisticLink.link} />;
+  }
+
+  return <ConcreteLink link={optimisticLink.link} removeLink={removeLink} />;
 }

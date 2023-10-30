@@ -24,7 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { Link } from "@prisma/client";
+import { Link, Prisma } from "@prisma/client";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -68,7 +68,7 @@ const DEFAULT_FORM_VALUES = {
 export function CreateLinkForm({
   addLink,
 }: {
-  addLink: (link: Link) => Promise<void>;
+  addLink: (link: Prisma.LinkCreateInput) => Promise<void>;
 }) {
   const [createLinkFormIsOpen, setCreateLinkFormIsOpen] = useState(false);
   const parentId = useParentCollection();
@@ -84,7 +84,7 @@ export function CreateLinkForm({
 
   return (
     <CreateLinkFormInner
-      key={`${parentId}-${createLinkFormIsOpen}`}
+      key={`create-link-form-${parentId}-${createLinkFormIsOpen}`}
       open={createLinkFormIsOpen}
       setOpen={setCreateLinkFormIsOpen}
       addLink={addLink}
@@ -99,7 +99,7 @@ function CreateLinkFormInner({
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
-  addLink: (link: Link) => Promise<void>;
+  addLink: (link: Prisma.LinkCreateInput) => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
   const parentId = useParentCollection();
@@ -112,19 +112,21 @@ function CreateLinkFormInner({
   async function onSubmit(values: z.infer<typeof linkSchema>) {
     setLoading(true);
 
-    // TODO: handle failure case
-    await createLink({
-      title: values.title,
-      description: values.description,
-      url: values.url,
-      parentId: parentId,
-    })
-      .then((link) => {
-        console.log(link);
-      })
-      .catch((e) => {
-        console.log(e);
+    if (parentId === null) {
+      await addLink({
+        title: values.title || null,
+        description: values.description || null,
+        url: values.url,
       });
+    } else {
+      // TODO: handle failure case
+      await addLink({
+        title: values.title || null,
+        description: values.description || null,
+        url: values.url,
+        parent: { connect: { id: parentId } },
+      });
+    }
 
     setLoading(false);
     form.reset(DEFAULT_FORM_VALUES);

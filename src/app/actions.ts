@@ -39,6 +39,7 @@ export async function createCollection(
   collection: Prisma.CollectionCreateInput
 ) {
   const result = await prisma.collection.create({ data: collection });
+
   revalidatePath("/");
 
   return result;
