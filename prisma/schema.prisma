@@ -59,6 +59,7 @@ model Link {
   description String?
   url         String
   parentId    Int?
+  order       Float       @default(0)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   parent      Collection? @relation(fields: [parentId], references: [id])

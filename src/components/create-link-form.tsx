@@ -45,13 +45,11 @@ const linkSchema = z.object({
         return val;
       }
 
-      const valWithSchemePrefix = `https://${val}`;
+      const valWithHTTPSScheme = `https://${val}`;
 
-      if (isUrl(valWithSchemePrefix)) {
-        return valWithSchemePrefix;
+      if (isUrl(valWithHTTPSScheme)) {
+        return valWithHTTPSScheme;
       }
-
-      return val;
     })
     .pipe(z.string().url()),
   // tags: z.array(z.string().trim()),
@@ -117,6 +115,7 @@ function CreateLinkFormInner({
         title: values.title || null,
         description: values.description || null,
         url: values.url,
+        order: Number.POSITIVE_INFINITY,
       });
     });
 

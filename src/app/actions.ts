@@ -6,6 +6,10 @@ import { revalidatePath } from "next/cache";
 
 export async function createLink(link: Prisma.LinkCreateInput) {
   const result = await prisma.link.create({ data: link });
+  await prisma.link.update({
+    where: { id: result.id },
+    data: { order: result.id * 100 },
+  });
   revalidatePath("/");
 
   return result;

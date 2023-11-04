@@ -25,14 +25,13 @@ export function Links({
         <div className="flex flex-col gap-4">
           <AnimatePresence>
             {optimisticLinks
-              .sort((a, b) => a.link.url.localeCompare(b.link.url))
+              .sort((a, b) => (a.link.order || 0) - (b.link.order || 0))
               .map((l, i) => (
                 <motion.div
                   key={`link-${i}`}
                   whileHover={{ scale: 1.025 }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
                 >
                   <LinkComponent
                     optimisticLink={l}
@@ -69,9 +68,7 @@ export function LinksSkeleton() {
             >
               <Card className="w-full ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 motion-safe:animate-pulse dark:ring-offset-neutral-950">
                 <CardHeader>
-                  <CardDescription>
-                    <div className="h-[1.25rem]"></div>
-                  </CardDescription>
+                  <div className="h-[1.25rem] w-full"></div>
                 </CardHeader>
               </Card>
             </motion.div>
