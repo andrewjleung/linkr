@@ -58,7 +58,9 @@ const linkSchema = z.object({
 });
 
 const DEFAULT_FORM_VALUES = {
+  title: "",
   url: "",
+  description: "",
 };
 
 export function CreateLinkForm({
@@ -119,9 +121,18 @@ function CreateLinkFormInner({
     });
 
     if (parentId === null) {
-      await createLink(values);
+      await createLink({
+        title: values.title || null,
+        description: values.description || null,
+        url: values.url,
+      });
     } else {
-      await createLink({ ...values, parent: { connect: { id: parentId } } });
+      await createLink({
+        title: values.title || null,
+        description: values.description || null,
+        url: values.url,
+        parent: { connect: { id: parentId } },
+      });
     }
 
     setLoading(false);

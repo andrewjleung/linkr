@@ -19,11 +19,13 @@ import { startTransition } from "react";
 
 function AbstractLink({ link }: { link: Prisma.LinkCreateInput }) {
   return (
-    <Link href={link.url} className="animate-pulse">
+    <Link href={link.url}>
       <Card className="ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
         <CardHeader>
-          {link.title === null ? null : <CardTitle>{link.title}</CardTitle>}
-          <CardDescription>{link.url}</CardDescription>
+          <CardTitle className="text-sm">{link.url}</CardTitle>
+          {link.title === null ? null : (
+            <CardDescription>{link.title}</CardDescription>
+          )}
         </CardHeader>
         {link.description === null ? null : (
           <CardContent className="whitespace-pre-wrap">
@@ -58,10 +60,10 @@ function ConcreteLink({
           <Link href={link.url}>
             <Card className="ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
               <CardHeader>
+                <CardTitle className="text-sm">{link.url}</CardTitle>
                 {link.title === null ? null : (
-                  <CardTitle>{link.title}</CardTitle>
+                  <CardDescription>{link.title}</CardDescription>
                 )}
-                <CardDescription>{link.url}</CardDescription>
               </CardHeader>
               {link.description === null ? null : (
                 <CardContent className="whitespace-pre-wrap">
