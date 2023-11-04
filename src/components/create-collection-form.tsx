@@ -78,6 +78,8 @@ function CreateCollectionFormInner({
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
     setLoading(true);
+    form.reset(DEFAULT_FORM_VALUES);
+    setOpen(false);
 
     // TODO: handle failure case
     await addCollection({
@@ -91,8 +93,6 @@ function CreateCollectionFormInner({
       });
 
     setLoading(false);
-    form.reset(DEFAULT_FORM_VALUES);
-    setOpen(false);
   }
 
   return (

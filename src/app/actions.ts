@@ -1,15 +1,10 @@
 "use server";
 
-import { Prisma, Link } from "@prisma/client";
+import { Collection, Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
-export async function getLinks(parentId?: number): Promise<Link[]> {
-  return prisma.link.findMany({ where: { parentId: parentId || null } });
-}
-
-export async function createLink(link: Prisma.LinkUncheckedCreateInput) {
+export async function createLink(link: Prisma.LinkCreateInput) {
   const result = await prisma.link.create({ data: link });
   revalidatePath("/");
 
@@ -25,14 +20,6 @@ export async function deleteLink(id: number) {
   revalidatePath("/");
 
   return result;
-}
-
-export async function validateCollection(id: number) {
-  const count = await prisma.collection.count({ where: { id } });
-
-  if (count < 1) {
-    redirect("/");
-  }
 }
 
 export async function createCollection(
@@ -95,7 +82,7 @@ export async function safeDeleteCollection(id: number) {
 }
 
 export async function unsafeDeleteCollection(id: number) {
-  const nestedCollections = await prisma.collection.findMany({
+  const nestedCollections: Collection[] = await prisma.collection.findMany({
     where: {
       parentId: id,
     },

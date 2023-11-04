@@ -1,8 +1,10 @@
 import LinksView from "@/components/links-view";
-import { getLinks } from "./actions";
+import prisma from "@/lib/prisma";
 
 export default async function Home() {
-  const unoptimisticLinks = await getLinks();
+  const links = await prisma.link.findMany({
+    where: { parentId: null },
+  });
 
-  return <LinksView unoptimisticLinks={unoptimisticLinks} />;
+  return <LinksView links={links} />;
 }

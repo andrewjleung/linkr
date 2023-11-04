@@ -5,18 +5,17 @@ import { Link } from "@prisma/client";
 import { Links } from "@/components/links";
 import { useOptimisticLinks } from "@/hooks/use-optimistic-links";
 
-export default function LinksView({
-  unoptimisticLinks,
-}: {
-  unoptimisticLinks: Link[];
-}) {
-  const { optimisticLinks, addLink, removeLink } =
-    useOptimisticLinks(unoptimisticLinks);
+export default function LinksView({ links }: { links: Link[] }) {
+  const { optimisticLinks, addOptimisticLink, removeOptimisticLink } =
+    useOptimisticLinks(links);
 
   return (
     <>
-      <Links optimisticLinks={optimisticLinks} removeLink={removeLink} />
-      <CreateLinkForm addLink={addLink} />
+      <Links
+        optimisticLinks={optimisticLinks}
+        removeOptimisticLink={removeOptimisticLink}
+      />
+      <CreateLinkForm addOptimisticLink={addOptimisticLink} />
     </>
   );
 }

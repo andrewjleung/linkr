@@ -11,22 +11,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createLink } from "../app/actions";
-import { useState } from "react";
+import { createLink } from "@/app/actions";
+import { startTransition, useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { Link, Prisma } from "@prisma/client";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { Textarea } from "@/components/ui/textarea";
+import { OptimisticLinks } from "@/hooks/use-optimistic-links";
 
 function isUrl(s: string): boolean {
   try {
@@ -57,18 +54,17 @@ const linkSchema = z.object({
       return val;
     })
     .pipe(z.string().url()),
-  tags: z.array(z.string().trim()),
+  // tags: z.array(z.string().trim()),
 });
 
 const DEFAULT_FORM_VALUES = {
   url: "",
-  tags: [],
 };
 
 export function CreateLinkForm({
-  addLink,
+  addOptimisticLink,
 }: {
-  addLink: (link: Prisma.LinkCreateInput) => Promise<void>;
+  addOptimisticLink: OptimisticLinks["addOptimisticLink"];
 }) {
   const [createLinkFormIsOpen, setCreateLinkFormIsOpen] = useState(false);
   const parentId = useParentCollection();
@@ -87,7 +83,7 @@ export function CreateLinkForm({
       key={`create-link-form-${parentId}-${createLinkFormIsOpen}`}
       open={createLinkFormIsOpen}
       setOpen={setCreateLinkFormIsOpen}
-      addLink={addLink}
+      addOptimisticLink={addOptimisticLink}
     />
   );
 }
@@ -95,11 +91,11 @@ export function CreateLinkForm({
 function CreateLinkFormInner({
   open,
   setOpen,
-  addLink,
+  addOptimisticLink,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
-  addLink: (link: Prisma.LinkCreateInput) => Promise<void>;
+  addOptimisticLink: OptimisticLinks["addOptimisticLink"];
 }) {
   const [loading, setLoading] = useState(false);
   const parentId = useParentCollection();
@@ -111,26 +107,24 @@ function CreateLinkFormInner({
 
   async function onSubmit(values: z.infer<typeof linkSchema>) {
     setLoading(true);
+    form.reset(DEFAULT_FORM_VALUES);
+    setOpen(false);
+
+    startTransition(() => {
+      addOptimisticLink({
+        title: values.title || null,
+        description: values.description || null,
+        url: values.url,
+      });
+    });
 
     if (parentId === null) {
-      await addLink({
-        title: values.title || null,
-        description: values.description || null,
-        url: values.url,
-      });
+      await createLink(values);
     } else {
-      // TODO: handle failure case
-      await addLink({
-        title: values.title || null,
-        description: values.description || null,
-        url: values.url,
-        parent: { connect: { id: parentId } },
-      });
+      await createLink({ ...values, parent: { connect: { id: parentId } } });
     }
 
     setLoading(false);
-    form.reset(DEFAULT_FORM_VALUES);
-    setOpen(false);
     // TODO: create tags as well...
   }
 

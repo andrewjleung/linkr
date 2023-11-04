@@ -5,7 +5,7 @@ import {
   renameCollection as renameCollectionAction,
 } from "@/app/actions";
 import { Prisma, Collection } from "@prisma/client";
-import { useOptimistic } from "react";
+import { startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
 
 type CollectionAdd = {
@@ -114,22 +114,30 @@ export function useOptimisticCollections(
   );
 
   async function addCollection(collection: Prisma.CollectionCreateInput) {
-    updateOptimisticCollections({ type: "add", collection });
+    startTransition(() => {
+      updateOptimisticCollections({ type: "add", collection });
+    });
     await createCollection(collection);
   }
 
   async function safeRemoveCollection(id: number) {
-    updateOptimisticCollections({ type: "delete", id });
+    startTransition(() => {
+      updateOptimisticCollections({ type: "delete", id });
+    });
     await safeDeleteCollection(id);
   }
 
   async function unsafeRemoveCollection(id: number) {
-    updateOptimisticCollections({ type: "delete", id });
+    startTransition(() => {
+      updateOptimisticCollections({ type: "delete", id });
+    });
     await unsafeDeleteCollection(id);
   }
 
   async function renameCollection(id: number, newName: string) {
-    updateOptimisticCollections({ type: "rename", id, newName });
+    startTransition(() => {
+      updateOptimisticCollections({ type: "rename", id, newName });
+    });
     await renameCollectionAction(id, newName);
   }
 

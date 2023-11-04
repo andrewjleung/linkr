@@ -1,67 +1,21 @@
 import { Link as LinkModel, Prisma } from "@prisma/client";
-import { cn } from "@/lib/utils";
 import {
   ContextMenu,
-  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuLabel,
-  ContextMenuRadioGroup,
-  ContextMenuRadioItem,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Input } from "@/components/ui/input";
-import {
-  MutableRefObject,
-  useRef,
-  useState,
-  forwardRef,
-  useEffect,
-  useCallback,
-  useContext,
-  Dispatch,
-  SetStateAction,
-  KeyboardEventHandler,
-  useOptimistic,
-} from "react";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { OptimisticLink } from "@/hooks/use-optimistic-links";
+import { OptimisticLink, OptimisticLinks } from "@/hooks/use-optimistic-links";
+import { deleteLink } from "@/app/actions";
+import { startTransition } from "react";
 
 function AbstractLink({ link }: { link: Prisma.LinkCreateInput }) {
   return (
@@ -83,19 +37,18 @@ function AbstractLink({ link }: { link: Prisma.LinkCreateInput }) {
 
 function ConcreteLink({
   link,
-  removeLink,
+  removeOptimisticLink,
 }: {
   link: LinkModel;
-  removeLink: (id: OptimisticLink["id"]) => Promise<void>;
+  removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
 }) {
-  const [loading, setLoading] = useState(false);
-
-  function onClickEdit() { }
+  function onClickEdit() {}
 
   async function onClickDelete() {
-    setLoading(true);
-    await removeLink(link.id);
-    setLoading(false);
+    startTransition(() => {
+      removeOptimisticLink(link.id);
+    });
+    await deleteLink(link.id);
   }
 
   return (
@@ -133,14 +86,19 @@ function ConcreteLink({
 
 export default function LinkComponent({
   optimisticLink,
-  removeLink,
+  removeOptimisticLink,
 }: {
   optimisticLink: OptimisticLink;
-  removeLink: (id: OptimisticLink["id"]) => Promise<void>;
+  removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
 }) {
   if (optimisticLink.type === "abstract") {
     return <AbstractLink link={optimisticLink.link} />;
   }
 
-  return <ConcreteLink link={optimisticLink.link} removeLink={removeLink} />;
+  return (
+    <ConcreteLink
+      link={optimisticLink.link}
+      removeOptimisticLink={removeOptimisticLink}
+    />
+  );
 }

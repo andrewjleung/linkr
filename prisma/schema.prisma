@@ -1,32 +1,28 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-datasource db {
-  provider = "postgresql"
-  url = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
- 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-  refresh_token_expires_in Int?
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?
+  access_token             String?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+  refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -58,30 +54,30 @@ model VerificationToken {
 }
 
 model Link {
-  id Int @id @default(autoincrement())
-  title String?
+  id          Int         @id @default(autoincrement())
+  title       String?
   description String?
-  url String
-  parent Collection? @relation(fields: [parentId], references: [id])
-  parentId Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  url         String
+  parentId    Int?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  parent      Collection? @relation(fields: [parentId], references: [id])
 }
 
 model Tag {
-  id Int @id @default(autoincrement())
-  name String
+  id        Int      @id @default(autoincrement())
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Collection {
-  id Int @id @default(autoincrement())
-  name String
-  parent Collection? @relation("CollectionHierarchy", fields: [parentId], references: [id])
-  parentId Int?
+  id          Int          @id @default(autoincrement())
+  name        String
+  parentId    Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  parent      Collection?  @relation("CollectionHierarchy", fields: [parentId], references: [id])
   collections Collection[] @relation("CollectionHierarchy")
-  links Link[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  links       Link[]
 }

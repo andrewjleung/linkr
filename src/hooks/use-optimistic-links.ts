@@ -1,4 +1,3 @@
-import { createLink, deleteLink } from "@/app/actions";
 import { Prisma, Link } from "@prisma/client";
 import { useOptimistic } from "react";
 import { match } from "ts-pattern";
@@ -10,14 +9,13 @@ type LinkAdd = {
 
 type LinkDelete = {
   type: "delete";
-  id: string | number;
+  id: number;
 };
 
 type LinkUpdate = LinkAdd | LinkDelete;
 
 type AbstractLink = {
   type: "abstract";
-  id: string;
   link: Prisma.LinkCreateInput;
 };
 
@@ -29,10 +27,10 @@ type ConcreteLink = {
 
 export type OptimisticLink = AbstractLink | ConcreteLink;
 
-type OptimisticLinks = {
+export type OptimisticLinks = {
   optimisticLinks: OptimisticLink[];
-  addLink: (link: Prisma.LinkCreateInput) => Promise<void>;
-  removeLink: (id: number | string) => Promise<void>;
+  addOptimisticLink: (link: Prisma.LinkCreateInput) => Promise<void>;
+  removeOptimisticLink: (id: number) => Promise<void>;
 };
 
 function handleAdd(
@@ -42,7 +40,6 @@ function handleAdd(
     ...state,
     {
       type: "abstract",
-      id: crypto.randomUUID(),
       link,
     } satisfies AbstractLink,
   ];
@@ -51,7 +48,7 @@ function handleAdd(
 function handleDelete(
   state: OptimisticLink[]
 ): (del: LinkDelete) => OptimisticLink[] {
-  return ({ id }) => state.filter((l) => l.id !== id);
+  return ({ id }) => state.filter((l) => l.type == "abstract" || l.id !== id);
 }
 
 export function useOptimisticLinks(links: Link[]): OptimisticLinks {
@@ -71,24 +68,17 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
       .exhaustive()
   );
 
-  async function addLink(link: Prisma.LinkCreateInput) {
+  async function addOptimisticLink(link: Prisma.LinkCreateInput) {
     updateOptimisticLinks({ type: "add", link });
-    console.log("yay");
-    await createLink(link);
-    console.log("nooo");
   }
 
-  async function removeLink(id: number | string) {
+  async function removeOptimisticLink(id: number) {
     updateOptimisticLinks({ type: "delete", id });
-
-    if (typeof id === "number") {
-      await deleteLink(id);
-    }
   }
 
   return {
     optimisticLinks,
-    addLink,
-    removeLink,
+    addOptimisticLink,
+    removeOptimisticLink,
   };
 }

@@ -1,11 +1,24 @@
-import { getLinks, validateCollection } from "@/app/actions";
 import LinksView from "@/components/links-view";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+import { Link } from "@prisma/client";
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const parentId = Number(params.id);
-  const links = await getLinks(parentId);
+  async function validateCollection(id: number) {
+    "use server";
 
+    const count = await prisma.collection.count({ where: { id } });
+
+    if (count < 1) {
+      redirect("/");
+    }
+  }
+
+  const parentId = Number(params.id);
   await validateCollection(parentId);
+  const links: Link[] = await prisma.link.findMany({
+    where: { parentId },
+  });
 
   return <LinksView links={links} />;
 }

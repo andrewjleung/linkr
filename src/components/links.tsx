@@ -1,13 +1,13 @@
 import LinkComponent from "@/components/link";
-import { Skeleton } from "./ui/skeleton";
-import { OptimisticLink } from "@/hooks/use-optimistic-links";
+import { Skeleton } from "@/components/ui/skeleton";
+import { OptimisticLink, OptimisticLinks } from "@/hooks/use-optimistic-links";
 
-export async function Links({
+export function Links({
   optimisticLinks,
-  removeLink,
+  removeOptimisticLink,
 }: {
   optimisticLinks: OptimisticLink[];
-  removeLink: (id: OptimisticLink["id"]) => Promise<void>;
+  removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
 }) {
   return (
     <>
@@ -15,11 +15,11 @@ export async function Links({
         <div className="flex flex-col gap-4">
           {optimisticLinks
             .sort((a, b) => a.link.url.localeCompare(b.link.url))
-            .map((l) => (
+            .map((l, i) => (
               <LinkComponent
-                key={`link-${l.id}`}
+                key={`link-${i}`}
                 optimisticLink={l}
-                removeLink={removeLink}
+                removeOptimisticLink={removeOptimisticLink}
               />
             ))}
         </div>
