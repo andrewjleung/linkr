@@ -1,5 +1,5 @@
 import { Prisma, Link } from "@prisma/client";
-import { useOptimistic } from "react";
+import { startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
 
 type LinkAdd = {
@@ -12,14 +12,21 @@ type LinkDelete = {
   id: number;
 };
 
-type LinkUpdate = LinkAdd | LinkDelete;
+type LinkReorder = {
+  type: "reorder";
+  sourceIndex: number;
+  destinationIndex: number;
+};
 
-type AbstractLink = {
+type LinkUpdate = LinkAdd | LinkDelete | LinkReorder;
+
+export type AbstractLink = {
   type: "abstract";
+  id: string;
   link: Prisma.LinkCreateInput;
 };
 
-type ConcreteLink = {
+export type ConcreteLink = {
   type: "concrete";
   id: number;
   link: Link;
@@ -29,8 +36,12 @@ export type OptimisticLink = AbstractLink | ConcreteLink;
 
 export type OptimisticLinks = {
   optimisticLinks: OptimisticLink[];
-  addOptimisticLink: (link: Prisma.LinkCreateInput) => Promise<void>;
-  removeOptimisticLink: (id: number) => Promise<void>;
+  addOptimisticLink: (link: Prisma.LinkCreateInput) => void;
+  removeOptimisticLink: (id: number) => void;
+  reorderOptimisticLinks: (
+    sourceIndex: number,
+    destinationIndex: number
+  ) => void;
 };
 
 function handleAdd(
@@ -40,6 +51,7 @@ function handleAdd(
     ...state,
     {
       type: "abstract",
+      id: crypto.randomUUID(),
       link,
     } satisfies AbstractLink,
   ];
@@ -49,6 +61,29 @@ function handleDelete(
   state: OptimisticLink[]
 ): (del: LinkDelete) => OptimisticLink[] {
   return ({ id }) => state.filter((l) => l.type == "abstract" || l.id !== id);
+}
+
+function handleReorder(
+  state: OptimisticLink[]
+): (reorder: LinkReorder) => OptimisticLink[] {
+  return ({ sourceIndex, destinationIndex }) => {
+    if (state.length < 2) {
+      return state;
+    }
+
+    const element = state[sourceIndex];
+    // console.log(sourceIndex, destinationIndex);
+
+    const withoutSource = [
+      ...state.slice(0, sourceIndex),
+      ...state.slice(sourceIndex + 1),
+    ];
+    return [
+      ...withoutSource.slice(0, destinationIndex),
+      element,
+      ...withoutSource.slice(destinationIndex),
+    ];
+  };
 }
 
 export function useOptimisticLinks(links: Link[]): OptimisticLinks {
@@ -65,20 +100,31 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
     match(update)
       .with({ type: "add" }, handleAdd(state))
       .with({ type: "delete" }, handleDelete(state))
+      .with({ type: "reorder" }, handleReorder(state))
       .exhaustive()
   );
 
-  async function addOptimisticLink(link: Prisma.LinkCreateInput) {
+  function addOptimisticLink(link: Prisma.LinkCreateInput) {
     updateOptimisticLinks({ type: "add", link });
   }
 
-  async function removeOptimisticLink(id: number) {
+  function removeOptimisticLink(id: number) {
     updateOptimisticLinks({ type: "delete", id });
+  }
+
+  function reorderOptimisticLinks(
+    sourceIndex: number,
+    destinationIndex: number
+  ) {
+    startTransition(() =>
+      updateOptimisticLinks({ type: "reorder", sourceIndex, destinationIndex })
+    );
   }
 
   return {
     optimisticLinks,
     addOptimisticLink,
     removeOptimisticLink,
+    reorderOptimisticLinks,
   };
 }

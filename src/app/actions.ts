@@ -1,15 +1,21 @@
 "use server";
 
-import { Collection, Prisma } from "@prisma/client";
+import { Collection, Link, Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function createLink(link: Prisma.LinkCreateInput) {
-  const result = await prisma.link.create({ data: link });
-  await prisma.link.update({
-    where: { id: result.id },
-    data: { order: result.id * 100 },
+export async function createLink(
+  link: Parameters<typeof prisma.link.create>[0]["data"]
+) {
+  const lastLinkInCollection = await prisma.link.findFirst({
+    where: { parentId: link.parentId },
+    orderBy: { order: "desc" },
   });
+
+  const order =
+    lastLinkInCollection === null ? 100 : lastLinkInCollection.order + 100;
+
+  const result = await prisma.link.create({ data: { ...link, order } });
   revalidatePath("/");
 
   return result;
@@ -21,6 +27,13 @@ export async function deleteLink(id: number) {
       id,
     },
   });
+  revalidatePath("/");
+
+  return result;
+}
+
+export async function updateLinkOrder(id: number, order: number) {
+  const result = await prisma.link.update({ where: { id }, data: { order } });
   revalidatePath("/");
 
   return result;

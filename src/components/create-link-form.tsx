@@ -130,7 +130,7 @@ function CreateLinkFormInner({
         title: values.title || null,
         description: values.description || null,
         url: values.url,
-        parent: { connect: { id: parentId } },
+        parentId,
       });
     }
 

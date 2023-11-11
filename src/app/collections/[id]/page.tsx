@@ -18,6 +18,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   await validateCollection(parentId);
   const links: Link[] = await prisma.link.findMany({
     where: { parentId },
+    orderBy: { order: "asc" },
   });
 
   return <LinksView links={links} />;
