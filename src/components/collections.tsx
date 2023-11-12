@@ -69,6 +69,7 @@ export function Collections({
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
+                      className="mb-2"
                     >
                       <Collection
                         optimisticCollection={c}
