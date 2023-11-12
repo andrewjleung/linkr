@@ -3,11 +3,36 @@ import {
   safeDeleteCollection,
   unsafeDeleteCollection,
   renameCollection as renameCollectionAction,
+  updateCollectionOrder,
 } from "@/app/actions";
 import { Prisma, Collection } from "@prisma/client";
 // @ts-ignore
 import { startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
+
+const ORDER_BUFFER = 100;
+
+function orderForReorderedElement(
+  orders: number[],
+  source: number,
+  destination: number
+): number {
+  if (destination === 0) {
+    return orders[0] / 2;
+  } else if (destination >= orders.length - 1) {
+    return orders[orders.length - 1] + ORDER_BUFFER;
+  } else {
+    if (destination < source) {
+      const before = orders[destination - 1];
+      const after = orders[destination];
+      return (after - before) / 2 + before;
+    } else {
+      const before = orders[destination];
+      const after = orders[destination + 1];
+      return (after - before) / 2 + before;
+    }
+  }
+}
 
 type CollectionAdd = {
   type: "add";
@@ -25,27 +50,44 @@ type CollectionRename = {
   newName: string;
 };
 
-type CollectionUpdate = CollectionAdd | CollectionDelete | CollectionRename;
-
-type AbstractCollection = {
-  type: "abstract";
-  tempId: string;
-  collection: Pick<Collection, "name">;
+type CollectionReorder = {
+  type: "reorder";
+  id: Collection["id"];
+  sourceIndex: number;
+  destinationIndex: number;
 };
 
-type ConcreteCollection = {
+type CollectionUpdate =
+  | CollectionAdd
+  | CollectionDelete
+  | CollectionRename
+  | CollectionReorder;
+
+export type AbstractCollection = {
+  type: "abstract";
+  id: string;
+  collection: Pick<Collection, "name" | "order">;
+};
+
+export type ConcreteCollection = {
   type: "concrete";
+  id: number;
   collection: Collection;
 };
 
 export type OptimisticCollection = AbstractCollection | ConcreteCollection;
 
-type OptimisticCollections = {
+export type OptimisticCollections = {
   optimisticCollections: OptimisticCollection[];
   addCollection: (collection: Prisma.CollectionCreateInput) => Promise<void>;
   unsafeRemoveCollection: (id: number) => Promise<void>;
   safeRemoveCollection: (id: number) => Promise<void>;
   renameCollection: (id: number, newName: string) => Promise<void>;
+  reorderCollection: (
+    id: number,
+    sourceIndex: number,
+    destinationIndex: number
+  ) => Promise<void>;
 };
 
 function handleAdd(
@@ -55,8 +97,11 @@ function handleAdd(
     ...state,
     {
       type: "abstract",
-      tempId: crypto.randomUUID(),
-      collection,
+      id: crypto.randomUUID(),
+      collection: {
+        name: collection.name,
+        order: collection.order || Number.POSITIVE_INFINITY,
+      },
     } satisfies AbstractCollection,
   ];
 }
@@ -91,12 +136,35 @@ function handleRename(
     });
 }
 
+function handleReorder(
+  state: OptimisticCollection[]
+): (reorder: CollectionReorder) => OptimisticCollection[] {
+  return ({ sourceIndex, destinationIndex }) => {
+    if (state.length < 2) {
+      return state;
+    }
+
+    const element = state[sourceIndex];
+
+    const withoutSource = [
+      ...state.slice(0, sourceIndex),
+      ...state.slice(sourceIndex + 1),
+    ];
+    return [
+      ...withoutSource.slice(0, destinationIndex),
+      element,
+      ...withoutSource.slice(destinationIndex),
+    ];
+  };
+}
+
 export function useOptimisticCollections(
   collections: Collection[]
 ): OptimisticCollections {
   const concreteCollections: OptimisticCollection[] = collections.map(
     (collection) => ({
       type: "concrete",
+      id: collection.id,
       collection,
     })
   );
@@ -111,6 +179,7 @@ export function useOptimisticCollections(
         .with({ type: "add" }, handleAdd(state))
         .with({ type: "delete" }, handleDelete(state))
         .with({ type: "rename" }, handleRename(state))
+        .with({ type: "reorder" }, handleReorder(state))
         .exhaustive()
   );
 
@@ -142,11 +211,35 @@ export function useOptimisticCollections(
     await renameCollectionAction(id, newName);
   }
 
+  async function reorderCollection(
+    id: number,
+    sourceIndex: number,
+    destinationIndex: number
+  ) {
+    startTransition(() => {
+      updateOptimisticCollections({
+        type: "reorder",
+        id,
+        sourceIndex,
+        destinationIndex,
+      });
+    });
+
+    const order = orderForReorderedElement(
+      concreteCollections.map((c) => c.collection.order),
+      sourceIndex,
+      destinationIndex
+    );
+
+    await updateCollectionOrder(id, order);
+  }
+
   return {
     optimisticCollections,
     addCollection,
     unsafeRemoveCollection,
     safeRemoveCollection,
     renameCollection,
+    reorderCollection,
   };
 }

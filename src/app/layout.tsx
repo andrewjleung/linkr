@@ -16,7 +16,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const unoptimisticCollections = await prisma.collection.findMany();
+  const unoptimisticCollections = await prisma.collection.findMany({
+    orderBy: { order: "asc" },
+  });
 
   return (
     <html lang="en" suppressHydrationWarning>

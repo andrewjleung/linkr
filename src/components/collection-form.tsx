@@ -46,7 +46,6 @@ export function RenameCollectionForm({
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [loading, setLoading] = useState(false);
-  const parentId = useParentCollection();
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
@@ -57,7 +56,6 @@ export function RenameCollectionForm({
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
     setLoading(true);
-    form.reset(DEFAULT_FORM_VALUES);
     setOpen(false);
 
     // TODO: handle failure case
@@ -68,9 +66,9 @@ export function RenameCollectionForm({
 
   return (
     <CollectionFormInner
+      key={`rename-collection-form-${open}-${collection.id}`}
       title="Rename collection"
       form={form}
-      key={`create-collection-form-${open}-${parentId}`}
       open={open}
       setOpen={setOpen}
       loading={loading}
@@ -123,9 +121,9 @@ export function CreateCollectionForm({
 
   return (
     <CollectionFormInner
+      key={`create-collection-form-${open}-${parentId}`}
       title="Add a new collection"
       form={form}
-      key={`create-collection-form-${open}-${parentId}`}
       open={open}
       setOpen={setOpen}
       loading={loading}

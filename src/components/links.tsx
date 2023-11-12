@@ -20,6 +20,7 @@ import {
 } from "@hello-pangea/dnd";
 import { updateLinkOrder } from "@/app/actions";
 
+// TODO: DRY this up since it's used with collections too
 const ORDER_BUFFER = 100;
 
 function orderForReorderedElement(

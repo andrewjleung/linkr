@@ -86,10 +86,8 @@ export function EditLinkForm({
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof linkSchema>) => {
-    console.log("ahh", editOptimisticLink);
+  async function onSubmit(values: z.infer<typeof linkSchema>) {
     setLoading(true);
-    form.reset(DEFAULT_FORM_VALUES);
     setOpen(false);
 
     editOptimisticLink(link.id, {
@@ -105,7 +103,7 @@ export function EditLinkForm({
     });
 
     setLoading(false);
-  };
+  }
 
   return (
     <LinkFormInner
@@ -178,7 +176,7 @@ export function CreateLinkForm({
 
   return (
     <LinkFormInner
-      key={`create-link-form-${open}`}
+      key={`create-link-form-${open}-${parentId}`}
       title="Add a new link"
       form={form}
       loading={loading}

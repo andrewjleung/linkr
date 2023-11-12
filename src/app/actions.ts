@@ -5,6 +5,9 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+// TODO: DRY this up...
+const ORDER_BUFFER = 100;
+
 export async function createLink(
   link: Parameters<typeof prisma.link.create>[0]["data"]
 ) {
@@ -14,7 +17,9 @@ export async function createLink(
   });
 
   const order =
-    lastLinkInCollection === null ? 100 : lastLinkInCollection.order + 100;
+    lastLinkInCollection === null
+      ? ORDER_BUFFER
+      : lastLinkInCollection.order + ORDER_BUFFER;
 
   const result = await prisma.link.create({ data: { ...link, order } });
   revalidatePath("/");
@@ -58,9 +63,21 @@ export async function validateCollection(id: number) {
 }
 
 export async function createCollection(
-  collection: Prisma.CollectionCreateInput
+  collection: Parameters<typeof prisma.collection.create>[0]["data"]
 ) {
-  const result = await prisma.collection.create({ data: collection });
+  const lastCollectionInCollection = await prisma.collection.findFirst({
+    where: { parentId: collection.parentId },
+    orderBy: { order: "desc" },
+  });
+
+  const order =
+    lastCollectionInCollection === null
+      ? ORDER_BUFFER
+      : lastCollectionInCollection.order + ORDER_BUFFER;
+
+  const result = await prisma.collection.create({
+    data: { ...collection, order },
+  });
 
   revalidatePath("/");
 
@@ -148,4 +165,14 @@ export async function unsafeDeleteCollection(id: number) {
     deletedLinks,
     deletedCollection,
   };
+}
+
+export async function updateCollectionOrder(id: number, order: number) {
+  const result = await prisma.collection.update({
+    where: { id },
+    data: { order },
+  });
+  revalidatePath("/");
+
+  return result;
 }

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Collection" ADD COLUMN     "order" DOUBLE PRECISION NOT NULL DEFAULT 0;

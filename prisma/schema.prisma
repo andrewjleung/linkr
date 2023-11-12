@@ -79,6 +79,7 @@ model Collection {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   parent      Collection?  @relation("CollectionHierarchy", fields: [parentId], references: [id])
+  order       Float        @default(0)
   collections Collection[] @relation("CollectionHierarchy")
   links       Link[]
 }

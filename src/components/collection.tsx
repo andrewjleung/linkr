@@ -58,8 +58,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
-import LoadingIndicator from "./loading-indicator";
-import { RenameCollectionForm } from "./create-collection-form";
+import LoadingIndicator from "@/components/loading-indicator";
+import { RenameCollectionForm } from "@/components/collection-form";
 
 export function HomeCollection() {
   const parentId = useParentCollection();
@@ -104,7 +104,12 @@ function AbstractCollection({
 }) {
   return (
     <Button variant="ghost" className="w-full">
-      <div className="mr-auto">{collection.name}</div>
+      <div className="mr-auto flex-row">
+        {collection.name}
+        <span className="mr-auto dark:text-neutral-700">
+          {collection.order || "no order"}
+        </span>
+      </div>
       <LoadingIndicator />
     </Button>
   );
@@ -121,7 +126,6 @@ function ConcreteCollection({
 }) {
   const parentId = useParentCollection();
   const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [renameFormOpen, setRenameFormOpen] = useState(false);
 
@@ -134,12 +138,7 @@ function ConcreteCollection({
   async function onClickDelete() {
     // TODO: Ask dialog to determine unsafe/safe deletion.
 
-    setLoading(true);
     await unsafeRemoveCollection(collection.id);
-    // TODO: Don't set loading to false so that it lasts as long as the
-    // component still remains. This could cause a bug but seems okay for now.
-    // Change this when you figure out how to do things optimistically.
-    setLoading(false);
   }
 
   function onRename() {
@@ -158,7 +157,9 @@ function ConcreteCollection({
             )}
           >
             <div className="w-full">{displayName}</div>
-            {loading ? <LoadingIndicator /> : null}
+            <span className="mr-auto text-xs dark:text-neutral-700">
+              {collection.order || "0"}
+            </span>
           </Link>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-48">

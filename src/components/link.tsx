@@ -29,10 +29,10 @@ function LinkMenu({
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
+  const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
 
   function onClickEdit() {
-    setOpen(true);
+    setEditLinkFormOpen(true);
   }
 
   async function onClickDelete() {
@@ -56,8 +56,8 @@ function LinkMenu({
       <EditLinkForm
         link={link}
         editOptimisticLink={editOptimisticLink}
-        open={open}
-        setOpen={setOpen}
+        open={editLinkFormOpen}
+        setOpen={setEditLinkFormOpen}
       />
     </>
   );
