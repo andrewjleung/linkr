@@ -1,5 +1,3 @@
-"use client";
-
 import LinkComponent from "@/components/link";
 import {
   ConcreteLink,
@@ -50,12 +48,13 @@ export function Links({
   optimisticLinks,
   removeOptimisticLink,
   reorderOptimisticLinks,
+  editOptimisticLink,
 }: {
   optimisticLinks: OptimisticLink[];
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   reorderOptimisticLinks: OptimisticLinks["reorderOptimisticLinks"];
+  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
 }) {
-  console.count("render");
   function onDragStart() {}
 
   function onDragEnd(result: DropResult) {
@@ -122,6 +121,7 @@ export function Links({
                           <LinkComponent
                             optimisticLink={l}
                             removeOptimisticLink={removeOptimisticLink}
+                            editOptimisticLink={editOptimisticLink}
                           />
                         </motion.div>
                       </div>
@@ -134,25 +134,6 @@ export function Links({
           </Droppable>
         </DragDropContext>
       </AnimatePresence>
-    </div>
-  );
-}
-
-export function LinksSkeleton() {
-  return (
-    <div className="flex flex-col gap-4">
-      {Array(8)
-        .fill(0)
-        .map((_, i) => (
-          <Card
-            key={`link-skeleton-${i}`}
-            className="w-full ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 motion-safe:animate-pulse dark:ring-offset-neutral-950"
-          >
-            <CardHeader>
-              <div className="h-[1.25rem] w-full"></div>
-            </CardHeader>
-          </Card>
-        ))}
     </div>
   );
 }

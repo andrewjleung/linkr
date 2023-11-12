@@ -39,6 +39,13 @@ export async function updateLinkOrder(id: number, order: number) {
   return result;
 }
 
+export async function editLink(id: number, data: Prisma.LinkUpdateInput) {
+  const result = await prisma.link.update({ where: { id }, data });
+  revalidatePath("/");
+
+  return result;
+}
+
 export async function createCollection(
   collection: Prisma.CollectionCreateInput
 ) {

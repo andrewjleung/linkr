@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateLinkForm } from "@/components/create-link-form";
+import { CreateLinkForm } from "@/components/link-form";
 import { Link } from "@prisma/client";
 import { Links } from "@/components/links";
 import { useOptimisticLinks } from "@/hooks/use-optimistic-links";
@@ -11,6 +11,7 @@ export default function LinksView({ links }: { links: Link[] }) {
     addOptimisticLink,
     removeOptimisticLink,
     reorderOptimisticLinks,
+    editOptimisticLink,
   } = useOptimisticLinks(links);
 
   return (
@@ -19,6 +20,7 @@ export default function LinksView({ links }: { links: Link[] }) {
         optimisticLinks={optimisticLinks}
         removeOptimisticLink={removeOptimisticLink}
         reorderOptimisticLinks={reorderOptimisticLinks}
+        editOptimisticLink={editOptimisticLink}
       />
       <CreateLinkForm addOptimisticLink={addOptimisticLink} />
     </>

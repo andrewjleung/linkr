@@ -18,12 +18,18 @@ type LinkReorder = {
   destinationIndex: number;
 };
 
-type LinkUpdate = LinkAdd | LinkDelete | LinkReorder;
+type LinkEdit = {
+  type: "edit";
+  id: Link["id"];
+  data: AbstractLink["link"];
+};
+
+type LinkUpdate = LinkAdd | LinkDelete | LinkReorder | LinkEdit;
 
 export type AbstractLink = {
   type: "abstract";
   id: string;
-  link: Prisma.LinkCreateInput;
+  link: Pick<Link, "title" | "url" | "description" | "order">;
 };
 
 export type ConcreteLink = {
@@ -42,6 +48,7 @@ export type OptimisticLinks = {
     sourceIndex: number,
     destinationIndex: number
   ) => void;
+  editOptimisticLink: (id: Link["id"], data: Prisma.LinkUpdateInput) => void;
 };
 
 function handleAdd(
@@ -52,7 +59,12 @@ function handleAdd(
     {
       type: "abstract",
       id: crypto.randomUUID(),
-      link,
+      link: {
+        title: link.title || null,
+        url: link.url,
+        description: link.description || null,
+        order: link.order || Number.POSITIVE_INFINITY,
+      },
     } satisfies AbstractLink,
   ];
 }
@@ -72,7 +84,6 @@ function handleReorder(
     }
 
     const element = state[sourceIndex];
-    // console.log(sourceIndex, destinationIndex);
 
     const withoutSource = [
       ...state.slice(0, sourceIndex),
@@ -82,6 +93,43 @@ function handleReorder(
       ...withoutSource.slice(0, destinationIndex),
       element,
       ...withoutSource.slice(destinationIndex),
+    ];
+  };
+}
+
+function handleEdit(
+  state: OptimisticLink[]
+): (edit: LinkEdit) => OptimisticLink[] {
+  return ({ id, data }) => {
+    const updateIndex = state.findIndex((l) => l.id === id);
+
+    if (updateIndex === -1) {
+      console.error("could not find link to edit");
+      return state;
+    }
+
+    const originalLink = state[updateIndex];
+    const updatedLink: AbstractLink | null = (() => {
+      if (originalLink.type === "abstract") {
+        return null;
+      }
+
+      return {
+        type: "abstract",
+        id: crypto.randomUUID(),
+        link: data,
+      };
+    })();
+
+    if (updatedLink === null) {
+      console.error("cannot edit abstract link");
+      return state;
+    }
+
+    return [
+      ...state.slice(0, updateIndex),
+      updatedLink,
+      ...state.slice(updateIndex + 1),
     ];
   };
 }
@@ -101,15 +149,16 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
       .with({ type: "add" }, handleAdd(state))
       .with({ type: "delete" }, handleDelete(state))
       .with({ type: "reorder" }, handleReorder(state))
+      .with({ type: "edit" }, handleEdit(state))
       .exhaustive()
   );
 
   function addOptimisticLink(link: Prisma.LinkCreateInput) {
-    updateOptimisticLinks({ type: "add", link });
+    startTransition(() => updateOptimisticLinks({ type: "add", link }));
   }
 
   function removeOptimisticLink(id: number) {
-    updateOptimisticLinks({ type: "delete", id });
+    startTransition(() => updateOptimisticLinks({ type: "delete", id }));
   }
 
   function reorderOptimisticLinks(
@@ -121,10 +170,15 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
     );
   }
 
+  function editOptimisticLink(id: Link["id"], data: Prisma.LinkUpdateInput) {
+    startTransition(() => updateOptimisticLinks({ type: "edit", id, data }));
+  }
+
   return {
     optimisticLinks,
     addOptimisticLink,
     removeOptimisticLink,
     reorderOptimisticLinks,
+    editOptimisticLink,
   };
 }

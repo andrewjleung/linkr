@@ -77,8 +77,9 @@ function RenameForm({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputRef?.current?.focus();
-    inputRef?.current?.select();
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   }, []);
 
   const form = useForm<z.infer<typeof renameFormSchema>>({
@@ -118,9 +119,6 @@ function RenameForm({
                   {...field}
                   ref={inputRef}
                   onKeyDown={onKeyDown}
-                  // TODO: uncomment this when you figure out how to focus this
-                  // input on mount.
-                  // onBlur={onBlur}
                   className="px-4 py-2"
                 />
               </FormControl>

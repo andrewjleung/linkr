@@ -15,38 +15,51 @@ import {
 import Link from "next/link";
 import { OptimisticLink, OptimisticLinks } from "@/hooks/use-optimistic-links";
 import { deleteLink } from "@/app/actions";
-import { startTransition } from "react";
+import { useState } from "react";
+import { EditLinkForm } from "./link-form";
 
 function LinkMenu({
   link,
   removeOptimisticLink,
+  editOptimisticLink,
   children,
 }: {
   link: LinkModel;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
+  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
   children: React.ReactNode;
 }) {
-  function onClickEdit() {}
+  const [open, setOpen] = useState(false);
+
+  function onClickEdit() {
+    setOpen(true);
+  }
 
   async function onClickDelete() {
-    startTransition(() => {
-      removeOptimisticLink(link.id);
-    });
+    removeOptimisticLink(link.id);
     await deleteLink(link.id);
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>{children}</ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem inset onClick={onClickEdit}>
-          Edit
-        </ContextMenuItem>
-        <ContextMenuItem inset onClick={onClickDelete}>
-          Delete
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger>{children}</ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem inset onClick={onClickEdit}>
+            Edit
+          </ContextMenuItem>
+          <ContextMenuItem inset onClick={onClickDelete}>
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+      <EditLinkForm
+        link={link}
+        editOptimisticLink={editOptimisticLink}
+        open={open}
+        setOpen={setOpen}
+      />
+    </>
   );
 }
 
@@ -57,7 +70,7 @@ function AbstractLink({ link }: { link: Prisma.LinkCreateInput }) {
         <CardHeader>
           <CardTitle className="flex flex-row text-sm">
             {link.url}
-            <div className="ml-auto text-neutral-700">
+            <div className="ml-auto text-xs text-neutral-300 dark:text-neutral-700">
               {link.order || "no order"}
             </div>
           </CardTitle>
@@ -78,12 +91,18 @@ function AbstractLink({ link }: { link: Prisma.LinkCreateInput }) {
 function ConcreteLink({
   link,
   removeOptimisticLink,
+  editOptimisticLink,
 }: {
   link: LinkModel;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
+  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
 }) {
   return (
-    <LinkMenu link={link} removeOptimisticLink={removeOptimisticLink}>
+    <LinkMenu
+      link={link}
+      removeOptimisticLink={removeOptimisticLink}
+      editOptimisticLink={editOptimisticLink}
+    >
       <AbstractLink link={link} />
     </LinkMenu>
   );
@@ -92,9 +111,11 @@ function ConcreteLink({
 export default function LinkComponent({
   optimisticLink,
   removeOptimisticLink,
+  editOptimisticLink,
 }: {
   optimisticLink: OptimisticLink;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
+  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
 }) {
   if (optimisticLink.type === "abstract") {
     return <AbstractLink link={optimisticLink.link} />;
@@ -104,6 +125,7 @@ export default function LinkComponent({
     <ConcreteLink
       link={optimisticLink.link}
       removeOptimisticLink={removeOptimisticLink}
+      editOptimisticLink={editOptimisticLink}
     />
   );
 }

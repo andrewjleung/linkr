@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { UseFormReturn, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createLink } from "@/app/actions";
+import { createLink, editLink } from "@/app/actions";
 import { startTransition, useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import {
@@ -24,6 +24,7 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { Textarea } from "@/components/ui/textarea";
 import { OptimisticLinks } from "@/hooks/use-optimistic-links";
+import { Link } from "@prisma/client";
 
 function isUrl(s: string): boolean {
   try {
@@ -34,24 +35,26 @@ function isUrl(s: string): boolean {
   }
 }
 
+const urlSchema = z
+  .string()
+  .trim()
+  .transform((val) => {
+    if (isUrl(val)) {
+      return val;
+    }
+
+    const valWithHTTPSScheme = `https://${val}`;
+
+    if (isUrl(valWithHTTPSScheme)) {
+      return valWithHTTPSScheme;
+    }
+  })
+  .pipe(z.string().url());
+
 const linkSchema = z.object({
   title: z.optional(z.string().trim()),
   description: z.optional(z.string()),
-  url: z
-    .string()
-    .trim()
-    .transform((val) => {
-      if (isUrl(val)) {
-        return val;
-      }
-
-      const valWithHTTPSScheme = `https://${val}`;
-
-      if (isUrl(valWithHTTPSScheme)) {
-        return valWithHTTPSScheme;
-      }
-    })
-    .pipe(z.string().url()),
+  url: urlSchema,
   // tags: z.array(z.string().trim()),
 });
 
@@ -61,43 +64,69 @@ const DEFAULT_FORM_VALUES = {
   description: "",
 };
 
+export function EditLinkForm({
+  link,
+  editOptimisticLink,
+  open,
+  setOpen,
+}: {
+  link: Link;
+  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof linkSchema>>({
+    resolver: zodResolver(linkSchema),
+    defaultValues: {
+      title: link.title || "",
+      url: link.url,
+      description: link.description || "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof linkSchema>) => {
+    console.log("ahh", editOptimisticLink);
+    setLoading(true);
+    form.reset(DEFAULT_FORM_VALUES);
+    setOpen(false);
+
+    editOptimisticLink(link.id, {
+      title: values.title || null,
+      description: values.description || null,
+      url: values.url,
+    });
+
+    await editLink(link.id, {
+      title: values.title || null,
+      description: values.description || null,
+      url: values.url,
+    });
+
+    setLoading(false);
+  };
+
+  return (
+    <LinkFormInner
+      key={`edit-link-form-${open}-${link.id}`}
+      title="Edit link"
+      form={form}
+      loading={loading}
+      open={open}
+      setOpen={setOpen}
+      onSubmit={onSubmit}
+    />
+  );
+}
+
 export function CreateLinkForm({
   addOptimisticLink,
 }: {
   addOptimisticLink: OptimisticLinks["addOptimisticLink"];
 }) {
-  const [createLinkFormIsOpen, setCreateLinkFormIsOpen] = useState(false);
-  const parentId = useParentCollection();
-
-  useKeyPress(
-    { shiftKey: false, metaKey: false, code: "KeyQ" },
-    (event) => {
-      event.preventDefault();
-      setCreateLinkFormIsOpen(true);
-    },
-    createLinkFormIsOpen
-  );
-
-  return (
-    <CreateLinkFormInner
-      key={`create-link-form-${parentId}-${createLinkFormIsOpen}`}
-      open={createLinkFormIsOpen}
-      setOpen={setCreateLinkFormIsOpen}
-      addOptimisticLink={addOptimisticLink}
-    />
-  );
-}
-
-function CreateLinkFormInner({
-  open,
-  setOpen,
-  addOptimisticLink,
-}: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  addOptimisticLink: OptimisticLinks["addOptimisticLink"];
-}) {
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const parentId = useParentCollection();
 
   const form = useForm<z.infer<typeof linkSchema>>({
@@ -105,7 +134,7 @@ function CreateLinkFormInner({
     defaultValues: DEFAULT_FORM_VALUES,
   });
 
-  async function onSubmit(values: z.infer<typeof linkSchema>) {
+  const onSubmit = async (values: z.infer<typeof linkSchema>) => {
     setLoading(true);
     form.reset(DEFAULT_FORM_VALUES);
     setOpen(false);
@@ -136,13 +165,50 @@ function CreateLinkFormInner({
 
     setLoading(false);
     // TODO: create tags as well...
-  }
+  };
 
+  useKeyPress(
+    { shiftKey: false, metaKey: false, code: "KeyQ" },
+    (event) => {
+      event.preventDefault();
+      setOpen(true);
+    },
+    open
+  );
+
+  return (
+    <LinkFormInner
+      key={`create-link-form-${open}`}
+      title="Add a new link"
+      form={form}
+      loading={loading}
+      open={open}
+      setOpen={setOpen}
+      onSubmit={onSubmit}
+    />
+  );
+}
+
+function LinkFormInner({
+  title,
+  form,
+  loading,
+  open,
+  setOpen,
+  onSubmit,
+}: {
+  title: string;
+  form: UseFormReturn<z.infer<typeof linkSchema>>;
+  loading: boolean;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onSubmit: (values: z.infer<typeof linkSchema>) => Promise<void>;
+}) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add a new link</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
