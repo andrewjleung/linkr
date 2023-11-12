@@ -12,10 +12,6 @@ export function Collections({
   unsafeRemoveCollection: (id: number) => Promise<void>;
   renameCollection: (id: number, newName: string) => Promise<void>;
 }) {
-  const [editingCollection, setEditingCollection] = useState<number | null>(
-    null
-  );
-
   return (
     <div className="flex flex-col space-y-2">
       <HomeCollection />
@@ -28,8 +24,6 @@ export function Collections({
               : `concrete-collection-${c.collection.id}`
           }
           optimisticCollection={c}
-          editingCollection={editingCollection}
-          setEditingCollection={setEditingCollection}
           unsafeRemoveCollection={unsafeRemoveCollection}
           renameCollection={renameCollection}
         />

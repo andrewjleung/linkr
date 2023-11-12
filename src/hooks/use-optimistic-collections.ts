@@ -5,6 +5,7 @@ import {
   renameCollection as renameCollectionAction,
 } from "@/app/actions";
 import { Prisma, Collection } from "@prisma/client";
+// @ts-ignore
 import { startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
 
@@ -29,7 +30,7 @@ type CollectionUpdate = CollectionAdd | CollectionDelete | CollectionRename;
 type AbstractCollection = {
   type: "abstract";
   tempId: string;
-  collection: Prisma.CollectionCreateInput;
+  collection: Pick<Collection, "name">;
 };
 
 type ConcreteCollection = {

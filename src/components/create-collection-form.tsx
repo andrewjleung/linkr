@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { UseFormReturn, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { Prisma } from "@prisma/client";
+import { Collection, Prisma } from "@prisma/client";
+import { OptimisticCollections } from "@/hooks/use-optimistic-collections";
 
 const collectionSchema = z.object({
   name: z.string().nonempty(),
@@ -33,48 +34,73 @@ const DEFAULT_FORM_VALUES = {
   name: "",
 };
 
-export function CreateCollectionForm({
-  addCollection,
+export function RenameCollectionForm({
+  collection,
+  renameCollection,
+  open,
+  setOpen,
 }: {
-  addCollection: (collection: Prisma.CollectionCreateInput) => Promise<void>;
+  collection: Collection;
+  renameCollection: OptimisticCollections["renameCollection"];
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [formIsOpen, setFormIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const parentId = useParentCollection();
 
-  useKeyPress(
-    { shiftKey: true, metaKey: false, code: "KeyQ" },
-    (event) => {
-      event.preventDefault();
-      setFormIsOpen(true);
+  const form = useForm<z.infer<typeof collectionSchema>>({
+    resolver: zodResolver(collectionSchema),
+    defaultValues: {
+      name: collection.name,
     },
-    formIsOpen
-  );
+  });
+
+  async function onSubmit(values: z.infer<typeof collectionSchema>) {
+    setLoading(true);
+    form.reset(DEFAULT_FORM_VALUES);
+    setOpen(false);
+
+    // TODO: handle failure case
+    await renameCollection(collection.id, values.name);
+
+    setLoading(false);
+  }
 
   return (
-    <CreateCollectionFormInner
-      key={`create-collection-form-${parentId}-${formIsOpen}`}
-      open={formIsOpen}
-      setOpen={setFormIsOpen}
-      addCollection={addCollection}
+    <CollectionFormInner
+      title="Rename collection"
+      form={form}
+      key={`create-collection-form-${open}-${parentId}`}
+      open={open}
+      setOpen={setOpen}
+      loading={loading}
+      onSubmit={onSubmit}
     />
   );
 }
 
-function CreateCollectionFormInner({
-  open,
-  setOpen,
+export function CreateCollectionForm({
   addCollection,
 }: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  addCollection: (collection: Prisma.CollectionCreateInput) => Promise<void>;
+  addCollection: OptimisticCollections["addCollection"];
 }) {
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const parentId = useParentCollection();
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
     defaultValues: DEFAULT_FORM_VALUES,
   });
+
+  useKeyPress(
+    { shiftKey: true, metaKey: false, code: "KeyQ" },
+    (event) => {
+      event.preventDefault();
+      setOpen(true);
+    },
+    open
+  );
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
     setLoading(true);
@@ -96,10 +122,38 @@ function CreateCollectionFormInner({
   }
 
   return (
+    <CollectionFormInner
+      title="Add a new collection"
+      form={form}
+      key={`create-collection-form-${open}-${parentId}`}
+      open={open}
+      setOpen={setOpen}
+      loading={loading}
+      onSubmit={onSubmit}
+    />
+  );
+}
+
+function CollectionFormInner({
+  title,
+  form,
+  open,
+  setOpen,
+  loading,
+  onSubmit,
+}: {
+  title: string;
+  form: UseFormReturn<z.infer<typeof collectionSchema>>;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  loading: boolean;
+  onSubmit: (values: z.infer<typeof collectionSchema>) => Promise<void>;
+}) {
+  return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add a new collection</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form

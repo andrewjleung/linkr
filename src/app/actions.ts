@@ -3,6 +3,7 @@
 import { Collection, Link, Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function createLink(
   link: Parameters<typeof prisma.link.create>[0]["data"]
@@ -44,6 +45,16 @@ export async function editLink(id: number, data: Prisma.LinkUpdateInput) {
   revalidatePath("/");
 
   return result;
+}
+
+export async function validateCollection(id: number) {
+  "use server";
+
+  const count = await prisma.collection.count({ where: { id } });
+
+  if (count < 1) {
+    redirect("/");
+  }
 }
 
 export async function createCollection(

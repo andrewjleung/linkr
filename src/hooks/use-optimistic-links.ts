@@ -1,4 +1,5 @@
 import { Prisma, Link } from "@prisma/client";
+// @ts-ignore
 import { startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
 
