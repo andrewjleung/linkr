@@ -25,7 +25,7 @@ export default async function RootLayout({
       <body className="min-h-screen dark:bg-neutral-950">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <main className="relative flex min-h-screen flex-col">
-            <header className="sticky top-0 w-full border-b backdrop-blur dark:border-neutral-800">
+            <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
               <div className="container flex max-w-7xl flex-col items-start justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
                 <h2 className="ml-4 text-lg font-semibold">linkr</h2>
                 <div className="ml-auto mr-4 flex w-full space-x-2 sm:justify-end">
@@ -33,13 +33,15 @@ export default async function RootLayout({
                 </div>
               </div>
             </header>
-            <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-3 gap-8 p-8">
+            <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-3 gap-8 px-8 pt-8">
               <div className="col-span-1">
                 <CollectionsView
                   unoptimisticCollections={unoptimisticCollections}
                 />
               </div>
-              <div className="col-span-2 mr-4">{children}</div>
+              <div className="col-span-2 mr-4 h-[calc(100vh-97px)] overflow-y-auto">
+                {children}
+              </div>
             </div>
           </main>
         </ThemeProvider>

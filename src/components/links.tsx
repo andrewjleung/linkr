@@ -99,42 +99,38 @@ export function Links({
   }
 
   return (
-    <div>
-      <AnimatePresence>
-        <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-          <Droppable droppableId="LINK-LIST">
-            {(provided, snapshot) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
-                {optimisticLinks.map((l, i) => (
-                  <Draggable
-                    key={`link-${l.id}`}
-                    draggableId={`${l.type}-link-${l.id}`}
-                    index={i}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="mb-4"
-                      >
-                        <motion.div whileHover={{ scale: 1.025 }}>
-                          <LinkComponent
-                            optimisticLink={l}
-                            removeOptimisticLink={removeOptimisticLink}
-                            editOptimisticLink={editOptimisticLink}
-                          />
-                        </motion.div>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </AnimatePresence>
-    </div>
+    <AnimatePresence>
+      <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <Droppable droppableId="LINK-LIST">
+          {(provided, snapshot) => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              {optimisticLinks.map((l, i) => (
+                <Draggable
+                  key={`link-${l.id}`}
+                  draggableId={`${l.type}-link-${l.id}`}
+                  index={i}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className="mb-4"
+                    >
+                      <LinkComponent
+                        optimisticLink={l}
+                        removeOptimisticLink={removeOptimisticLink}
+                        editOptimisticLink={editOptimisticLink}
+                      />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </AnimatePresence>
   );
 }
