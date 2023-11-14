@@ -2,8 +2,8 @@
 
 import { CreateCollectionForm } from "@/components/collection-form";
 import { Collections } from "@/components/collections";
+import { Collection } from "@/database/types";
 import { useOptimisticCollections } from "@/hooks/use-optimistic-collections";
-import { Collection } from "@prisma/client";
 
 export function CollectionsView({
   unoptimisticCollections,

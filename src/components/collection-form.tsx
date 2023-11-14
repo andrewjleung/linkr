@@ -108,6 +108,7 @@ export function CreateCollectionForm({
     // TODO: handle failure case
     await addCollection({
       name: values.name,
+      parentCollectionId: null,
     })
       .then((collection) => {
         console.log(collection);

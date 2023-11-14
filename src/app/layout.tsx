@@ -3,8 +3,10 @@ import clsx from "clsx";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Separator } from "@/components/ui/separator";
-import prisma from "@/lib/prisma";
 import { CollectionsView } from "@/components/collections-view";
+import { db } from "@/database/database";
+import { collections } from "@/database/schema";
+import { asc } from "drizzle-orm";
 
 export const metadata = {
   title: "Create Next App",
@@ -16,9 +18,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const unoptimisticCollections = await prisma.collection.findMany({
-    orderBy: { order: "asc" },
-  });
+  const unoptimisticCollections = await db
+    .select()
+    .from(collections)
+    .orderBy(asc(collections.order));
 
   return (
     <html lang="en" suppressHydrationWarning>

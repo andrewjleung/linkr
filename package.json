@@ -6,15 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "migrate": "npx prisma migrate dev --name",
-    "generate": "npx prisma generate"
+    "lint": "next lint"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^1.0.5",
     "@hello-pangea/dnd": "^16.3.0",
     "@hookform/resolvers": "^3.3.2",
-    "@prisma/client": "^5.5.2",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
@@ -52,6 +48,7 @@
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
+    "drizzle-orm": "^0.29.0",
     "eslint": "8.43.0",
     "eslint-config-next": "14.0.0",
     "framer-motion": "^10.16.4",
@@ -61,6 +58,7 @@
     "next-auth": "^4.24.4",
     "next-themes": "^0.2.1",
     "postcss": "8.4.24",
+    "postgres": "^3.4.3",
     "react": "18.2.0",
     "react-day-picker": "^8.9.1",
     "react-dom": "18.2.0",
@@ -74,8 +72,8 @@
   },
   "devDependencies": {
     "@types/prettier": "^2.7.3",
+    "drizzle-kit": "^0.20.2",
     "prettier": "^2.8.8",
-    "prettier-plugin-tailwindcss": "^0.3.0",
-    "prisma": "^5.5.2"
+    "prettier-plugin-tailwindcss": "^0.3.0"
   }
 }

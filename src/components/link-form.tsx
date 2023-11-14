@@ -146,20 +146,12 @@ export function CreateLinkForm({
       });
     });
 
-    if (parentId === null) {
-      await createLink({
-        title: values.title || null,
-        description: values.description || null,
-        url: values.url,
-      });
-    } else {
-      await createLink({
-        title: values.title || null,
-        description: values.description || null,
-        url: values.url,
-        parentId,
-      });
-    }
+    await createLink({
+      title: values.title || null,
+      description: values.description || null,
+      url: values.url,
+      parentCollectionId: parentId,
+    });
 
     setLoading(false);
     // TODO: create tags as well...

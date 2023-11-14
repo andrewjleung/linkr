@@ -5,7 +5,7 @@ import {
   renameCollection as renameCollectionAction,
   updateCollectionOrder,
 } from "@/app/actions";
-import { Prisma, Collection } from "@prisma/client";
+import { Collection, CollectionInsert } from "@/database/types";
 // @ts-ignore
 import { startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
@@ -36,7 +36,7 @@ function orderForReorderedElement(
 
 type CollectionAdd = {
   type: "add";
-  collection: Prisma.CollectionCreateInput;
+  collection: Omit<CollectionInsert, "order">;
 };
 
 type CollectionDelete = {
@@ -79,7 +79,7 @@ export type OptimisticCollection = AbstractCollection | ConcreteCollection;
 
 export type OptimisticCollections = {
   optimisticCollections: OptimisticCollection[];
-  addCollection: (collection: Prisma.CollectionCreateInput) => Promise<void>;
+  addCollection: (collection: Omit<CollectionInsert, "order">) => Promise<void>;
   unsafeRemoveCollection: (id: number) => Promise<void>;
   safeRemoveCollection: (id: number) => Promise<void>;
   renameCollection: (id: number, newName: string) => Promise<void>;
@@ -100,7 +100,7 @@ function handleAdd(
       id: crypto.randomUUID(),
       collection: {
         name: collection.name,
-        order: collection.order || Number.POSITIVE_INFINITY,
+        order: Number.POSITIVE_INFINITY,
       },
     } satisfies AbstractCollection,
   ];
@@ -183,7 +183,7 @@ export function useOptimisticCollections(
         .exhaustive()
   );
 
-  async function addCollection(collection: Prisma.CollectionCreateInput) {
+  async function addCollection(collection: Omit<CollectionInsert, "order">) {
     startTransition(() => {
       updateOptimisticCollections({ type: "add", collection });
     });

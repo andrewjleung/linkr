@@ -1,9 +1,9 @@
 "use client";
 
 import { CreateLinkForm } from "@/components/link-form";
-import { Link } from "@prisma/client";
-import { Links } from "@/components/links";
 import { useOptimisticLinks } from "@/hooks/use-optimistic-links";
+import type { Link } from "@/database/types";
+import { Links } from "@/components/links";
 
 export default function LinksView({ links }: { links: Link[] }) {
   const {
