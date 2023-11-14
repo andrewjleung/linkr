@@ -24,7 +24,7 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { Textarea } from "@/components/ui/textarea";
 import { OptimisticLinks } from "@/hooks/use-optimistic-links";
-import { Link } from "@prisma/client";
+import { Link } from "@/database/types";
 
 function isUrl(s: string): boolean {
   try {
@@ -91,12 +91,14 @@ export function EditLinkForm({
     setOpen(false);
 
     editOptimisticLink(link.id, {
+      ...link,
       title: values.title || null,
       description: values.description || null,
       url: values.url,
     });
 
     await editLink(link.id, {
+      ...link,
       title: values.title || null,
       description: values.description || null,
       url: values.url,
@@ -137,13 +139,11 @@ export function CreateLinkForm({
     form.reset(DEFAULT_FORM_VALUES);
     setOpen(false);
 
-    startTransition(() => {
-      addOptimisticLink({
-        title: values.title || null,
-        description: values.description || null,
-        url: values.url,
-        order: Number.POSITIVE_INFINITY,
-      });
+    addOptimisticLink({
+      title: values.title || null,
+      description: values.description || null,
+      url: values.url,
+      order: Number.POSITIVE_INFINITY,
     });
 
     await createLink({

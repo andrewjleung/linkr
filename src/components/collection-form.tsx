@@ -23,8 +23,8 @@ import {
 } from "@/components/ui/dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { Collection, Prisma } from "@prisma/client";
 import { OptimisticCollections } from "@/hooks/use-optimistic-collections";
+import { Collection } from "@/database/types";
 
 const collectionSchema = z.object({
   name: z.string().nonempty(),
@@ -50,7 +50,7 @@ export function RenameCollectionForm({
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
     defaultValues: {
-      name: collection.name,
+      name: collection.name || "",
     },
   });
 

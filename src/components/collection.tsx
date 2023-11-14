@@ -1,4 +1,3 @@
-import { Collection, Prisma } from "@prisma/client";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,6 +59,7 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
 import LoadingIndicator from "@/components/loading-indicator";
 import { RenameCollectionForm } from "@/components/collection-form";
+import { Collection, CollectionInsert } from "@/database/types";
 
 export function HomeCollection() {
   const parentId = useParentCollection();
@@ -75,7 +75,7 @@ export function HomeCollection() {
   );
 }
 
-export function Collection({
+export function CollectionComponent({
   optimisticCollection,
   unsafeRemoveCollection,
   renameCollection,
@@ -100,7 +100,7 @@ export function Collection({
 function AbstractCollection({
   collection,
 }: {
-  collection: Prisma.CollectionCreateInput;
+  collection: Omit<CollectionInsert, "parentCollectionId">;
 }) {
   return (
     <Button variant="ghost" className="w-full">

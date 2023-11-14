@@ -1,4 +1,4 @@
-import { Collection, HomeCollection } from "@/components/collection";
+import { CollectionComponent, HomeCollection } from "@/components/collection";
 import { Separator } from "@/components/ui/separator";
 import {
   ConcreteCollection,
@@ -71,7 +71,7 @@ export function Collections({
                       {...provided.dragHandleProps}
                       className="mb-2"
                     >
-                      <Collection
+                      <CollectionComponent
                         optimisticCollection={c}
                         unsafeRemoveCollection={unsafeRemoveCollection}
                         renameCollection={renameCollection}

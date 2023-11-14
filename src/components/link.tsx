@@ -1,4 +1,3 @@
-import { Link as LinkModel, Prisma } from "@prisma/client";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -17,6 +16,7 @@ import { OptimisticLink, OptimisticLinks } from "@/hooks/use-optimistic-links";
 import { deleteLink } from "@/app/actions";
 import { useState } from "react";
 import { EditLinkForm } from "./link-form";
+import { LinkInsert, Link as LinkSchema } from "@/database/types";
 
 function LinkMenu({
   link,
@@ -24,7 +24,7 @@ function LinkMenu({
   editOptimisticLink,
   children,
 }: {
-  link: LinkModel;
+  link: LinkSchema;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
   children: React.ReactNode;
@@ -63,20 +63,41 @@ function LinkMenu({
   );
 }
 
-function AbstractLink({ link }: { link: Prisma.LinkCreateInput }) {
+function stripProtocol(url: string) {
+  const parsed = new URL(url);
+
+  if (parsed.protocol === "https:") {
+    return url.slice(parsed.protocol.length + 2);
+  }
+
+  return url;
+}
+
+function AbstractLink({
+  link,
+}: {
+  link: Omit<LinkInsert, "parentCollectionId">;
+}) {
   return (
     <Link href={link.url}>
       <Card className="ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
         <CardHeader>
-          <CardTitle className="flex flex-row text-sm">
-            {link.url}
-            <div className="ml-auto text-xs text-neutral-300 dark:text-neutral-700">
-              {link.order || "no order"}
-            </div>
-          </CardTitle>
           {link.title === null ? null : (
-            <CardDescription>{link.title}</CardDescription>
+            <CardTitle className="flex flex-row text-sm">
+              {link.title}
+              <div className="ml-auto text-xs text-neutral-300 dark:text-neutral-700">
+                {link.order || "no order"}
+              </div>
+            </CardTitle>
           )}
+          <CardDescription className="flex flex-row">
+            {stripProtocol(link.url)}
+            {link.title === null ? (
+              <div className="ml-auto text-xs text-neutral-300 dark:text-neutral-700">
+                {link.order || "no order"}
+              </div>
+            ) : null}
+          </CardDescription>
         </CardHeader>
         {link.description === null ? null : (
           <CardContent className="whitespace-pre-wrap text-xs">
@@ -93,7 +114,7 @@ function ConcreteLink({
   removeOptimisticLink,
   editOptimisticLink,
 }: {
-  link: LinkModel;
+  link: LinkSchema;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
 }) {
