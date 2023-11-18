@@ -1,3 +1,4 @@
+import { LinkWithOg } from "@/app/page";
 import type { Link, LinkInsert } from "@/database/types";
 // @ts-ignore
 import { startTransition, useOptimistic } from "react";
@@ -22,7 +23,7 @@ type LinkReorder = {
 type LinkEdit = {
   type: "edit";
   id: Link["id"];
-  link: AbstractLink["link"];
+  edit: Pick<Link, "title" | "url" | "description">;
 };
 
 type LinkUpdate = LinkAdd | LinkDelete | LinkReorder | LinkEdit;
@@ -36,7 +37,7 @@ export type AbstractLink = {
 export type ConcreteLink = {
   type: "concrete";
   id: number;
-  link: Link;
+  link: LinkWithOg;
 };
 
 export type OptimisticLink = AbstractLink | ConcreteLink;
@@ -49,7 +50,7 @@ export type OptimisticLinks = {
     sourceIndex: number,
     destinationIndex: number
   ) => void;
-  editOptimisticLink: (id: Link["id"], link: Link) => void;
+  editOptimisticLink: (id: Link["id"], edit: LinkEdit["edit"]) => void;
 };
 
 function handleAdd(
@@ -101,7 +102,7 @@ function handleReorder(
 function handleEdit(
   state: OptimisticLink[]
 ): (edit: LinkEdit) => OptimisticLink[] {
-  return ({ id, link }) => {
+  return ({ id, edit }) => {
     const updateIndex = state.findIndex((l) => l.id === id);
 
     if (updateIndex === -1) {
@@ -118,7 +119,10 @@ function handleEdit(
       return {
         type: "abstract",
         id: crypto.randomUUID(),
-        link,
+        link: {
+          ...originalLink.link,
+          ...edit,
+        },
       };
     })();
 
@@ -171,8 +175,8 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
     );
   }
 
-  function editOptimisticLink(id: Link["id"], link: AbstractLink["link"]) {
-    startTransition(() => updateOptimisticLinks({ type: "edit", id, link }));
+  function editOptimisticLink(id: Link["id"], edit: LinkEdit["edit"]) {
+    startTransition(() => updateOptimisticLinks({ type: "edit", id, edit }));
   }
 
   return {

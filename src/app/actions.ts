@@ -44,8 +44,14 @@ export async function updateLinkOrder(id: number, order: number) {
   return result;
 }
 
-export async function editLink(id: number, data: LinkInsert) {
-  const result = await db.update(links).set(data).where(eq(links.id, id));
+export async function editLink(
+  id: number,
+  data: Pick<LinkInsert, "title" | "url" | "description">
+) {
+  const result = await db
+    .update(links)
+    .set({ ...data, updatedAt: new Date(Date.now()) })
+    .where(eq(links.id, id));
   revalidatePath("/");
 
   return result;

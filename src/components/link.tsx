@@ -12,11 +12,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { OptimisticLink, OptimisticLinks } from "@/hooks/use-optimistic-links";
+import {
+  AbstractLink,
+  ConcreteLink,
+  OptimisticLink,
+  OptimisticLinks,
+} from "@/hooks/use-optimistic-links";
 import { deleteLink } from "@/app/actions";
 import { useState } from "react";
 import { EditLinkForm } from "./link-form";
 import { LinkInsert, Link as LinkSchema } from "@/database/types";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { LinkIcon } from "lucide-react";
+import ogs from "open-graph-scraper";
+import { LinkWithOg } from "@/app/page";
 
 function LinkMenu({
   link,
@@ -63,69 +73,30 @@ function LinkMenu({
   );
 }
 
-function stripProtocol(url: string) {
-  const parsed = new URL(url);
+function AbstractLink({ link }: { link: AbstractLink["link"] }) {
+  const title = [link.title, link.og?.ogTitle, link.url].find(Boolean) || null;
+  const description =
+    [link.description, link.og?.ogDescription].find(Boolean) || null;
 
-  if (parsed.protocol === "https:") {
-    return url.slice(parsed.protocol.length + 2);
-  }
-
-  return url;
-}
-
-function AbstractLink({
-  link,
-}: {
-  link: Omit<LinkInsert, "parentCollectionId">;
-}) {
   return (
     <Link href={link.url}>
-      <Card className="ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
+      <Card className="group relative ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
+        <div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
+          {link.order || "no order"}
+        </div>
         <CardHeader>
-          {link.title === null ? null : (
-            <CardTitle className="flex flex-row text-sm">
-              {link.title}
-              <div className="ml-auto text-xs text-neutral-300 dark:text-neutral-700">
-                {link.order || "no order"}
-              </div>
-            </CardTitle>
-          )}
-          <CardDescription className="flex flex-row">
-            {stripProtocol(link.url)}
-            {link.title === null ? (
-              <div className="ml-auto text-xs text-neutral-300 dark:text-neutral-700">
-                {link.order || "no order"}
-              </div>
-            ) : null}
-          </CardDescription>
+          <CardTitle className="flex flex-row items-center text-sm">
+            {title}
+          </CardTitle>
+          <CardDescription>{link.url}</CardDescription>
         </CardHeader>
-        {link.description === null ? null : (
+        {description === null ? null : (
           <CardContent className="whitespace-pre-wrap text-xs">
-            {link.description}
+            {description}
           </CardContent>
         )}
       </Card>
     </Link>
-  );
-}
-
-function ConcreteLink({
-  link,
-  removeOptimisticLink,
-  editOptimisticLink,
-}: {
-  link: LinkSchema;
-  removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
-  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
-}) {
-  return (
-    <LinkMenu
-      link={link}
-      removeOptimisticLink={removeOptimisticLink}
-      editOptimisticLink={editOptimisticLink}
-    >
-      <AbstractLink link={link} />
-    </LinkMenu>
   );
 }
 
@@ -143,10 +114,12 @@ export default function LinkComponent({
   }
 
   return (
-    <ConcreteLink
+    <LinkMenu
       link={optimisticLink.link}
       removeOptimisticLink={removeOptimisticLink}
       editOptimisticLink={editOptimisticLink}
-    />
+    >
+      <AbstractLink link={optimisticLink.link} />
+    </LinkMenu>
   );
 }

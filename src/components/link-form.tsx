@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { createLink, editLink } from "@/app/actions";
-import { startTransition, useState } from "react";
+import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import {
   Dialog,
@@ -91,14 +91,12 @@ export function EditLinkForm({
     setOpen(false);
 
     editOptimisticLink(link.id, {
-      ...link,
       title: values.title || null,
       description: values.description || null,
       url: values.url,
     });
 
     await editLink(link.id, {
-      ...link,
       title: values.title || null,
       description: values.description || null,
       url: values.url,
