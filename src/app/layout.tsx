@@ -29,9 +29,9 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <main className="relative flex min-h-screen flex-col">
             <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
-              <div className="container flex max-w-7xl flex-col items-start justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
+              <div className="container flex h-16 max-w-7xl flex-row items-center">
                 <h2 className="ml-4 text-lg font-semibold">linkr</h2>
-                <div className="ml-auto mr-4 flex w-full space-x-2 sm:justify-end">
+                <div className="ml-auto mr-4 mt-0">
                   <ThemeToggle />
                 </div>
               </div>

@@ -11,6 +11,7 @@ import { desc, eq, isNull } from "drizzle-orm";
 const ORDER_BUFFER = 100;
 
 export async function createLink(link: Omit<LinkInsert, "order">) {
+  // TODO: Reset ordering numbers of links in collection
   const lastLinkInCollection = await db.query.links.findFirst({
     where:
       link.parentCollectionId === null
