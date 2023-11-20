@@ -25,8 +25,7 @@ import { LinkInsert, Link as LinkSchema } from "@/database/types";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon } from "lucide-react";
-import ogs from "open-graph-scraper";
-import { LinkWithOg } from "@/app/page";
+import { OgObject } from "open-graph-scraper/dist/lib/types";
 
 function LinkMenu({
   link,
@@ -73,10 +72,16 @@ function LinkMenu({
   );
 }
 
-function AbstractLink({ link }: { link: AbstractLink["link"] }) {
-  const title = [link.title, link.og?.ogTitle, link.url].find(Boolean) || null;
+function AbstractLink({
+  link,
+  og,
+}: {
+  link: AbstractLink["link"];
+  og?: OgObject;
+}) {
+  const title = [link.title, og?.ogTitle, link.url].find(Boolean) || null;
   const description =
-    [link.description, link.og?.ogDescription].find(Boolean) || null;
+    [link.description, og?.ogDescription].find(Boolean) || null;
 
   return (
     <Link href={link.url}>
@@ -102,15 +107,17 @@ function AbstractLink({ link }: { link: AbstractLink["link"] }) {
 
 export default function LinkComponent({
   optimisticLink,
+  og,
   removeOptimisticLink,
   editOptimisticLink,
 }: {
   optimisticLink: OptimisticLink;
+  og?: OgObject;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
 }) {
   if (optimisticLink.type === "abstract") {
-    return <AbstractLink link={optimisticLink.link} />;
+    return <AbstractLink link={optimisticLink.link} og={og} />;
   }
 
   return (
@@ -119,7 +126,7 @@ export default function LinkComponent({
       removeOptimisticLink={removeOptimisticLink}
       editOptimisticLink={editOptimisticLink}
     >
-      <AbstractLink link={optimisticLink.link} />
+      <AbstractLink link={optimisticLink.link} og={og} />
     </LinkMenu>
   );
 }

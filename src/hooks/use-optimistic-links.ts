@@ -1,5 +1,5 @@
-import { LinkWithOg } from "@/app/page";
 import type { Link, LinkInsert } from "@/database/types";
+import { OgObject } from "open-graph-scraper/dist/lib/types";
 // @ts-ignore
 import { startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
@@ -37,7 +37,8 @@ export type AbstractLink = {
 export type ConcreteLink = {
   type: "concrete";
   id: number;
-  link: LinkWithOg;
+  link: Link;
+  og?: OgObject;
 };
 
 export type OptimisticLink = AbstractLink | ConcreteLink;
