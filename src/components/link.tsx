@@ -2,6 +2,10 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import {
@@ -18,10 +22,10 @@ import {
   OptimisticLink,
   OptimisticLinks,
 } from "@/hooks/use-optimistic-links";
-import { deleteLink } from "@/app/actions";
+import { deleteLink, editLink, moveLink } from "@/app/actions";
 import { useState } from "react";
 import { EditLinkForm } from "./link-form";
-import { LinkInsert, Link as LinkSchema } from "@/database/types";
+import { Collection, LinkInsert, Link as LinkSchema } from "@/database/types";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon } from "lucide-react";
@@ -29,11 +33,13 @@ import { OgObject } from "open-graph-scraper/dist/lib/types";
 
 function LinkMenu({
   link,
+  collections,
   removeOptimisticLink,
   editOptimisticLink,
   children,
 }: {
   link: LinkSchema;
+  collections: Collection[];
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
   children: React.ReactNode;
@@ -49,14 +55,36 @@ function LinkMenu({
     await deleteLink(link.id);
   }
 
+  async function onClickMoveTo(collectionId: Collection["id"] | null) {
+    removeOptimisticLink(link.id);
+    await moveLink(link.id, collectionId);
+  }
+
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger>{children}</ContextMenuTrigger>
-        <ContextMenuContent>
+        <ContextMenuContent className="w-64">
           <ContextMenuItem inset onClick={onClickEdit}>
             Edit
           </ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger inset>Move to</ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-48">
+              <ContextMenuItem onClick={() => onClickMoveTo(null)}>
+                Home
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              {collections.map((c) => (
+                <ContextMenuItem
+                  key={`move-to-collection-item-${c.id}`}
+                  onClick={() => onClickMoveTo(c.id)}
+                >
+                  {c.name}
+                </ContextMenuItem>
+              ))}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
           <ContextMenuItem inset onClick={onClickDelete}>
             Delete
           </ContextMenuItem>
@@ -107,11 +135,13 @@ function AbstractLink({
 
 export default function LinkComponent({
   optimisticLink,
+  collections,
   og,
   removeOptimisticLink,
   editOptimisticLink,
 }: {
   optimisticLink: OptimisticLink;
+  collections: Collection[];
   og?: OgObject;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
@@ -123,6 +153,7 @@ export default function LinkComponent({
   return (
     <LinkMenu
       link={optimisticLink.link}
+      collections={collections}
       removeOptimisticLink={removeOptimisticLink}
       editOptimisticLink={editOptimisticLink}
     >

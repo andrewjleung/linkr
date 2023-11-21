@@ -20,6 +20,7 @@ import {
 } from "@hello-pangea/dnd";
 import { updateLinkOrder } from "@/app/actions";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
+import { Collection } from "@/database/types";
 
 // TODO: DRY this up since it's used with collections too
 const ORDER_BUFFER = 100;
@@ -48,12 +49,14 @@ function orderForReorderedElement(
 
 export function Links({
   optimisticLinks,
+  collections,
   ogs,
   removeOptimisticLink,
   reorderOptimisticLinks,
   editOptimisticLink,
 }: {
   optimisticLinks: OptimisticLink[];
+  collections: Collection[];
   ogs: Map<string, OgObject>;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   reorderOptimisticLinks: OptimisticLinks["reorderOptimisticLinks"];
@@ -122,6 +125,7 @@ export function Links({
                     >
                       <LinkComponent
                         optimisticLink={l}
+                        collections={collections}
                         og={ogs.get(new URL(l.link.url).origin)}
                         removeOptimisticLink={removeOptimisticLink}
                         editOptimisticLink={editOptimisticLink}

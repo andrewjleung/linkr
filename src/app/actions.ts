@@ -58,6 +58,30 @@ export async function editLink(
   return result;
 }
 
+export async function moveLink(id: number, parentCollectionId: number | null) {
+  const lastLinkInCollection = await db.query.links.findFirst({
+    where:
+      parentCollectionId === null
+        ? isNull(links.parentCollectionId)
+        : eq(links.parentCollectionId, parentCollectionId),
+    orderBy: desc(links.order),
+  });
+
+  const order =
+    lastLinkInCollection === undefined
+      ? ORDER_BUFFER
+      : lastLinkInCollection.order + ORDER_BUFFER;
+
+  const result = db
+    .update(links)
+    .set({ parentCollectionId, order })
+    .where(eq(links.id, id));
+
+  revalidatePath("/");
+
+  return result;
+}
+
 export async function validateCollection(id: number) {
   const results = await db
     .select({ id: collections.id })

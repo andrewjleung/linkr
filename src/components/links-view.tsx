@@ -3,14 +3,16 @@
 import { CreateLinkForm } from "@/components/link-form";
 import { useOptimisticLinks } from "@/hooks/use-optimistic-links";
 import { Links } from "@/components/links";
-import { Link } from "@/database/types";
+import { Collection, Link } from "@/database/types";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 
 export default function LinksView({
   links,
+  collections,
   ogs,
 }: {
   links: Link[];
+  collections: Collection[];
   ogs: Map<string, OgObject>;
 }) {
   const {
@@ -25,6 +27,7 @@ export default function LinksView({
     <>
       <Links
         optimisticLinks={optimisticLinks}
+        collections={collections}
         ogs={ogs}
         removeOptimisticLink={removeOptimisticLink}
         reorderOptimisticLinks={reorderOptimisticLinks}
