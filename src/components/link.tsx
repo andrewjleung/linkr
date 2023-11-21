@@ -31,6 +31,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon } from "lucide-react";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 import { useParentCollection } from "@/hooks/use-parent-collection";
+import { cn } from "@/lib/utils";
 
 function LinkMenu({
   link,
@@ -112,6 +113,14 @@ function faviconUrl(url: string): string {
   return `${parsed.origin}/favicon.ico`;
 }
 
+const GRADIENTS = [
+  "bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500",
+  "bg-[conic-gradient(at_bottom_left,_var(--tw-gradient-stops))] from-fuchsia-300 via-green-400 to-rose-700",
+  "bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-yellow-200 via-red-500 to-fuchsia-500",
+  "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-700 via-orange-300 to-rose-800",
+  "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-300 via-fuchsia-600 to-orange-600",
+];
+
 function AbstractLink({
   link,
   og,
@@ -130,9 +139,16 @@ function AbstractLink({
           {link.order || "no order"}
         </div>
         <CardHeader className="flex flex-row items-center space-y-0">
-          <Avatar className="h-9 w-9">
+          <Avatar className="h-9 w-9 outline outline-1 outline-neutral-950">
             <AvatarImage src={faviconUrl(link.url)} />
-            <AvatarFallback></AvatarFallback>
+            <AvatarFallback>
+              <div
+                className={cn(
+                  "h-full w-full blur-sm",
+                  GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)]
+                )}
+              />
+            </AvatarFallback>
           </Avatar>
           <div className="ml-4">
             <CardTitle className="flex flex-row items-center text-sm">
