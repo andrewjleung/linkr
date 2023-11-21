@@ -71,7 +71,7 @@ function LinkMenu({
     <>
       <ContextMenu>
         <ContextMenuTrigger>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="w-64">
+        <ContextMenuContent className="w-48">
           <ContextMenuItem inset onClick={onClickEdit}>
             Edit
           </ContextMenuItem>
@@ -107,6 +107,11 @@ function LinkMenu({
   );
 }
 
+function faviconUrl(url: string): string {
+  const parsed = new URL(url);
+  return `${parsed.origin}/favicon.ico`;
+}
+
 function AbstractLink({
   link,
   og,
@@ -124,11 +129,17 @@ function AbstractLink({
         <div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
           {link.order || "no order"}
         </div>
-        <CardHeader>
-          <CardTitle className="flex flex-row items-center text-sm">
-            {title}
-          </CardTitle>
-          <CardDescription>{link.url}</CardDescription>
+        <CardHeader className="flex flex-row items-center space-y-0">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={faviconUrl(link.url)} />
+            <AvatarFallback></AvatarFallback>
+          </Avatar>
+          <div className="ml-4">
+            <CardTitle className="flex flex-row items-center text-sm">
+              {title}
+            </CardTitle>
+            <CardDescription>{link.url}</CardDescription>
+          </div>
         </CardHeader>
         {description === null ? null : (
           <CardContent className="whitespace-pre-wrap text-xs">
