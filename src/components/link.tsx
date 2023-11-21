@@ -30,6 +30,7 @@ import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon } from "lucide-react";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
+import { useParentCollection } from "@/hooks/use-parent-collection";
 
 function LinkMenu({
   link,
@@ -45,6 +46,7 @@ function LinkMenu({
   children: React.ReactNode;
 }) {
   const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
+  const parentId = useParentCollection();
 
   function onClickEdit() {
     setEditLinkFormOpen(true);
@@ -56,6 +58,11 @@ function LinkMenu({
   }
 
   async function onClickMoveTo(collectionId: Collection["id"] | null) {
+    if (collectionId === parentId) {
+      // TODO: Also do a toast.
+      return;
+    }
+
     removeOptimisticLink(link.id);
     await moveLink(link.id, collectionId);
   }
