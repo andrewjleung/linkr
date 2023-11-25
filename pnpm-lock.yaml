@@ -149,6 +149,9 @@ dependencies:
   next-themes:
     specifier: ^0.2.1
     version: 0.2.1(next@14.0.1)(react-dom@18.2.0)(react@18.2.0)
+  object-hash:
+    specifier: ^3.0.0
+    version: 3.0.0
   open-graph-scraper:
     specifier: ^6.3.2
     version: 6.3.2
@@ -190,6 +193,9 @@ dependencies:
     version: 3.22.4
 
 devDependencies:
+  '@types/object-hash':
+    specifier: ^3.0.6
+    version: 3.0.6
   '@types/prettier':
     specifier: ^2.7.3
     version: 2.7.3
@@ -2510,6 +2516,10 @@ packages:
 
   /@types/node@20.3.1:
     resolution: {integrity: sha512-EhcH/wvidPy1WeML3TtYFGR83UzjxeWRen9V402T8aUGYsCHOmfoisV3ZSg03gAFIbLq8TnWOJ0f4cALtnSEUg==}
+
+  /@types/object-hash@3.0.6:
+    resolution: {integrity: sha512-fOBV8C1FIu2ELinoILQ+ApxcUKz4ngq+IWUYrxSGjXzzjUALijilampwkMgEtJ+h2njAW3pi853QpzNVCHB73w==}
+    dev: true
 
   /@types/prettier@2.7.3:
     resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}

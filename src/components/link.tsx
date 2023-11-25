@@ -25,13 +25,14 @@ import {
 import { deleteLink, editLink, moveLink } from "@/app/actions";
 import { useState } from "react";
 import { EditLinkForm } from "./link-form";
-import { Collection, LinkInsert, Link as LinkSchema } from "@/database/types";
+import { Collection, Link as LinkSchema } from "@/database/types";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon } from "lucide-react";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
+import hash from "object-hash";
 
 function LinkMenu({
   link,
@@ -122,6 +123,10 @@ const GRADIENTS = [
   "bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-red-200 via-red-300 to-yellow-200",
 ];
 
+function hashLink(link: AbstractLink["link"]): number {
+  return parseInt(hash(link, { encoding: "hex" }), 16);
+}
+
 function AbstractLink({
   link,
   og,
@@ -146,7 +151,7 @@ function AbstractLink({
               <div
                 className={cn(
                   "h-full w-full scale-125 blur-sm",
-                  GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)]
+                  GRADIENTS[hashLink(link) % GRADIENTS.length]
                 )}
               />
             </AvatarFallback>
