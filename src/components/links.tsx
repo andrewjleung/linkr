@@ -1,6 +1,7 @@
 import LinkComponent from "@/components/link";
 import {
   ConcreteLink,
+  LinksContext,
   OptimisticLink,
   OptimisticLinks,
 } from "@/hooks/use-optimistic-links";
@@ -21,24 +22,17 @@ import {
 import { updateLinkOrder } from "@/app/actions";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 import { Collection } from "@/database/types";
+import { useContext } from "react";
 
 export function Links({
-  optimisticLinks,
   collections,
   ogs,
-  removeOptimisticLink,
-  reorderOptimisticLinks,
-  editOptimisticLink,
-  moveOptimisticLink,
 }: {
-  optimisticLinks: OptimisticLink[];
   collections: Collection[];
   ogs: Map<string, OgObject>;
-  removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
-  reorderOptimisticLinks: OptimisticLinks["reorderOptimisticLinks"];
-  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
-  moveOptimisticLink: OptimisticLinks["moveOptimisticLink"];
 }) {
+  const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
+
   function onDragStart() {}
 
   function onDragEnd(result: DropResult) {
@@ -99,9 +93,6 @@ export function Links({
                         optimisticLink={l}
                         collections={collections}
                         og={ogs.get(new URL(l.link.url).origin)}
-                        removeOptimisticLink={removeOptimisticLink}
-                        editOptimisticLink={editOptimisticLink}
-                        moveOptimisticLink={moveOptimisticLink}
                       />
                     </div>
                   )}

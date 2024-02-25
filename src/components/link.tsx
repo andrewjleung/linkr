@@ -19,11 +19,12 @@ import Link from "next/link";
 import {
   AbstractLink,
   ConcreteLink,
+  LinksContext,
   OptimisticLink,
   OptimisticLinks,
 } from "@/hooks/use-optimistic-links";
 import { deleteLink, editLink, moveLink } from "@/app/actions";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { EditLinkForm } from "./link-form";
 import { Collection, Link as LinkSchema } from "@/database/types";
 import Image from "next/image";
@@ -39,18 +40,14 @@ import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
 function LinkMenu({
   link,
   collections,
-  removeOptimisticLink,
-  editOptimisticLink,
-  moveOptimisticLink,
   children,
 }: {
   link: LinkSchema;
   collections: Collection[];
-  removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
-  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
-  moveOptimisticLink: OptimisticLinks["moveOptimisticLink"];
   children: React.ReactNode;
 }) {
+  const { removeOptimisticLink, moveOptimisticLink } = useContext(LinksContext);
+
   const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
   const parentId = useParentCollection();
 
@@ -104,7 +101,6 @@ function LinkMenu({
       </ContextMenu>
       <EditLinkForm
         link={link}
-        editOptimisticLink={editOptimisticLink}
         open={editLinkFormOpen}
         setOpen={setEditLinkFormOpen}
       />
@@ -180,29 +176,17 @@ export default function LinkComponent({
   optimisticLink,
   collections,
   og,
-  removeOptimisticLink,
-  editOptimisticLink,
-  moveOptimisticLink,
 }: {
   optimisticLink: OptimisticLink;
   collections: Collection[];
   og?: OgObject;
-  removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
-  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
-  moveOptimisticLink: OptimisticLinks["moveOptimisticLink"];
 }) {
   if (optimisticLink.type === "abstract") {
     return <AbstractLink link={optimisticLink.link} og={og} />;
   }
 
   return (
-    <LinkMenu
-      link={optimisticLink.link}
-      collections={collections}
-      removeOptimisticLink={removeOptimisticLink}
-      editOptimisticLink={editOptimisticLink}
-      moveOptimisticLink={moveOptimisticLink}
-    >
+    <LinkMenu link={optimisticLink.link} collections={collections}>
       <AbstractLink link={optimisticLink.link} og={og} />
     </LinkMenu>
   );

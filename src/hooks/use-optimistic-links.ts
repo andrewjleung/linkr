@@ -8,7 +8,7 @@ import {
 import type { Collection, Link, LinkInsert } from "@/database/types";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 // @ts-ignore
-import { startTransition, useOptimistic } from "react";
+import { createContext, startTransition, useOptimistic } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 import { useParentCollection } from "./use-parent-collection";
@@ -36,6 +36,19 @@ function orderForReorderedElement(
     }
   }
 }
+
+const DEFAULT_LINKS_CONTEXT: OptimisticLinks = {
+  optimisticLinks: [],
+  async addOptimisticLink() {},
+  async removeOptimisticLink() {},
+  async reorderOptimisticLinks() {},
+  async editOptimisticLink() {},
+  async moveOptimisticLink() {},
+};
+
+export const LinksContext = createContext<OptimisticLinks>(
+  DEFAULT_LINKS_CONTEXT
+);
 
 type LinkAdd = {
   type: "add";

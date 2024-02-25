@@ -11,8 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createLink, editLink } from "@/app/actions";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import {
   Dialog,
@@ -23,7 +22,7 @@ import {
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { Textarea } from "@/components/ui/textarea";
-import { OptimisticLinks } from "@/hooks/use-optimistic-links";
+import { LinksContext } from "@/hooks/use-optimistic-links";
 import { Link } from "@/database/types";
 
 function isUrl(s: string): boolean {
@@ -66,15 +65,14 @@ const DEFAULT_FORM_VALUES = {
 
 export function EditLinkForm({
   link,
-  editOptimisticLink,
   open,
   setOpen,
 }: {
   link: Link;
-  editOptimisticLink: OptimisticLinks["editOptimisticLink"];
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { editOptimisticLink } = useContext(LinksContext);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof linkSchema>>({
@@ -112,11 +110,8 @@ export function EditLinkForm({
   );
 }
 
-export function CreateLinkForm({
-  addOptimisticLink,
-}: {
-  addOptimisticLink: OptimisticLinks["addOptimisticLink"];
-}) {
+export function CreateLinkForm() {
+  const { addOptimisticLink } = useContext(LinksContext);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const parentId = useParentCollection();

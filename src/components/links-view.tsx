@@ -1,7 +1,7 @@
 "use client";
 
 import { CreateLinkForm } from "@/components/link-form";
-import { useOptimisticLinks } from "@/hooks/use-optimistic-links";
+import { LinksContext, useOptimisticLinks } from "@/hooks/use-optimistic-links";
 import { Links } from "@/components/links";
 import { Collection, Link } from "@/database/types";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
@@ -15,27 +15,12 @@ export default function LinksView({
   collections: Collection[];
   ogs: Map<string, OgObject>;
 }) {
-  const {
-    optimisticLinks,
-    addOptimisticLink,
-    removeOptimisticLink,
-    reorderOptimisticLinks,
-    editOptimisticLink,
-    moveOptimisticLink,
-  } = useOptimisticLinks(links);
+  const ol = useOptimisticLinks(links);
 
   return (
-    <>
-      <Links
-        optimisticLinks={optimisticLinks}
-        collections={collections}
-        ogs={ogs}
-        removeOptimisticLink={removeOptimisticLink}
-        reorderOptimisticLinks={reorderOptimisticLinks}
-        editOptimisticLink={editOptimisticLink}
-        moveOptimisticLink={moveOptimisticLink}
-      />
-      <CreateLinkForm addOptimisticLink={addOptimisticLink} />
-    </>
+    <LinksContext.Provider value={ol}>
+      <Links collections={collections} ogs={ogs} />
+      <CreateLinkForm />
+    </LinksContext.Provider>
   );
 }
