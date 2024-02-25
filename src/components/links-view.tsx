@@ -21,6 +21,7 @@ export default function LinksView({
     removeOptimisticLink,
     reorderOptimisticLinks,
     editOptimisticLink,
+    moveOptimisticLink,
   } = useOptimisticLinks(links);
 
   return (
@@ -32,6 +33,7 @@ export default function LinksView({
         removeOptimisticLink={removeOptimisticLink}
         reorderOptimisticLinks={reorderOptimisticLinks}
         editOptimisticLink={editOptimisticLink}
+        moveOptimisticLink={moveOptimisticLink}
       />
       <CreateLinkForm addOptimisticLink={addOptimisticLink} />
     </>

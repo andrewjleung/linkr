@@ -126,12 +126,7 @@ function ConcreteCollection({
 }) {
   const parentId = useParentCollection();
   const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
-  const [displayName, setDisplayName] = useState("");
   const [renameFormOpen, setRenameFormOpen] = useState(false);
-
-  useEffect(() => {
-    setDisplayName(collection.name);
-  }, [setDisplayName, collection.name]);
 
   const variant = parentId === collection.id ? "secondary" : "ghost";
 
@@ -156,7 +151,7 @@ function ConcreteCollection({
               "relative w-full"
             )}
           >
-            <div className="w-full">{displayName}</div>
+            <div className="w-full">{collection.name}</div>
             <span className="mr-auto text-xs dark:text-neutral-700">
               {collection.order || "0"}
             </span>

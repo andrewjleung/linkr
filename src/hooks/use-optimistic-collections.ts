@@ -8,6 +8,7 @@ import {
 import { Collection, CollectionInsert } from "@/database/types";
 // @ts-ignore
 import { startTransition, useOptimistic } from "react";
+import { toast } from "sonner";
 import { match } from "ts-pattern";
 
 const ORDER_BUFFER = 100;
@@ -187,6 +188,7 @@ export function useOptimisticCollections(
     startTransition(() => {
       updateOptimisticCollections({ type: "add", collection });
     });
+    toast.success(`Collection "${collection.name}" has been created.`);
     await createCollection(collection);
   }
 
@@ -194,6 +196,7 @@ export function useOptimisticCollections(
     startTransition(() => {
       updateOptimisticCollections({ type: "delete", id });
     });
+    toast.success("Collection has been deleted.");
     await safeDeleteCollection(id);
   }
 
@@ -201,6 +204,7 @@ export function useOptimisticCollections(
     startTransition(() => {
       updateOptimisticCollections({ type: "delete", id });
     });
+    toast.success("Collection has been deleted.");
     await unsafeDeleteCollection(id);
   }
 
@@ -208,6 +212,7 @@ export function useOptimisticCollections(
     startTransition(() => {
       updateOptimisticCollections({ type: "rename", id, newName });
     });
+    toast.success(`Collection has been renamed to ${newName}`);
     await renameCollectionAction(id, newName);
   }
 

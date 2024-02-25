@@ -1,8 +1,41 @@
-import type { Link, LinkInsert } from "@/database/types";
+import {
+  createLink,
+  deleteLink,
+  editLink,
+  moveLink,
+  updateLinkOrder,
+} from "@/app/actions";
+import type { Collection, Link, LinkInsert } from "@/database/types";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 // @ts-ignore
 import { startTransition, useOptimistic } from "react";
+import { toast } from "sonner";
 import { match } from "ts-pattern";
+import { useParentCollection } from "./use-parent-collection";
+
+const ORDER_BUFFER = 100;
+
+function orderForReorderedElement(
+  orders: number[],
+  source: number,
+  destination: number
+): number {
+  if (destination === 0) {
+    return orders[0] / 2;
+  } else if (destination >= orders.length - 1) {
+    return orders[orders.length - 1] + ORDER_BUFFER;
+  } else {
+    if (destination < source) {
+      const before = orders[destination - 1];
+      const after = orders[destination];
+      return (after - before) / 2 + before;
+    } else {
+      const before = orders[destination];
+      const after = orders[destination + 1];
+      return (after - before) / 2 + before;
+    }
+  }
+}
 
 type LinkAdd = {
   type: "add";
@@ -45,13 +78,18 @@ export type OptimisticLink = AbstractLink | ConcreteLink;
 
 export type OptimisticLinks = {
   optimisticLinks: OptimisticLink[];
-  addOptimisticLink: (link: Omit<LinkInsert, "parentCollectionId">) => void;
-  removeOptimisticLink: (id: number) => void;
+  addOptimisticLink: (link: Omit<LinkInsert, "order">) => Promise<void>;
+  removeOptimisticLink: (id: number) => Promise<void>;
   reorderOptimisticLinks: (
+    id: number,
     sourceIndex: number,
     destinationIndex: number
-  ) => void;
-  editOptimisticLink: (id: Link["id"], edit: LinkEdit["edit"]) => void;
+  ) => Promise<void>;
+  editOptimisticLink: (id: Link["id"], edit: LinkEdit["edit"]) => Promise<void>;
+  moveOptimisticLink: (
+    link: Link,
+    newParent: Collection | null
+  ) => Promise<void>;
 };
 
 function handleAdd(
@@ -141,6 +179,8 @@ function handleEdit(
 }
 
 export function useOptimisticLinks(links: Link[]): OptimisticLinks {
+  const parentId = useParentCollection();
+
   const concreteLinks: OptimisticLink[] = links.map((link) => ({
     type: "concrete",
     id: link.id,
@@ -159,25 +199,56 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
       .exhaustive()
   );
 
-  function addOptimisticLink(link: AbstractLink["link"]) {
+  async function addOptimisticLink(link: Omit<LinkInsert, "order">) {
     startTransition(() => updateOptimisticLinks({ type: "add", link }));
+    toast("Link has been created.", { description: link.url });
+    await createLink(link);
   }
 
-  function removeOptimisticLink(id: number) {
+  async function removeOptimisticLink(id: number) {
     startTransition(() => updateOptimisticLinks({ type: "delete", id }));
+    toast("Link has been deleted.");
+    await deleteLink(id);
   }
 
-  function reorderOptimisticLinks(
+  async function reorderOptimisticLinks(
+    id: number,
     sourceIndex: number,
     destinationIndex: number
   ) {
     startTransition(() =>
       updateOptimisticLinks({ type: "reorder", sourceIndex, destinationIndex })
     );
+
+    const order = orderForReorderedElement(
+      concreteLinks.map((l) => l.link.order),
+      sourceIndex,
+      destinationIndex
+    );
+
+    await updateLinkOrder(id, order);
   }
 
-  function editOptimisticLink(id: Link["id"], edit: LinkEdit["edit"]) {
+  async function editOptimisticLink(id: Link["id"], edit: LinkEdit["edit"]) {
     startTransition(() => updateOptimisticLinks({ type: "edit", id, edit }));
+    toast("Link has been edited.", { description: edit.url });
+    await editLink(id, edit);
+  }
+
+  async function moveOptimisticLink(link: Link, newParent: Collection | null) {
+    const newParentId = newParent?.id || null;
+    const newParentName = newParent?.name || "Home";
+
+    if (newParentId === parentId) {
+      toast.info("Link is already in this collection.");
+      return;
+    }
+
+    startTransition(() =>
+      updateOptimisticLinks({ type: "delete", id: link.id })
+    );
+    toast.success(`Link has been moved to collection "${newParentName}"`);
+    await moveLink(link.id, newParentId);
   }
 
   return {
@@ -186,5 +257,6 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
     removeOptimisticLink,
     reorderOptimisticLinks,
     editOptimisticLink,
+    moveOptimisticLink,
   };
 }

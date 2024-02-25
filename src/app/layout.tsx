@@ -7,6 +7,7 @@ import { CollectionsView } from "@/components/collections-view";
 import { db } from "@/database/database";
 import { collections } from "@/database/schema";
 import { asc } from "drizzle-orm";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   title: "Create Next App",
@@ -47,6 +48,7 @@ export default async function RootLayout({
               </div>
             </div>
           </main>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

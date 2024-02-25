@@ -33,18 +33,22 @@ import { OgObject } from "open-graph-scraper/dist/lib/types";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
 import hash from "object-hash";
+import { toast } from "sonner";
+import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
 
 function LinkMenu({
   link,
   collections,
   removeOptimisticLink,
   editOptimisticLink,
+  moveOptimisticLink,
   children,
 }: {
   link: LinkSchema;
   collections: Collection[];
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
+  moveOptimisticLink: OptimisticLinks["moveOptimisticLink"];
   children: React.ReactNode;
 }) {
   const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
@@ -54,19 +58,12 @@ function LinkMenu({
     setEditLinkFormOpen(true);
   }
 
-  async function onClickDelete() {
+  function onClickDelete() {
     removeOptimisticLink(link.id);
-    await deleteLink(link.id);
   }
 
-  async function onClickMoveTo(collectionId: Collection["id"] | null) {
-    if (collectionId === parentId) {
-      // TODO: Also do a toast.
-      return;
-    }
-
-    removeOptimisticLink(link.id);
-    await moveLink(link.id, collectionId);
+  function onClickMoveTo(collection: Collection | null) {
+    moveOptimisticLink(link, collection);
   }
 
   return (
@@ -77,26 +74,32 @@ function LinkMenu({
           <ContextMenuItem inset onClick={onClickEdit}>
             Edit
           </ContextMenuItem>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger inset>Move to</ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-48">
-              <ContextMenuItem onClick={() => onClickMoveTo(null)}>
-                Home
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              {collections.map((c) => (
-                <ContextMenuItem
-                  key={`move-to-collection-item-${c.id}`}
-                  onClick={() => onClickMoveTo(c.id)}
-                >
-                  {c.name}
-                </ContextMenuItem>
-              ))}
-            </ContextMenuSubContent>
-          </ContextMenuSub>
           <ContextMenuItem inset onClick={onClickDelete}>
             Delete
           </ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger inset>Move to</ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-48">
+              {parentId === null ? null : (
+                <>
+                  <ContextMenuItem onClick={() => onClickMoveTo(null)}>
+                    Home
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                </>
+              )}
+              {collections
+                .filter((c) => c.id !== parentId)
+                .map((c) => (
+                  <ContextMenuItem
+                    key={`move-to-collection-item-${c.id}`}
+                    onClick={() => onClickMoveTo(c)}
+                  >
+                    {c.name}
+                  </ContextMenuItem>
+                ))}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
         </ContextMenuContent>
       </ContextMenu>
       <EditLinkForm
@@ -179,12 +182,14 @@ export default function LinkComponent({
   og,
   removeOptimisticLink,
   editOptimisticLink,
+  moveOptimisticLink,
 }: {
   optimisticLink: OptimisticLink;
   collections: Collection[];
   og?: OgObject;
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
+  moveOptimisticLink: OptimisticLinks["moveOptimisticLink"];
 }) {
   if (optimisticLink.type === "abstract") {
     return <AbstractLink link={optimisticLink.link} og={og} />;
@@ -196,6 +201,7 @@ export default function LinkComponent({
       collections={collections}
       removeOptimisticLink={removeOptimisticLink}
       editOptimisticLink={editOptimisticLink}
+      moveOptimisticLink={moveOptimisticLink}
     >
       <AbstractLink link={optimisticLink.link} og={og} />
     </LinkMenu>

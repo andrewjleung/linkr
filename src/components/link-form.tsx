@@ -90,13 +90,7 @@ export function EditLinkForm({
     setLoading(true);
     setOpen(false);
 
-    editOptimisticLink(link.id, {
-      title: values.title || null,
-      description: values.description || null,
-      url: values.url,
-    });
-
-    await editLink(link.id, {
+    await editOptimisticLink(link.id, {
       title: values.title || null,
       description: values.description || null,
       url: values.url,
@@ -137,14 +131,7 @@ export function CreateLinkForm({
     form.reset(DEFAULT_FORM_VALUES);
     setOpen(false);
 
-    addOptimisticLink({
-      title: values.title || null,
-      description: values.description || null,
-      url: values.url,
-      order: Number.POSITIVE_INFINITY,
-    });
-
-    await createLink({
+    await addOptimisticLink({
       title: values.title || null,
       description: values.description || null,
       url: values.url,

@@ -22,31 +22,6 @@ import { updateLinkOrder } from "@/app/actions";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 import { Collection } from "@/database/types";
 
-// TODO: DRY this up since it's used with collections too
-const ORDER_BUFFER = 100;
-
-function orderForReorderedElement(
-  orders: number[],
-  source: number,
-  destination: number
-): number {
-  if (destination === 0) {
-    return orders[0] / 2;
-  } else if (destination >= orders.length - 1) {
-    return orders[orders.length - 1] + ORDER_BUFFER;
-  } else {
-    if (destination < source) {
-      const before = orders[destination - 1];
-      const after = orders[destination];
-      return (after - before) / 2 + before;
-    } else {
-      const before = orders[destination];
-      const after = orders[destination + 1];
-      return (after - before) / 2 + before;
-    }
-  }
-}
-
 export function Links({
   optimisticLinks,
   collections,
@@ -54,6 +29,7 @@ export function Links({
   removeOptimisticLink,
   reorderOptimisticLinks,
   editOptimisticLink,
+  moveOptimisticLink,
 }: {
   optimisticLinks: OptimisticLink[];
   collections: Collection[];
@@ -61,6 +37,7 @@ export function Links({
   removeOptimisticLink: OptimisticLinks["removeOptimisticLink"];
   reorderOptimisticLinks: OptimisticLinks["reorderOptimisticLinks"];
   editOptimisticLink: OptimisticLinks["editOptimisticLink"];
+  moveOptimisticLink: OptimisticLinks["moveOptimisticLink"];
 }) {
   function onDragStart() {}
 
@@ -83,16 +60,11 @@ export function Links({
 
     const link = concreteLinks[result.source.index];
 
-    reorderOptimisticLinks(result.source.index, result.destination.index);
-
-    // TODO: Put this logic into the optimistic links hook
-    const order = orderForReorderedElement(
-      concreteLinks.map((l) => l.link.order),
+    reorderOptimisticLinks(
+      link.id,
       result.source.index,
       result.destination.index
     );
-
-    updateLinkOrder(link.id, order);
   }
 
   if (optimisticLinks.length < 1) {
@@ -129,6 +101,7 @@ export function Links({
                         og={ogs.get(new URL(l.link.url).origin)}
                         removeOptimisticLink={removeOptimisticLink}
                         editOptimisticLink={editOptimisticLink}
+                        moveOptimisticLink={moveOptimisticLink}
                       />
                     </div>
                   )}
