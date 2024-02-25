@@ -1,6 +1,7 @@
 import { CollectionComponent, HomeCollection } from "@/components/collection";
 import { Separator } from "@/components/ui/separator";
 import {
+  CollectionsContext,
   ConcreteCollection,
   OptimisticCollection,
   OptimisticCollections,
@@ -11,18 +12,12 @@ import {
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd";
+import { useContext } from "react";
 
-export function Collections({
-  optimisticCollections,
-  unsafeRemoveCollection,
-  renameCollection,
-  reorderCollection,
-}: {
-  optimisticCollections: OptimisticCollection[];
-  unsafeRemoveCollection: OptimisticCollections["unsafeRemoveCollection"];
-  renameCollection: OptimisticCollections["renameCollection"];
-  reorderCollection: OptimisticCollections["reorderCollection"];
-}) {
+export function Collections() {
+  const { optimisticCollections, reorderCollection } =
+    useContext(CollectionsContext);
+
   function onDragEnd(result: DropResult) {
     if (optimisticCollections.some((c) => c.type === "abstract")) {
       console.error(
@@ -71,11 +66,7 @@ export function Collections({
                       {...provided.dragHandleProps}
                       className="mb-2"
                     >
-                      <CollectionComponent
-                        optimisticCollection={c}
-                        unsafeRemoveCollection={unsafeRemoveCollection}
-                        renameCollection={renameCollection}
-                      />
+                      <CollectionComponent optimisticCollection={c} />
                     </div>
                   )}
                 </Draggable>

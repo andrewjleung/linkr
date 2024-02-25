@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import {
   Dialog,
@@ -23,7 +23,10 @@ import {
 } from "@/components/ui/dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { OptimisticCollections } from "@/hooks/use-optimistic-collections";
+import {
+  CollectionsContext,
+  OptimisticCollections,
+} from "@/hooks/use-optimistic-collections";
 import { Collection } from "@/database/types";
 
 const collectionSchema = z.object({
@@ -36,15 +39,14 @@ const DEFAULT_FORM_VALUES = {
 
 export function RenameCollectionForm({
   collection,
-  renameCollection,
   open,
   setOpen,
 }: {
   collection: Collection;
-  renameCollection: OptimisticCollections["renameCollection"];
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { renameCollection } = useContext(CollectionsContext);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof collectionSchema>>({
@@ -77,11 +79,8 @@ export function RenameCollectionForm({
   );
 }
 
-export function CreateCollectionForm({
-  addCollection,
-}: {
-  addCollection: OptimisticCollections["addCollection"];
-}) {
+export function CreateCollectionForm() {
+  const { addCollection } = useContext(CollectionsContext);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const parentId = useParentCollection();

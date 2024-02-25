@@ -56,7 +56,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
+import {
+  CollectionsContext,
+  OptimisticCollection,
+} from "@/hooks/use-optimistic-collections";
 import LoadingIndicator from "@/components/loading-indicator";
 import { RenameCollectionForm } from "@/components/collection-form";
 import { Collection, CollectionInsert } from "@/database/types";
@@ -77,24 +80,14 @@ export function HomeCollection() {
 
 export function CollectionComponent({
   optimisticCollection,
-  unsafeRemoveCollection,
-  renameCollection,
 }: {
   optimisticCollection: OptimisticCollection;
-  unsafeRemoveCollection: (id: number) => Promise<void>;
-  renameCollection: (id: number, newName: string) => Promise<void>;
 }) {
   if (optimisticCollection.type === "abstract") {
     return <AbstractCollection collection={optimisticCollection.collection} />;
   }
 
-  return (
-    <ConcreteCollection
-      collection={optimisticCollection.collection}
-      unsafeRemoveCollection={unsafeRemoveCollection}
-      renameCollection={renameCollection}
-    />
-  );
+  return <ConcreteCollection collection={optimisticCollection.collection} />;
 }
 
 function AbstractCollection({
@@ -115,15 +108,8 @@ function AbstractCollection({
   );
 }
 
-function ConcreteCollection({
-  collection,
-  unsafeRemoveCollection,
-  renameCollection,
-}: {
-  collection: Collection;
-  unsafeRemoveCollection: (id: number) => Promise<void>;
-  renameCollection: (id: number, name: string) => Promise<void>;
-}) {
+function ConcreteCollection({ collection }: { collection: Collection }) {
+  const { unsafeRemoveCollection } = useContext(CollectionsContext);
   const parentId = useParentCollection();
   const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
   const [renameFormOpen, setRenameFormOpen] = useState(false);
@@ -187,7 +173,6 @@ function ConcreteCollection({
       </AlertDialog>
       <RenameCollectionForm
         collection={collection}
-        renameCollection={renameCollection}
         open={renameFormOpen}
         setOpen={setRenameFormOpen}
       />

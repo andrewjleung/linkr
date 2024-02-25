@@ -7,7 +7,7 @@ import {
 } from "@/app/actions";
 import { Collection, CollectionInsert } from "@/database/types";
 // @ts-ignore
-import { startTransition, useOptimistic } from "react";
+import { createContext, startTransition, useOptimistic } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 
@@ -34,6 +34,19 @@ function orderForReorderedElement(
     }
   }
 }
+
+const DEFAULT_COLLECTIONS_CONTEXT: OptimisticCollections = {
+  optimisticCollections: [],
+  async addCollection() {},
+  async unsafeRemoveCollection() {},
+  async safeRemoveCollection() {},
+  async renameCollection() {},
+  async reorderCollection() {},
+};
+
+export const CollectionsContext = createContext<OptimisticCollections>(
+  DEFAULT_COLLECTIONS_CONTEXT
+);
 
 type CollectionAdd = {
   type: "add";
