@@ -132,6 +132,7 @@ function ConcreteCollection({ collection }: { collection: Collection }) {
         <ContextMenuTrigger>
           <Link
             href={`/collections/${collection.id}`}
+            prefetch
             className={cn(
               buttonVariants({ variant: variant }),
               "relative w-full"
