@@ -123,7 +123,7 @@ const GRADIENTS = [
 ];
 
 function hashLink(link: AbstractLink["link"]): number {
-  return parseInt(hash(link, { encoding: "hex" }), 16);
+  return parseInt(hash(link.url, { encoding: "hex" }), 16);
 }
 
 function AbstractLink({
