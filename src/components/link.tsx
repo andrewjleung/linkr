@@ -18,24 +18,19 @@ import {
 import Link from "next/link";
 import {
   AbstractLink,
-  ConcreteLink,
   LinksContext,
   OptimisticLink,
-  OptimisticLinks,
 } from "@/hooks/use-optimistic-links";
-import { deleteLink, editLink, moveLink } from "@/app/actions";
 import { useContext, useState } from "react";
 import { EditLinkForm } from "./link-form";
 import { Collection, Link as LinkSchema } from "@/database/types";
-import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { LinkIcon } from "lucide-react";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
 import hash from "object-hash";
-import { toast } from "sonner";
-import { OptimisticCollection } from "@/hooks/use-optimistic-collections";
+import { HoverCard } from "@radix-ui/react-hover-card";
+import { HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
 function LinkMenu({
   link,
@@ -138,37 +133,39 @@ function AbstractLink({
     [link.description, og?.ogDescription].find(Boolean) || null;
 
   return (
-    <Link href={link.url}>
-      <Card className="group relative ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
-        <div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
-          {link.order || "no order"}
-        </div>
-        <CardHeader className="flex flex-row items-center space-y-0">
-          <Avatar className="h-9 w-9 outline outline-1 outline-neutral-300 dark:outline-neutral-950">
-            <AvatarImage src={faviconUrl(link.url)} />
-            <AvatarFallback>
-              <div
-                className={cn(
-                  "h-full w-full scale-125 blur-sm",
-                  GRADIENTS[hashLink(link) % GRADIENTS.length]
-                )}
-              />
-            </AvatarFallback>
-          </Avatar>
-          <div className="ml-4">
-            <CardTitle className="flex flex-row items-center text-sm">
-              {title}
-            </CardTitle>
-            <CardDescription>{link.url}</CardDescription>
-          </div>
-        </CardHeader>
-        {description === null ? null : (
-          <CardContent className="whitespace-pre-wrap text-xs">
-            {description}
-          </CardContent>
-        )}
-      </Card>
-    </Link>
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <Link href={link.url}>
+          <Card className="group relative ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
+            <div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
+              {link.order || "no order"}
+            </div>
+            <CardHeader className="flex flex-row items-center space-y-0">
+              <Avatar className="h-9 w-9 outline outline-1 outline-neutral-300 dark:outline-neutral-950">
+                <AvatarImage src={faviconUrl(link.url)} />
+                <AvatarFallback>
+                  <div
+                    className={cn(
+                      "h-full w-full scale-125 blur-sm",
+                      GRADIENTS[hashLink(link) % GRADIENTS.length]
+                    )}
+                  />
+                </AvatarFallback>
+              </Avatar>
+              <div className="ml-4">
+                <CardTitle className="flex flex-row items-center text-sm">
+                  {title}
+                </CardTitle>
+                <CardDescription>{link.url}</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+        </Link>
+      </HoverCardTrigger>
+      {description === null ? null : (
+        <HoverCardContent className="w-80">{description}</HoverCardContent>
+      )}
+    </HoverCard>
   );
 }
 
