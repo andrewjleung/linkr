@@ -214,13 +214,13 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 
   async function addOptimisticLink(link: Omit<LinkInsert, "order">) {
     startTransition(() => updateOptimisticLinks({ type: "add", link }));
-    toast("Link has been created.", { description: link.url });
+    toast.success("Link has been created.", { description: link.url });
     await createLink(link);
   }
 
   async function removeOptimisticLink(id: number) {
     startTransition(() => updateOptimisticLinks({ type: "delete", id }));
-    toast("Link has been deleted.");
+    toast.success("Link has been deleted.");
     await deleteLink(id);
   }
 
@@ -244,7 +244,7 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 
   async function editOptimisticLink(id: Link["id"], edit: LinkEdit["edit"]) {
     startTransition(() => updateOptimisticLinks({ type: "edit", id, edit }));
-    toast("Link has been edited.", { description: edit.url });
+    toast.success("Link has been edited.", { description: edit.url });
     await editLink(id, edit);
   }
 
