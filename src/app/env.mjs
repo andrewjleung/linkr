@@ -17,6 +17,7 @@ export const env = createEnv({
     DB_NAME: z.string(),
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
+    HTTP_BASIC_AUTH: z.string(),
   },
   /*
    * Environment variables available on the client (and server).
@@ -40,5 +41,6 @@ export const env = createEnv({
     DB_NAME: process.env.DB_NAME,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    HTTP_BASIC_AUTH: process.env.HTTP_BASIC_AUTH,
   },
 });
