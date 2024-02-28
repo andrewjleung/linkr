@@ -90,7 +90,7 @@ export function EditLinkForm({
 
     await editOptimisticLink(link.id, {
       title: values.title || null,
-      description: values.description || null,
+      description: values.description?.trim() || null,
       url: values.url,
     });
 
@@ -128,7 +128,7 @@ export function CreateLinkForm() {
 
     await addOptimisticLink({
       title: values.title || null,
-      description: values.description || null,
+      description: values.description?.trim() || null,
       url: values.url,
       parentCollectionId: parentId,
     });

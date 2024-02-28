@@ -48,7 +48,7 @@ export default async function RootLayout({
               </div>
             </div>
           </main>
-          <Toaster />
+          <Toaster position="bottom-center" />
         </ThemeProvider>
       </body>
     </html>
