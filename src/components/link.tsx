@@ -32,6 +32,9 @@ import hash from "object-hash";
 import { HoverCard } from "@radix-ui/react-hover-card";
 import { HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
+const LINK_CUTOFF_LENGTH = 100;
+const LINK_TITLE_CUTOFF_LENGTH = 50;
+
 function LinkMenu({
   link,
   collections,
@@ -121,6 +124,21 @@ function hashLink(link: AbstractLink["link"]): number {
   return parseInt(hash(link.url, { encoding: "hex" }), 16);
 }
 
+const truncateByWord = (str: string, charLimit: number) => {
+  const lastWhitespace = str.lastIndexOf(" ", charLimit);
+  const truncated = str.slice(0, lastWhitespace);
+
+  return truncated.replace(/\W+$/, "");
+};
+
+function ellipsis(str: string): string {
+  if (str.length < LINK_TITLE_CUTOFF_LENGTH) {
+    return str;
+  }
+
+  return truncateByWord(str, LINK_TITLE_CUTOFF_LENGTH) + "...";
+}
+
 function AbstractLink({
   link,
   og,
@@ -128,7 +146,15 @@ function AbstractLink({
   link: AbstractLink["link"];
   og?: OgObject;
 }) {
-  const title = [link.title, og?.ogTitle, link.url].find(Boolean) || null;
+  const title = link.title || og?.ogTitle || null;
+  const displayTitle = title === null ? title : ellipsis(title);
+
+  const url = new URL(link.url);
+  const displayUrl =
+    link.url.length > LINK_CUTOFF_LENGTH
+      ? url.hostname
+      : url.hostname + (url.pathname === "/" ? "" : url.pathname);
+
   const description =
     [link.description, og?.ogDescription].find(Boolean) || null;
 
@@ -136,12 +162,12 @@ function AbstractLink({
     <HoverCard>
       <HoverCardTrigger asChild>
         <Link href={link.url}>
-          <Card className="group relative ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
-            <div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
+          <Card className="group relative border-none ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
+            {/*<div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
               {link.order || "no order"}
-            </div>
-            <CardHeader className="flex flex-row items-center space-y-0">
-              <Avatar className="h-9 w-9 outline outline-1 outline-neutral-300 dark:outline-neutral-950">
+            </div>*/}
+            <CardHeader className="flex flex-row items-center space-y-0 p-2">
+              <Avatar className="h-6 w-6 outline outline-1 outline-neutral-300 dark:outline-neutral-950">
                 <AvatarImage src={faviconUrl(link.url)} />
                 <AvatarFallback>
                   <div
@@ -153,10 +179,12 @@ function AbstractLink({
                 </AvatarFallback>
               </Avatar>
               <div className="ml-4">
-                <CardTitle className="flex flex-row items-center text-sm">
-                  {title}
+                <CardTitle className="flex flex-row items-center">
+                  <span className="text-sm">{displayTitle || displayUrl}</span>
+                  <span className="ml-3 text-xs text-neutral-500">
+                    {displayTitle === null ? null : displayUrl}
+                  </span>
                 </CardTitle>
-                <CardDescription>{link.url}</CardDescription>
               </div>
             </CardHeader>
           </Card>

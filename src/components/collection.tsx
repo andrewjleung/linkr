@@ -104,9 +104,9 @@ function ConcreteCollection({ collection }: { collection: Collection }) {
             )}
           >
             <div className="w-full">{collection.name}</div>
-            <span className="mr-auto text-xs dark:text-neutral-700">
+            {/* <span className="mr-auto text-xs dark:text-neutral-700">
               {collection.order || "0"}
-            </span>
+            </span> */}
           </Link>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-48">

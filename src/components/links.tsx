@@ -87,7 +87,7 @@ export function Links({
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="mb-4"
+                      className="mb-2"
                     >
                       <LinkComponent
                         optimisticLink={l}
