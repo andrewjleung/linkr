@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { LinksContext } from "@/hooks/use-optimistic-links";
 import { Link } from "@/database/types";
 import { useAtom } from "jotai";
-import { openedFormAtom } from "@/app/state";
+import { openedFormAtom } from "@/state";
 import { useGlobalForm } from "@/hooks/use-global-form";
 
 function isUrl(s: string): boolean {
