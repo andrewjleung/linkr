@@ -78,6 +78,7 @@ export async function moveLink(id: number, parentCollectionId: number | null) {
     .where(eq(links.id, id));
 
   revalidatePath("/");
+  revalidatePath("/collections/[slug]", "page");
 
   return result;
 }

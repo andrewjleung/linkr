@@ -7,6 +7,7 @@ import {
   CollectionsContext,
   useOptimisticCollections,
 } from "@/hooks/use-optimistic-collections";
+import { CommandMenu } from "./command-menu";
 
 export function CollectionsView({
   unoptimisticCollections,
@@ -19,6 +20,7 @@ export function CollectionsView({
     <CollectionsContext.Provider value={oc}>
       <CreateCollectionForm />
       <Collections />
+      <CommandMenu />
     </CollectionsContext.Provider>
   );
 }

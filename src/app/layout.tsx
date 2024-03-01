@@ -8,6 +8,7 @@ import { db } from "@/database/database";
 import { collections } from "@/database/schema";
 import { asc } from "drizzle-orm";
 import { Toaster } from "@/components/ui/sonner";
+import Providers from "@/components/state-provider";
 
 export const metadata = {
   title: "Create Next App",
@@ -27,29 +28,31 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen dark:bg-neutral-950">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <main className="relative flex min-h-screen flex-col">
-            <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
-              <div className="container flex h-16 max-w-7xl flex-row items-center">
-                <h2 className="ml-4 text-lg font-semibold">linkr</h2>
-                <div className="ml-auto mr-4 mt-0">
-                  <ThemeToggle />
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <main className="relative flex min-h-screen flex-col">
+              <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
+                <div className="container flex h-16 max-w-7xl flex-row items-center">
+                  <h2 className="ml-4 text-lg font-semibold">linkr</h2>
+                  <div className="ml-auto mr-4 mt-0">
+                    <ThemeToggle />
+                  </div>
+                </div>
+              </header>
+              <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-3 gap-8 px-8 pt-8">
+                <div className="col-span-1">
+                  <CollectionsView
+                    unoptimisticCollections={unoptimisticCollections}
+                  />
+                </div>
+                <div className="col-span-2 mr-4 h-[calc(100vh-97px)] overflow-y-auto">
+                  {children}
                 </div>
               </div>
-            </header>
-            <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-3 gap-8 px-8 pt-8">
-              <div className="col-span-1">
-                <CollectionsView
-                  unoptimisticCollections={unoptimisticCollections}
-                />
-              </div>
-              <div className="col-span-2 mr-4 h-[calc(100vh-97px)] overflow-y-auto">
-                {children}
-              </div>
-            </div>
-          </main>
-          <Toaster position="bottom-center" />
-        </ThemeProvider>
+            </main>
+            <Toaster position="bottom-center" />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

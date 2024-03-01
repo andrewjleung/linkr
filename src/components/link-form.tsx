@@ -24,6 +24,9 @@ import { useKeyPress } from "@/hooks/use-keyboard";
 import { Textarea } from "@/components/ui/textarea";
 import { LinksContext } from "@/hooks/use-optimistic-links";
 import { Link } from "@/database/types";
+import { useAtom } from "jotai";
+import { openedFormAtom } from "@/app/state";
+import { useGlobalForm } from "@/hooks/use-global-form";
 
 function isUrl(s: string): boolean {
   try {
@@ -110,11 +113,13 @@ export function EditLinkForm({
   );
 }
 
+const CREATE_LINK_FORM = "create-link-form";
+
 export function CreateLinkForm() {
   const { addOptimisticLink } = useContext(LinksContext);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
   const parentId = useParentCollection();
+  const [open, setOpen] = useGlobalForm(CREATE_LINK_FORM);
 
   const form = useForm<z.infer<typeof linkSchema>>({
     resolver: zodResolver(linkSchema),
@@ -138,7 +143,7 @@ export function CreateLinkForm() {
   };
 
   useKeyPress(
-    { shiftKey: false, metaKey: false, code: "KeyQ" },
+    { shiftKey: false, metaKey: false, key: "q" },
     (event) => {
       event.preventDefault();
       setOpen(true);

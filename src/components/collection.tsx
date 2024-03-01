@@ -64,11 +64,10 @@ function AbstractCollection({
     <Button variant="ghost" className="w-full">
       <div className="mr-auto flex-row">
         {collection.name}
-        <span className="mr-auto dark:text-neutral-700">
+        {/*<span className="mr-auto dark:text-neutral-700">
           {collection.order || "no order"}
-        </span>
+        </span>*/}
       </div>
-      <LoadingIndicator />
     </Button>
   );
 }

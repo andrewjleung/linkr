@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef, useLayoutEffect } from "react";
 
-export type KeyPress = Pick<KeyboardEvent, "shiftKey" | "metaKey" | "code">;
+export type KeyPress = Pick<KeyboardEvent, "shiftKey" | "metaKey" | "key">;
 
 export const useKeyPress = (
   keyPress: KeyPress,
@@ -21,7 +21,7 @@ export const useKeyPress = (
       if (
         event.shiftKey === keyPress.shiftKey &&
         event.metaKey === keyPress.metaKey &&
-        event.code === keyPress.code
+        event.key === keyPress.key
       ) {
         callbackRef.current(event);
       }

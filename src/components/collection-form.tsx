@@ -28,6 +28,7 @@ import {
   OptimisticCollections,
 } from "@/hooks/use-optimistic-collections";
 import { Collection } from "@/database/types";
+import { useGlobalForm } from "@/hooks/use-global-form";
 
 const collectionSchema = z.object({
   name: z.string().nonempty(),
@@ -79,11 +80,13 @@ export function RenameCollectionForm({
   );
 }
 
+const CREATE_COLLECTION_FORM = "create-collection-form";
+
 export function CreateCollectionForm() {
   const { addCollection } = useContext(CollectionsContext);
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const parentId = useParentCollection();
+  const [open, setOpen] = useGlobalForm(CREATE_COLLECTION_FORM);
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
@@ -91,7 +94,7 @@ export function CreateCollectionForm() {
   });
 
   useKeyPress(
-    { shiftKey: true, metaKey: false, code: "KeyQ" },
+    { shiftKey: true, metaKey: false, key: "Q" },
     (event) => {
       event.preventDefault();
       setOpen(true);

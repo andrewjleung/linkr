@@ -12,6 +12,7 @@ import { createContext, startTransition, useOptimistic } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 import { useParentCollection } from "./use-parent-collection";
+import { revalidatePath } from "next/cache";
 
 const ORDER_BUFFER = 100;
 
@@ -261,6 +262,7 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
       updateOptimisticLinks({ type: "delete", id: link.id })
     );
     toast.success(`Link has been moved to collection "${newParentName}"`);
+
     await moveLink(link.id, newParentId);
   }
 
