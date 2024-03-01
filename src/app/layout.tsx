@@ -9,6 +9,11 @@ import { collections } from "@/database/schema";
 import { asc } from "drizzle-orm";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/components/state-provider";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 
 export const metadata = {
   title: "Create Next App",
@@ -39,16 +44,23 @@ export default async function RootLayout({
                   </div>
                 </div>
               </header>
-              <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-3 gap-8 px-8 pt-8">
-                <div className="col-span-1">
+              <ResizablePanelGroup
+                direction="horizontal"
+                className="mx-auto h-full w-full max-w-7xl gap-4 px-8 pt-8"
+              >
+                <ResizablePanel
+                  collapsible
+                  minSize={10}
+                  defaultSize={33}
+                  maxSize={50}
+                >
                   <CollectionsView
                     unoptimisticCollections={unoptimisticCollections}
                   />
-                </div>
-                <div className="col-span-2 mr-4 h-[calc(100vh-97px)] overflow-y-auto">
-                  {children}
-                </div>
-              </div>
+                </ResizablePanel>
+                <ResizableHandle />
+                <ResizablePanel defaultSize={67}>{children}</ResizablePanel>
+              </ResizablePanelGroup>
             </main>
             <Toaster position="bottom-center" />
           </ThemeProvider>

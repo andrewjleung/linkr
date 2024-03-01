@@ -11,11 +11,38 @@ import {
 } from "@/components/ui/command";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
-import { openedFormAtom } from "@/state";
+import { openedFormAtom, showSidebarAtom } from "@/state";
 import { useAtom } from "jotai";
-import { Folder, FolderPlus, Home, Plus } from "lucide-react";
+import {
+  Folder,
+  FolderPlus,
+  Home,
+  Plus,
+  SidebarClose,
+  SidebarOpen,
+} from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useContext, useState } from "react";
+
+function ToggleSidebarCommand() {
+  const [showSidebar, setShowSidebar] = useAtom(showSidebarAtom);
+
+  return (
+    <CommandItem
+      onSelect={() => {
+        setShowSidebar((showSidebar) => !showSidebar);
+      }}
+      className="rounded-lg"
+    >
+      {showSidebar ? (
+        <SidebarClose className="mr-2 h-4 w-4" />
+      ) : (
+        <SidebarOpen className="mr-2 h-4 w-4" />
+      )}
+      <span>{showSidebar ? "Hide sidebar" : "Show sidebar"}</span>
+    </CommandItem>
+  );
+}
 
 export function CommandMenu() {
   const { optimisticCollections } = useContext(CollectionsContext);
@@ -60,6 +87,7 @@ export function CommandMenu() {
               <FolderPlus className="mr-2 h-4 w-4" />
               <span>Create a collection</span>
             </CommandItem>
+            <ToggleSidebarCommand />
           </CommandGroup>
 
           <CommandGroup heading="Collections">

@@ -8,6 +8,8 @@ import {
   useOptimisticCollections,
 } from "@/hooks/use-optimistic-collections";
 import { CommandMenu } from "./command-menu";
+import { useAtom } from "jotai";
+import { showSidebarAtom } from "@/state";
 
 export function CollectionsView({
   unoptimisticCollections,
@@ -15,11 +17,12 @@ export function CollectionsView({
   unoptimisticCollections: Collection[];
 }) {
   const oc = useOptimisticCollections(unoptimisticCollections);
+  const [showSidebar] = useAtom(showSidebarAtom);
 
   return (
     <CollectionsContext.Provider value={oc}>
+      {showSidebar ? <Collections /> : null}
       <CreateCollectionForm />
-      <Collections />
       <CommandMenu />
     </CollectionsContext.Provider>
   );
