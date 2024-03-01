@@ -139,13 +139,14 @@ function ellipsis(str: string): string {
   return truncateByWord(str, LINK_TITLE_CUTOFF_LENGTH) + "...";
 }
 
-function AbstractLink({
-  link,
+function OptimisticLink({
+  optimisticLink,
   og,
 }: {
-  link: AbstractLink["link"];
+  optimisticLink: OptimisticLink;
   og?: OgObject;
 }) {
+  const link = optimisticLink.link;
   const title = link.title || og?.ogTitle || null;
   const displayTitle = title === null ? title : ellipsis(title);
 
@@ -178,12 +179,17 @@ function AbstractLink({
                   />
                 </AvatarFallback>
               </Avatar>
-              <div className="ml-4">
-                <CardTitle className="flex flex-row items-center">
+              <div className="ml-4 w-full">
+                <CardTitle className="flex w-full flex-row items-center">
                   <span className="text-sm">{displayTitle || displayUrl}</span>
                   <span className="ml-3 text-xs text-neutral-500">
                     {displayTitle === null ? null : displayUrl}
                   </span>
+                  {optimisticLink.type === "concrete" ? (
+                    <span className="ml-auto text-xs text-neutral-500">
+                      {optimisticLink.link.createdAt.toDateString()}
+                    </span>
+                  ) : null}
                 </CardTitle>
               </div>
             </CardHeader>
@@ -207,12 +213,12 @@ export default function LinkComponent({
   og?: OgObject;
 }) {
   if (optimisticLink.type === "abstract") {
-    return <AbstractLink link={optimisticLink.link} og={og} />;
+    return <OptimisticLink optimisticLink={optimisticLink} og={og} />;
   }
 
   return (
     <LinkMenu link={optimisticLink.link} collections={collections}>
-      <AbstractLink link={optimisticLink.link} og={og} />
+      <OptimisticLink optimisticLink={optimisticLink} og={og} />
     </LinkMenu>
   );
 }

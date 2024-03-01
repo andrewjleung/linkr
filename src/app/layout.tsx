@@ -51,15 +51,16 @@ export default async function RootLayout({
                 <ResizablePanel
                   collapsible
                   minSize={10}
-                  defaultSize={33}
+                  defaultSize={20}
                   maxSize={50}
+                  className="hidden sm:block"
                 >
                   <CollectionsView
                     unoptimisticCollections={unoptimisticCollections}
                   />
                 </ResizablePanel>
-                <ResizableHandle />
-                <ResizablePanel defaultSize={67}>{children}</ResizablePanel>
+                <ResizableHandle className="invisible" />
+                <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
               </ResizablePanelGroup>
             </main>
             <Toaster position="bottom-center" />
