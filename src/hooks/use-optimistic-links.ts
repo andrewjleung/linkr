@@ -12,7 +12,6 @@ import { createContext, startTransition, useOptimistic } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 import { useParentCollection } from "./use-parent-collection";
-import { revalidatePath } from "next/cache";
 
 const ORDER_BUFFER = 100;
 

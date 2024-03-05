@@ -1,6 +1,9 @@
+import "server-only";
+
 import { Link } from "@/database/types";
 import ogs, { ErrorResult, SuccessResult } from "open-graph-scraper";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
+import { z } from "zod";
 
 function zipMap<T, R>(ts: T[], fn: (t: T) => R): [T, R][] {
   return ts.map((t) => [t, fn(t)]);
@@ -17,7 +20,7 @@ function zipMapAsync<T, R>(
   return Promise.allSettled(zipMap(ts, fn).map(hoistPromise));
 }
 
-export async function getOgs(links: Link[]): Promise<Map<string, OgObject>> {
+export async function getOgs(links: Link[]): Promise<[string, OgObject][]> {
   const origins = links.map((l) => new URL(l.url).origin);
   const uniqueOrigins = Array.from(new Set(origins));
 
@@ -45,5 +48,5 @@ export async function getOgs(links: Link[]): Promise<Map<string, OgObject>> {
     []
   );
 
-  return new Map(originsAndOgResults);
+  return originsAndOgResults;
 }
