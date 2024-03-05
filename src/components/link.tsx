@@ -31,20 +31,20 @@ import { cn } from "@/lib/utils";
 import hash from "object-hash";
 import { HoverCard } from "@radix-ui/react-hover-card";
 import { HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
+import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 
 const LINK_CUTOFF_LENGTH = 100;
 const LINK_TITLE_CUTOFF_LENGTH = 50;
 
 function LinkMenu({
   link,
-  collections,
   children,
 }: {
   link: LinkSchema;
-  collections: Collection[];
   children: React.ReactNode;
 }) {
   const { removeOptimisticLink, moveOptimisticLink } = useContext(LinksContext);
+  const { optimisticCollections } = useContext(CollectionsContext);
 
   const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
   const parentId = useParentCollection();
@@ -83,16 +83,22 @@ function LinkMenu({
                   <ContextMenuSeparator />
                 </>
               )}
-              {collections
+              {optimisticCollections
                 .filter((c) => c.id !== parentId)
-                .map((c) => (
-                  <ContextMenuItem
-                    key={`move-to-collection-item-${c.id}`}
-                    onClick={() => onClickMoveTo(c)}
-                  >
-                    {c.name}
-                  </ContextMenuItem>
-                ))}
+                .map((c) => {
+                  if (c.type === "abstract") {
+                    return null;
+                  }
+
+                  return (
+                    <ContextMenuItem
+                      key={`move-to-collection-item-${c.id}`}
+                      onClick={() => onClickMoveTo(c.collection)}
+                    >
+                      {c.collection.name}
+                    </ContextMenuItem>
+                  );
+                })}
             </ContextMenuSubContent>
           </ContextMenuSub>
         </ContextMenuContent>
@@ -168,7 +174,7 @@ function OptimisticLink({
               {link.order || "no order"}
             </div>*/}
             <CardHeader className="flex flex-row items-center space-y-0 p-2">
-              <Avatar className="h-6 w-6 outline outline-1 outline-neutral-300 dark:outline-neutral-950">
+              <Avatar className="h-6 w-6">
                 <AvatarImage src={faviconUrl(link.url)} />
                 <AvatarFallback>
                   <div
@@ -181,12 +187,14 @@ function OptimisticLink({
               </Avatar>
               <div className="ml-4 w-full">
                 <CardTitle className="flex w-full flex-row items-center">
-                  <span className="text-sm">{displayTitle || displayUrl}</span>
-                  <span className="ml-3 text-xs text-neutral-500">
+                  <span className="text-ellipsis whitespace-nowrap text-sm">
+                    {displayTitle || displayUrl}
+                  </span>
+                  <span className="ml-3 hidden whitespace-nowrap text-xs text-neutral-500 sm:block">
                     {displayTitle === null ? null : displayUrl}
                   </span>
                   {optimisticLink.type === "concrete" ? (
-                    <span className="ml-auto text-xs text-neutral-500">
+                    <span className="ml-auto whitespace-nowrap text-xs text-neutral-500">
                       {optimisticLink.link.createdAt.toDateString()}
                     </span>
                   ) : null}
@@ -205,11 +213,9 @@ function OptimisticLink({
 
 export default function LinkComponent({
   optimisticLink,
-  collections,
   og,
 }: {
   optimisticLink: OptimisticLink;
-  collections: Collection[];
   og?: OgObject;
 }) {
   if (optimisticLink.type === "abstract") {
@@ -217,7 +223,7 @@ export default function LinkComponent({
   }
 
   return (
-    <LinkMenu link={optimisticLink.link} collections={collections}>
+    <LinkMenu link={optimisticLink.link}>
       <OptimisticLink optimisticLink={optimisticLink} og={og} />
     </LinkMenu>
   );

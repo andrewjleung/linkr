@@ -1,36 +1,17 @@
+"use client";
+
 import LinkComponent from "@/components/link";
-import {
-  ConcreteLink,
-  LinksContext,
-  OptimisticLink,
-  OptimisticLinks,
-} from "@/hooks/use-optimistic-links";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { ConcreteLink, LinksContext } from "@/hooks/use-optimistic-links";
+import { AnimatePresence } from "framer-motion";
 import {
   DragDropContext,
   Draggable,
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd";
-import { updateLinkOrder } from "@/app/actions";
-import { OgObject } from "open-graph-scraper/dist/lib/types";
-import { Collection } from "@/database/types";
 import { useContext } from "react";
 
-export function Links({
-  collections,
-  ogs,
-}: {
-  collections: Collection[];
-  ogs: Map<string, OgObject>;
-}) {
+export function Links() {
   const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
 
   function onDragStart() {}
@@ -91,7 +72,6 @@ export function Links({
                     >
                       <LinkComponent
                         optimisticLink={l}
-                        collections={collections}
                         og={ogs.get(new URL(l.link.url).origin)}
                       />
                     </div>

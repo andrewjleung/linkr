@@ -1,12 +1,7 @@
 import "./globals.css";
-import clsx from "clsx";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Separator } from "@/components/ui/separator";
 import { CollectionsView } from "@/components/collections-view";
-import { db } from "@/database/database";
-import { collections } from "@/database/schema";
-import { asc } from "drizzle-orm";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/components/state-provider";
 import {
@@ -14,6 +9,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { db } from "@/database/database";
+import { collections as collectionsSchema } from "@/database/schema";
+import { asc } from "drizzle-orm";
+import CollectionsProvider from "@/components/collections-provider";
 
 export const metadata = {
   title: "Create Next App",
@@ -25,46 +24,45 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const unoptimisticCollections = await db
+  const collections = await db
     .select()
-    .from(collections)
-    .orderBy(asc(collections.order));
+    .from(collectionsSchema)
+    .orderBy(asc(collectionsSchema.order));
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen dark:bg-neutral-950">
         <Providers>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <main className="relative flex min-h-screen flex-col">
-              <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
-                <div className="container flex h-16 max-w-7xl flex-row items-center">
-                  <h2 className="ml-4 text-lg font-semibold">linkr</h2>
-                  <div className="ml-auto mr-4 mt-0">
-                    <ThemeToggle />
+          <CollectionsProvider collections={collections}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <main className="relative flex min-h-screen flex-col">
+                <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
+                  <div className="container flex h-16 max-w-7xl flex-row items-center">
+                    <h2 className="ml-4 text-lg font-semibold">linkr</h2>
+                    <div className="ml-auto mr-4 mt-0">
+                      <ThemeToggle />
+                    </div>
                   </div>
-                </div>
-              </header>
-              <ResizablePanelGroup
-                direction="horizontal"
-                className="mx-auto h-full w-full max-w-7xl gap-4 px-8 pt-8"
-              >
-                <ResizablePanel
-                  collapsible
-                  minSize={10}
-                  defaultSize={20}
-                  maxSize={50}
-                  className="hidden sm:block"
+                </header>
+                <ResizablePanelGroup
+                  direction="horizontal"
+                  className="mx-auto h-full w-full max-w-7xl gap-4 px-8 pt-8"
                 >
-                  <CollectionsView
-                    unoptimisticCollections={unoptimisticCollections}
-                  />
-                </ResizablePanel>
-                <ResizableHandle className="invisible" />
-                <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
-              </ResizablePanelGroup>
-            </main>
-            <Toaster position="bottom-center" />
-          </ThemeProvider>
+                  <ResizablePanel
+                    collapsible
+                    minSize={10}
+                    defaultSize={20}
+                    maxSize={50}
+                  >
+                    <CollectionsView />
+                  </ResizablePanel>
+                  <ResizableHandle className="invisible" />
+                  <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
+                </ResizablePanelGroup>
+              </main>
+              <Toaster position="bottom-center" />
+            </ThemeProvider>
+          </CollectionsProvider>
         </Providers>
       </body>
     </html>

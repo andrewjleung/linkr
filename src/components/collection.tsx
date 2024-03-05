@@ -36,7 +36,6 @@ export function HomeCollection() {
     <Link
       href="/collections"
       className={cn(buttonVariants({ variant: variant }), "w-full")}
-      prefetch
     >
       <div className="w-full">Home</div>
     </Link>
@@ -96,7 +95,6 @@ function ConcreteCollection({ collection }: { collection: Collection }) {
         <ContextMenuTrigger>
           <Link
             href={`/collections/${collection.id}`}
-            prefetch
             className={cn(
               buttonVariants({ variant: variant }),
               "relative w-full"
