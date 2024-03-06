@@ -20,8 +20,8 @@ function zipMapAsync<T, R>(
   return Promise.allSettled(zipMap(ts, fn).map(hoistPromise));
 }
 
-export async function getOgs(links: Link[]): Promise<[string, OgObject][]> {
-  const origins = links.map((l) => new URL(l.url).origin);
+export async function getOgs(urls: string[]): Promise<[string, OgObject][]> {
+  const origins = urls.map((url) => new URL(url).origin);
   const uniqueOrigins = Array.from(new Set(origins));
 
   const originsAndResults = await zipMapAsync(uniqueOrigins, (origin) =>

@@ -32,6 +32,8 @@ import hash from "object-hash";
 import { HoverCard } from "@radix-ui/react-hover-card";
 import { HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
+import { useQuery } from "@tanstack/react-query";
+import { z } from "zod";
 
 const LINK_CUTOFF_LENGTH = 100;
 const LINK_TITLE_CUTOFF_LENGTH = 50;
@@ -116,9 +118,22 @@ function LinkMenu({
   );
 }
 
-function faviconUrl(url: string): string {
+function isUrl(s: string): boolean {
+  try {
+    new URL(s);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function faviconUrl(url: string, favicon: string = "/favicon.ico"): string {
+  if (isUrl(favicon)) {
+    return favicon;
+  }
+
   const parsed = new URL(url);
-  return `${parsed.origin}/favicon.ico`;
+  return `${parsed.origin}${favicon}`;
 }
 
 const GRADIENTS = [
@@ -149,13 +164,28 @@ function ellipsis(str: string): string {
   return truncateByWord(str, LINK_TITLE_CUTOFF_LENGTH) + "...";
 }
 
+const OgSchema = z.object({
+  ogTitle: z.optional(z.string()),
+  ogDescription: z.optional(z.string()),
+  favicon: z.optional(z.string()),
+});
+
 function OptimisticLink({
   optimisticLink,
-  og,
 }: {
   optimisticLink: OptimisticLink;
-  og?: OgObject;
 }) {
+  const { data: og } = useQuery({
+    queryKey: ["og", optimisticLink.id],
+    queryFn: () =>
+      fetch(
+        `/api/opengraphs?url=${encodeURIComponent(optimisticLink.link.url)}`
+      )
+        .then((res) => res.json())
+        .then((res) => OgSchema.parse(res.data))
+        .catch((err) => null),
+  });
+
   const link = optimisticLink.link;
   const title = link.title || og?.ogTitle || null;
   const displayTitle = title === null ? title : ellipsis(title);
@@ -180,7 +210,7 @@ function OptimisticLink({
             <CardHeader className="p-2">
               <CardTitle className="flex flex-row items-center justify-stretch gap-4">
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={faviconUrl(link.url)} />
+                  <AvatarImage src={faviconUrl(link.url, og?.favicon)} />
                   <AvatarFallback>
                     <div
                       className={cn(
@@ -217,18 +247,16 @@ function OptimisticLink({
 
 export default function LinkComponent({
   optimisticLink,
-  og,
 }: {
   optimisticLink: OptimisticLink;
-  og?: OgObject;
 }) {
   if (optimisticLink.type === "abstract") {
-    return <OptimisticLink optimisticLink={optimisticLink} og={og} />;
+    return <OptimisticLink optimisticLink={optimisticLink} />;
   }
 
   return (
     <LinkMenu link={optimisticLink.link}>
-      <OptimisticLink optimisticLink={optimisticLink} og={og} />
+      <OptimisticLink optimisticLink={optimisticLink} />
     </LinkMenu>
   );
 }

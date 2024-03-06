@@ -10,27 +10,9 @@ import {
   Droppable,
 } from "@hello-pangea/dnd";
 import { useContext } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { z } from "zod";
-
-const OgObjectSchema = z.object({
-  ogTitle: z.optional(z.string()),
-  ogDescription: z.optional(z.string()),
-});
-
-const OgsResponseSchema = z.array(z.tuple([z.string(), OgObjectSchema]));
 
 export function Links() {
   const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
-
-  const { data: ogs } = useQuery({
-    queryKey: ["ogs"],
-    queryFn: () =>
-      fetch("/api/opengraphs", { method: "GET", next: { tags: ["ogs"] } })
-        .then((res) => res.json())
-        .then(OgsResponseSchema.parse)
-        .then((ogs) => new Map(ogs)),
-  });
 
   function onDragStart() {}
 
@@ -88,10 +70,7 @@ export function Links() {
                       {...provided.dragHandleProps}
                       className="mb-2"
                     >
-                      <LinkComponent
-                        optimisticLink={l}
-                        og={ogs?.get(new URL(l.link.url).origin)}
-                      />
+                      <LinkComponent optimisticLink={l} />
                     </div>
                   )}
                 </Draggable>

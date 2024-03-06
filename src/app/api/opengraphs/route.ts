@@ -1,18 +1,24 @@
-import { db } from "@/database/database";
-import { links as linksSchema } from "@/database/schema";
 import { getOgs } from "@/lib/opengraph";
-import { asc, isNull } from "drizzle-orm";
+import { NextRequest } from "next/server";
+import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  // TODO: only fetch for links of page
-  const links = await db
-    .select()
-    .from(linksSchema)
-    .orderBy(asc(linksSchema.order));
+const OpengraphGetRequestSchema = z.nullable(z.string().url());
 
-  const ogs = await getOgs(links);
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const url = OpengraphGetRequestSchema.parse(searchParams.get("url"));
 
-  return Response.json({ data: ogs });
+  if (url === null) {
+    return null;
+  }
+
+  const ogs = await getOgs([url]);
+
+  if (ogs.length !== 1) {
+    return Response.error();
+  }
+
+  return Response.json({ data: ogs[0][1] });
 }
