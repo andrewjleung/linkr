@@ -49,6 +49,10 @@ function LinkMenu({
   const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
   const parentId = useParentCollection();
 
+  const showMoveMenuSeparator =
+    (parentId === null && optimisticCollections.length > 0) ||
+    (parentId !== null && optimisticCollections.length > 1);
+
   function onClickEdit() {
     setEditLinkFormOpen(true);
   }
@@ -80,7 +84,7 @@ function LinkMenu({
                   <ContextMenuItem onClick={() => onClickMoveTo(null)}>
                     Home
                   </ContextMenuItem>
-                  <ContextMenuSeparator />
+                  {showMoveMenuSeparator ? <ContextMenuSeparator /> : null}
                 </>
               )}
               {optimisticCollections
@@ -173,33 +177,33 @@ function OptimisticLink({
             {/*<div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
               {link.order || "no order"}
             </div>*/}
-            <CardHeader className="flex flex-row items-center space-y-0 p-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={faviconUrl(link.url)} />
-                <AvatarFallback>
-                  <div
-                    className={cn(
-                      "h-full w-full scale-125 blur-sm",
-                      GRADIENTS[hashLink(link) % GRADIENTS.length]
-                    )}
-                  />
-                </AvatarFallback>
-              </Avatar>
-              <div className="ml-4 w-full">
-                <CardTitle className="flex w-full flex-row items-center">
-                  <span className="text-ellipsis whitespace-nowrap text-sm">
-                    {displayTitle || displayUrl}
+            <CardHeader className="p-2">
+              <CardTitle className="flex flex-row items-center justify-stretch gap-4">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={faviconUrl(link.url)} />
+                  <AvatarFallback>
+                    <div
+                      className={cn(
+                        "h-full w-full scale-125 blur-sm",
+                        GRADIENTS[hashLink(link) % GRADIENTS.length]
+                      )}
+                    />
+                  </AvatarFallback>
+                </Avatar>
+                <span className="flex-2 truncate text-sm">
+                  {displayTitle || displayUrl}
+                </span>
+                {displayTitle === null ? null : (
+                  <span className="hidden flex-1 whitespace-nowrap text-xs text-neutral-500 sm:block">
+                    {displayUrl}
                   </span>
-                  <span className="ml-3 hidden whitespace-nowrap text-xs text-neutral-500 sm:block">
-                    {displayTitle === null ? null : displayUrl}
+                )}
+                {optimisticLink.type === "concrete" ? (
+                  <span className="flex-auto whitespace-nowrap text-end text-xs text-neutral-500">
+                    {optimisticLink.link.createdAt.toDateString()}
                   </span>
-                  {optimisticLink.type === "concrete" ? (
-                    <span className="ml-auto whitespace-nowrap text-xs text-neutral-500">
-                      {optimisticLink.link.createdAt.toDateString()}
-                    </span>
-                  ) : null}
-                </CardTitle>
-              </div>
+                ) : null}
+              </CardTitle>
             </CardHeader>
           </Card>
         </Link>
