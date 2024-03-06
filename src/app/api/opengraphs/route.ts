@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const url = OpengraphGetRequestSchema.parse(searchParams.get("url"));
 
   if (url === null) {
-    return null;
+    return Response.error();
   }
 
   const ogs = await getOgs([url]);

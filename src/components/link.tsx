@@ -230,7 +230,12 @@ function OptimisticLink({
                 )}
                 {optimisticLink.type === "concrete" ? (
                   <span className="flex-auto whitespace-nowrap text-end text-xs text-neutral-500">
-                    {optimisticLink.link.createdAt.toDateString()}
+                    {optimisticLink.link.createdAt
+                      .toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                      })
+                      .replaceAll(",", "")}
                   </span>
                 ) : null}
               </CardTitle>
