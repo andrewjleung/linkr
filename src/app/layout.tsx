@@ -14,6 +14,10 @@ import { collections as collectionsSchema } from "@/database/schema";
 import { asc } from "drizzle-orm";
 import CollectionsProvider from "@/components/collections-provider";
 import { QCProvider } from "@/components/query-client-provider";
+import { CollectionsPicker } from "@/components/collections-picker";
+import { CommandMenu } from "@/components/command-menu";
+import { CreateCollectionForm } from "@/components/collection-form";
+import { CreateLinkForm } from "@/components/link-form";
 
 export const metadata = {
   title: "Create Next App",
@@ -43,29 +47,20 @@ export default async function RootLayout({
               >
                 <main className="relative flex min-h-screen flex-col">
                   <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
-                    <div className="container flex h-16 max-w-7xl flex-row items-center">
-                      <h2 className="ml-4 text-lg font-semibold">linkr</h2>
-                      <div className="ml-auto mr-4 mt-0">
+                    <div className="container flex h-16 max-w-5xl flex-row items-center">
+                      <CollectionsPicker />
+                      <div className="ml-auto mt-0">
                         <ThemeToggle />
                       </div>
                     </div>
                   </header>
-                  <ResizablePanelGroup
-                    direction="horizontal"
-                    className="mx-auto h-full w-full max-w-7xl gap-4 px-8 pt-8"
-                  >
-                    <ResizablePanel
-                      collapsible
-                      minSize={10}
-                      defaultSize={20}
-                      maxSize={50}
-                    >
-                      <CollectionsView />
-                    </ResizablePanel>
-                    <ResizableHandle className="invisible" />
-                    <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
-                  </ResizablePanelGroup>
+                  <div className="mx-auto h-full w-full max-w-5xl gap-4 px-8 pt-8">
+                    {children}
+                  </div>
                 </main>
+                <CommandMenu />
+                <CreateLinkForm />
+                <CreateCollectionForm />
                 <Toaster position="bottom-center" />
               </ThemeProvider>
             </CollectionsProvider>

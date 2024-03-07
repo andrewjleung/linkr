@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Command,
   CommandDialog,
@@ -72,20 +74,22 @@ export function CommandMenu() {
                 setOpenedForm("create-link-form");
                 setOpen(false);
               }}
-              className="rounded-lg"
+              className="rounded-md"
             >
               <Plus className="mr-2 h-4 w-4" />
               <span>Create a link</span>
+              <CommandShortcut>Q</CommandShortcut>
             </CommandItem>
             <CommandItem
               onSelect={() => {
                 setOpenedForm("create-collection-form");
                 setOpen(false);
               }}
-              className="rounded-lg"
+              className="rounded-md"
             >
               <FolderPlus className="mr-2 h-4 w-4" />
               <span>Create a collection</span>
+              <CommandShortcut>⇧Q</CommandShortcut>
             </CommandItem>
           </CommandGroup>
 
@@ -95,7 +99,7 @@ export function CommandMenu() {
                 router.push("/");
                 setOpen(false);
               }}
-              className="rounded-lg"
+              className="rounded-md"
             >
               <Home className="mr-2 h-4 w-4" />
               <span>Home</span>
@@ -110,7 +114,7 @@ export function CommandMenu() {
                     router.push(`/collections/${c.id}`);
                     setOpen(false);
                   }}
-                  className="rounded-lg"
+                  className="rounded-md"
                 >
                   <Folder className="mr-2 h-4 w-4" />
                   <span>{c.collection.name}</span>

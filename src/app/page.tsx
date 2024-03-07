@@ -4,6 +4,7 @@ import { db } from "@/database/database";
 import { links as linksSchema } from "@/database/schema";
 import { asc, isNull } from "drizzle-orm";
 import LinksProvider from "@/components/links-provider";
+import { CreateCollectionForm } from "@/components/collection-form";
 
 export default async function Home() {
   const links = await db
@@ -15,7 +16,6 @@ export default async function Home() {
   return (
     <LinksProvider links={links}>
       <Links />
-      <CreateLinkForm />
     </LinksProvider>
   );
 }

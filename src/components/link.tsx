@@ -207,9 +207,9 @@ function OptimisticLink({
             {/*<div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
               {link.order || "no order"}
             </div>*/}
-            <CardHeader className="p-2">
+            <CardHeader className="p-3">
               <CardTitle className="flex flex-row items-center justify-stretch gap-4">
-                <Avatar className="h-6 w-6">
+                <Avatar className="h-5 w-5">
                   <AvatarImage src={faviconUrl(link.url, og?.favicon)} />
                   <AvatarFallback>
                     <div
