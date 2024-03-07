@@ -18,6 +18,7 @@ import { CollectionsPicker } from "@/components/collections-picker";
 import { CommandMenu } from "@/components/command-menu";
 import { CreateCollectionForm } from "@/components/collection-form";
 import { CreateLinkForm } from "@/components/link-form";
+import { CommandMenuButton } from "@/components/command-menu-button";
 
 export const metadata = {
   title: "Create Next App",
@@ -49,7 +50,8 @@ export default async function RootLayout({
                   <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
                     <div className="container flex h-16 max-w-5xl flex-row items-center">
                       <CollectionsPicker />
-                      <div className="ml-auto mt-0">
+                      <CommandMenuButton className="ml-auto" />
+                      <div className="ml-2 mt-0 justify-self-end">
                         <ThemeToggle />
                       </div>
                     </div>

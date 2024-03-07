@@ -11,6 +11,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { useGlobalForm } from "@/hooks/use-global-form";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import { openedFormAtom, showSidebarAtom } from "@/state";
@@ -46,17 +47,19 @@ function ToggleSidebarCommand() {
   );
 }
 
+const COMMAND_MENU_FORM = "command-menu";
+
 export function CommandMenu() {
   const { optimisticCollections } = useContext(CollectionsContext);
-  const [open, setOpen] = useState(false);
   const router = useRouter();
+  const [open, setOpen] = useGlobalForm(COMMAND_MENU_FORM);
   const [, setOpenedForm] = useAtom(openedFormAtom);
 
   useKeyPress(
     { shiftKey: false, metaKey: true, key: "k" },
     (event) => {
       event.preventDefault();
-      setOpen((open) => !open);
+      setOpen(true);
     },
     open
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Home } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,7 @@ export function CollectionsPicker() {
                 setOpen(false);
               }}
             >
-              <Check
+              <Home
                 className={cn(
                   "mr-2 h-4 w-4",
                   parentId === null ? "opacity-100" : "opacity-0"
