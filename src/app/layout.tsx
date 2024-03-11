@@ -15,10 +15,9 @@ import { asc } from "drizzle-orm";
 import CollectionsProvider from "@/components/collections-provider";
 import { QCProvider } from "@/components/query-client-provider";
 import { CollectionsPicker } from "@/components/collections-picker";
-import { CommandMenu } from "@/components/command-menu";
-import { CreateCollectionForm } from "@/components/collection-form";
-import { CreateLinkForm } from "@/components/link-form";
 import { CommandMenuButton } from "@/components/command-menu-button";
+import { Button } from "@/components/ui/button";
+import { MobileFooter } from "@/components/mobile-footer";
 
 export const metadata = {
   title: "Create Next App",
@@ -48,21 +47,21 @@ export default async function RootLayout({
               >
                 <main className="relative flex min-h-screen flex-col">
                   <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
-                    <div className="container flex h-16 max-w-5xl flex-row items-center">
-                      <CollectionsPicker />
+                    <div className="container hidden h-16 max-w-5xl flex-row items-center sm:flex">
+                      <CollectionsPicker className="mx-auto sm:mx-0" />
                       <CommandMenuButton className="ml-auto" />
                       <div className="ml-2 mt-0 justify-self-end">
                         <ThemeToggle />
                       </div>
                     </div>
                   </header>
-                  <div className="mx-auto h-full w-full max-w-5xl gap-4 px-8 pt-8">
+                  <div className="mx-auto h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8">
                     {children}
                   </div>
+                  <footer className="relative w-full px-8 pb-8">
+                    <MobileFooter />
+                  </footer>
                 </main>
-                <CommandMenu />
-                <CreateLinkForm />
-                <CreateCollectionForm />
                 <Toaster position="bottom-center" />
               </ThemeProvider>
             </CollectionsProvider>

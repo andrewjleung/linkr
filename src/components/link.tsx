@@ -188,7 +188,6 @@ function OptimisticLink({
 
   const link = optimisticLink.link;
   const title = link.title || og?.ogTitle || null;
-  const displayTitle = title === null ? title : ellipsis(title);
 
   const url = new URL(link.url);
   const displayUrl =
@@ -221,9 +220,9 @@ function OptimisticLink({
                   </AvatarFallback>
                 </Avatar>
                 <span className="flex-2 truncate text-sm">
-                  {displayTitle || displayUrl}
+                  {title || displayUrl}
                 </span>
-                {displayTitle === null ? null : (
+                {title === null ? null : (
                   <span className="hidden flex-1 whitespace-nowrap text-xs text-neutral-500 sm:block">
                     {displayUrl}
                   </span>

@@ -1,11 +1,14 @@
 import { validateCollection } from "@/app/actions";
-import { CreateCollectionForm } from "@/components/collection-form";
-import { CreateLinkForm } from "@/components/link-form";
+import { LinkSearcher } from "@/components/link-searcher";
 import { Links } from "@/components/links";
 import LinksProvider from "@/components/links-provider";
 import { db } from "@/database/database";
 import { links as linksSchema } from "@/database/schema";
 import { asc, eq, isNull } from "drizzle-orm";
+import { RenameCollectionForm } from "@/components/collection-form";
+import { CommandMenu } from "@/components/command-menu";
+import { CreateCollectionForm } from "@/components/collection-form";
+import { CreateLinkForm } from "@/components/link-form";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const parentId = Number(params.id);
@@ -21,6 +24,10 @@ export default async function Page({ params }: { params: { id: string } }) {
   return (
     <LinksProvider links={links}>
       <Links />
+      <CommandMenu />
+      <CreateLinkForm />
+      <CreateCollectionForm />
+      <RenameCollectionForm />
     </LinksProvider>
   );
 }

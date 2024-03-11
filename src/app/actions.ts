@@ -110,7 +110,10 @@ export async function createCollection(
       ? ORDER_BUFFER
       : lastCollectionInCollection.order + ORDER_BUFFER;
 
-  const result = await db.insert(collections).values({ ...collection, order });
+  const result = await db
+    .insert(collections)
+    .values({ ...collection, order })
+    .returning();
   revalidatePath("/");
 
   return result;
@@ -143,12 +146,7 @@ export async function safeDeleteCollection(id: number) {
     .where(eq(collections.id, id));
 
   revalidatePath("/");
-
-  return {
-    updatedCollections,
-    updatedLinks,
-    deletedCollection,
-  };
+  redirect("/");
 }
 
 export async function unsafeDeleteCollection(id: number) {
@@ -173,12 +171,7 @@ export async function unsafeDeleteCollection(id: number) {
     .where(eq(collections.id, id));
 
   revalidatePath("/");
-
-  return {
-    deletedNestedCollections,
-    deletedLinks,
-    deletedCollection,
-  };
+  redirect("/");
 }
 
 export async function updateCollectionOrder(id: number, order: number) {

@@ -93,7 +93,9 @@ export type OptimisticCollection = AbstractCollection | ConcreteCollection;
 
 export type OptimisticCollections = {
   optimisticCollections: OptimisticCollection[];
-  addCollection: (collection: Omit<CollectionInsert, "order">) => Promise<void>;
+  addCollection: (
+    collection: Omit<CollectionInsert, "order">
+  ) => Promise<Collection>;
   unsafeRemoveCollection: (id: number) => Promise<void>;
   safeRemoveCollection: (id: number) => Promise<void>;
   renameCollection: (id: number, newName: string) => Promise<void>;
@@ -202,7 +204,10 @@ export function useOptimisticCollections(
       updateOptimisticCollections({ type: "add", collection });
     });
     toast.success(`Collection "${collection.name}" has been created.`);
-    await createCollection(collection);
+    const response = await createCollection(collection);
+
+    // TODO: make this safe
+    return response[0];
   }
 
   async function safeRemoveCollection(id: number) {

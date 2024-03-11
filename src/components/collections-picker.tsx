@@ -23,8 +23,9 @@ import {
 } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { useRouter } from "next/navigation";
+import clsx from "clsx";
 
-export function CollectionsPicker() {
+export function CollectionsPicker({ className }: { className?: string }) {
   const parentId = useParentCollection();
   const { optimisticCollections } = useContext(CollectionsContext);
   const [open, setOpen] = useState(false);
@@ -37,63 +38,65 @@ export function CollectionsPicker() {
     ) as ConcreteCollection[];
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between"
-        >
-          {parentId === null
-            ? "Home"
-            : concreteCollections.find((c) => c.id === parentId)?.collection
-                .name}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search collections..." />
-          <CommandEmpty>No collection found.</CommandEmpty>
-          <CommandGroup>
-            <CommandItem
-              key={"collection-picker-home"}
-              className="rounded-md"
-              onSelect={() => {
-                router.push("/");
-                setOpen(false);
-              }}
-            >
-              <Home
-                className={cn(
-                  "mr-2 h-4 w-4",
-                  parentId === null ? "opacity-100" : "opacity-0"
-                )}
-              />
-              Home
-            </CommandItem>
-            {concreteCollections.map((c) => (
+    <div className={clsx(className)}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-[200px] justify-between"
+          >
+            {parentId === null
+              ? "Home"
+              : concreteCollections.find((c) => c.id === parentId)?.collection
+                  .name}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search collections..." />
+            <CommandEmpty>No collection found.</CommandEmpty>
+            <CommandGroup>
               <CommandItem
-                key={`collection-picker-${c.id}`}
+                key={"collection-picker-home"}
                 className="rounded-md"
                 onSelect={() => {
-                  router.push(`/collections/${c.id}`);
+                  router.push("/");
                   setOpen(false);
                 }}
               >
-                <Check
+                <Home
                   className={cn(
                     "mr-2 h-4 w-4",
-                    parentId === c.id ? "opacity-100" : "opacity-0"
+                    parentId === null ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {c.collection.name}
+                Home
               </CommandItem>
-            ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
+              {concreteCollections.map((c) => (
+                <CommandItem
+                  key={`collection-picker-${c.id}`}
+                  className="rounded-md"
+                  onSelect={() => {
+                    router.push(`/collections/${c.id}`);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      parentId === c.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {c.collection.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

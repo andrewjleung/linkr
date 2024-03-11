@@ -27,10 +27,12 @@ import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import {
   CollectionsContext,
+  ConcreteCollection,
   OptimisticCollections,
 } from "@/hooks/use-optimistic-collections";
 import { Collection } from "@/database/types";
 import { useGlobalForm } from "@/hooks/use-global-form";
+import { useRouter } from "next/navigation";
 
 const collectionSchema = z.object({
   name: z.string().nonempty(),
@@ -40,33 +42,39 @@ const DEFAULT_FORM_VALUES = {
   name: "",
 };
 
-export function RenameCollectionForm({
-  collection,
-  open,
-  setOpen,
-}: {
-  collection: Collection;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+export function RenameCollectionForm() {
+  const { optimisticCollections } = useContext(CollectionsContext);
+  const parentId = useParentCollection();
+  const collection = optimisticCollections.find(
+    (c) => c.type === "concrete" && c.id === parentId
+  ) as ConcreteCollection | undefined;
+  const [open, setOpen] = useGlobalForm("rename-collection-form");
   const { renameCollection } = useContext(CollectionsContext);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
     defaultValues: {
-      name: collection.name || "",
+      name: collection?.collection.name || "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
+    if (collection === undefined) {
+      return;
+    }
+
     setLoading(true);
     setOpen(false);
 
     // TODO: handle failure case
-    await renameCollection(collection.id, values.name);
+    await renameCollection(collection.collection.id, values.name);
 
     setLoading(false);
+  }
+
+  if (collection === undefined) {
+    return null;
   }
 
   return (
@@ -89,6 +97,7 @@ export function CreateCollectionForm() {
   const [loading, setLoading] = useState(false);
   const parentId = useParentCollection();
   const [open, setOpen] = useGlobalForm(CREATE_COLLECTION_FORM);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
@@ -110,16 +119,12 @@ export function CreateCollectionForm() {
     setOpen(false);
 
     // TODO: handle failure case
-    await addCollection({
+    const collection = await addCollection({
       name: values.name,
       parentCollectionId: null,
-    })
-      .then((collection) => {
-        console.log(collection);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    });
+
+    router.push(`/collections/${collection.id}`);
 
     setLoading(false);
   }
