@@ -37,6 +37,7 @@ function orderForReorderedElement(
 
 const DEFAULT_COLLECTIONS_CONTEXT: OptimisticCollections = {
   optimisticCollections: [],
+  // @ts-ignore
   async addCollection() {},
   async unsafeRemoveCollection() {},
   async safeRemoveCollection() {},
@@ -44,9 +45,7 @@ const DEFAULT_COLLECTIONS_CONTEXT: OptimisticCollections = {
   async reorderCollection() {},
 };
 
-export const CollectionsContext = createContext<OptimisticCollections>(
-  DEFAULT_COLLECTIONS_CONTEXT
-);
+export const CollectionsContext = createContext(DEFAULT_COLLECTIONS_CONTEXT);
 
 type CollectionAdd = {
   type: "add";
