@@ -134,11 +134,7 @@ function ConcreteCollection({ collection }: { collection: Collection }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <RenameCollectionForm
-        collection={collection}
-        open={renameFormOpen}
-        setOpen={setRenameFormOpen}
-      />
+      <RenameCollectionForm />
     </>
   );
 }
