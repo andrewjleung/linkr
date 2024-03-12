@@ -44,9 +44,9 @@ export function Links() {
 
   if (optimisticLinks.length < 1) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-2">
-        <h1 className="text-2xl">There&apos;s nothing here! 🙀</h1>
-        <p className="text-xs">The world is your oyster. Go find some links!</p>
+      <div className="mt-16 flex flex-col items-center justify-center gap-2">
+        <h1 className="text-3xl">There&apos;s nothing here! 🙀</h1>
+        <p className="text-md">The world is your oyster. Go find some links!</p>
       </div>
     );
   }

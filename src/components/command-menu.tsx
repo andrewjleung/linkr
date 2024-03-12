@@ -181,7 +181,9 @@ function DeleteCollectionCommand({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction onClick={onClickDelete}>
               Delete
             </AlertDialogAction>

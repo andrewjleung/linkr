@@ -5,12 +5,14 @@ import { FolderPlus, Plus } from "lucide-react";
 import { CollectionsPicker } from "@/components/collections-picker";
 import { useAtom } from "jotai";
 import { openedFormAtom } from "@/state";
+import { MobileCollectionsPicker } from "./mobile-collections-picker";
 
 export function MobileFooter() {
   const [, setOpenedForm] = useAtom(openedFormAtom);
 
   return (
     <div className="flex w-full flex-row gap-4">
+      <MobileCollectionsPicker className="mx-auto flex-1 sm:mx-0 sm:hidden" />
       <Button
         variant="secondary"
         size="icon"
@@ -19,7 +21,6 @@ export function MobileFooter() {
       >
         <FolderPlus className="h-4 w-4" />
       </Button>
-      <CollectionsPicker className="left-1/3 mx-auto sm:mx-0 sm:hidden" />
       <Button
         variant="secondary"
         size="icon"
