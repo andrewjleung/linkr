@@ -21,9 +21,11 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { useClipboard } from "@/hooks/use-clipboard";
 import { useGlobalForm } from "@/hooks/use-global-form";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
+import { LinksContext } from "@/hooks/use-optimistic-links";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { openedFormAtom, showSidebarAtom } from "@/state";
 import { useAtom } from "jotai";
@@ -35,6 +37,7 @@ import {
   Home,
   Moon,
   Plus,
+  PlusCircle,
   SidebarClose,
   SidebarOpen,
   Sun,
@@ -218,6 +221,47 @@ function RenameCollectionCommand({
   );
 }
 
+function isUrl(s: string): boolean {
+  try {
+    new URL(s);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function QuickAddCommand({
+  setOpen,
+}: {
+  setOpen: ReturnType<typeof useGlobalForm>[1];
+}) {
+  const clipboard = useClipboard();
+  const parentId = useParentCollection();
+  const { addOptimisticLink } = useContext(LinksContext);
+
+  if (clipboard === undefined) return null;
+
+  if (!isUrl(clipboard)) return null;
+
+  return (
+    <CommandItem
+      onSelect={() => {
+        setOpen(false);
+        addOptimisticLink({
+          parentCollectionId: parentId,
+          url: clipboard,
+          title: null,
+          description: null,
+        });
+      }}
+      className="rounded-md"
+    >
+      <PlusCircle className="mr-2 h-4 w-4" />
+      <span>Add link from clipboard: {clipboard}</span>
+    </CommandItem>
+  );
+}
+
 const COMMAND_MENU_FORM = "command-menu";
 
 export function CommandMenu() {
@@ -243,6 +287,7 @@ export function CommandMenu() {
           <CommandEmpty>No results found.</CommandEmpty>
 
           <CommandGroup heading="Commands">
+            <QuickAddCommand setOpen={setOpen} />
             <CommandItem
               onSelect={() => {
                 setOpenedForm("create-link-form");
