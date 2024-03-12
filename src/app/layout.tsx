@@ -47,20 +47,20 @@ export default async function RootLayout({
               >
                 <main className="relative flex min-h-screen flex-col">
                   <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800">
-                    <div className="container hidden h-16 max-w-5xl flex-row items-center sm:flex">
-                      <CollectionsPicker className="mx-auto sm:mx-0" />
-                      <CommandMenuButton className="ml-auto" />
-                      <div className="ml-2 mt-0 justify-self-end">
+                    <div className="container flex h-16 max-w-5xl flex-row items-center">
+                      <CollectionsPicker className="mx-auto hidden sm:mx-0 sm:block" />
+                      <CommandMenuButton className="ml-auto hidden sm:block" />
+                      <div className="ml-2 mt-0 hidden justify-self-end sm:block">
                         <ThemeToggle />
+                      </div>
+                      <div className="block w-full sm:hidden">
+                        <MobileFooter />
                       </div>
                     </div>
                   </header>
                   <div className="mx-auto h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8">
                     {children}
                   </div>
-                  <footer className="relative w-full px-8 pb-8">
-                    <MobileFooter />
-                  </footer>
                 </main>
                 <Toaster position="bottom-center" />
               </ThemeProvider>
