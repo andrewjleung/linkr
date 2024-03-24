@@ -7,10 +7,7 @@ export function useClipboard() {
   useEffect(() => {
     if (typeof navigator.clipboard.readText === "undefined") return;
 
-    navigator.clipboard
-      .readText()
-      .then((text) => setClipboard(text))
-      .then(() => navigator.clipboard.writeText(""));
+    navigator.clipboard.readText().then((text) => setClipboard(text));
   }, []);
 
   return clipboard;

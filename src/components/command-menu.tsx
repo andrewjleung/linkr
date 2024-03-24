@@ -253,6 +253,7 @@ function QuickAddCommand({
           title: null,
           description: null,
         });
+        navigator.clipboard.writeText("");
       }}
       className="rounded-md"
     >

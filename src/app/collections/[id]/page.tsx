@@ -9,6 +9,12 @@ import { RenameCollectionForm } from "@/components/collection-form";
 import { CommandMenu } from "@/components/command-menu";
 import { CreateCollectionForm } from "@/components/collection-form";
 import { CreateLinkForm } from "@/components/link-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "linkr",
+  description: "A home for your links.",
+};
 
 export default async function Page({ params }: { params: { id: string } }) {
   const parentId = Number(params.id);
