@@ -191,5 +191,5 @@ export async function parseRaindropImport(file: string) {
 	const encoded = new TextEncoder().encode(file);
 	const result = await importFromRaindrop(encoded);
 
-	return Array.from(result.entries());
+	return result;
 }
