@@ -209,7 +209,11 @@ export default function ImportRaindropPage() {
 				<AnimatePresence>
 					<header className="text-xl mb-2 flex flex-row">
 						<span>Select links to import 👇</span>
-						<Button className="ml-auto" onClick={onSubmitSelection}>
+						<Button
+							disabled={selectedLinks.length < 1}
+							className="ml-auto"
+							onClick={onSubmitSelection}
+						>
 							Continue
 						</Button>
 					</header>
