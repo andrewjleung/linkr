@@ -1,25 +1,29 @@
+"use client";
+
 import { buttonVariants } from "@/components/ui/button";
 import clsx from "clsx";
-import type { Metadata } from "next";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-	title: "linkr Importer",
-	description: "Import links from your old bookmark manager.",
-};
 
 export default function ImportPage() {
 	return (
-		<div>
-			<header className="mb-4">Choose an import source:</header>
-			<div className="flex flex-col gap-4 w-64">
-				<Link
-					href="/import/raindrop"
-					className={clsx(buttonVariants({ variant: "outline" }))}
-				>
-					Raindrop.io
-				</Link>
-			</div>
-		</div>
+		<AnimatePresence>
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				exit={{ opacity: 0 }}
+				className="mx-auto mt-12 w-fit"
+			>
+				<div className="mb-4">Choose an import source:</div>
+				<div className="flex flex-col gap-4 w-64">
+					<Link
+						href="/import/raindrop"
+						className={clsx(buttonVariants({ variant: "outline" }))}
+					>
+						Raindrop.io
+					</Link>
+				</div>
+			</motion.div>
+		</AnimatePresence>
 	);
 }
