@@ -5,6 +5,7 @@ import { db } from "@/database/database";
 import { collections, links } from "@/database/schema";
 import type { CollectionInsert, LinkInsert } from "@/database/types";
 import { importFromRaindrop } from "@/services/import-service";
+import type { ImportedLink } from "@/services/import-service";
 import { desc, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -187,9 +188,39 @@ export async function updateCollectionOrder(id: number, order: number) {
 	return result;
 }
 
-export async function parseRaindropImport(file: string) {
+export async function parseRaindropImport(
+	file: string,
+): Promise<ImportedLink[]> {
 	const encoded = new TextEncoder().encode(file);
 	const result = await importFromRaindrop(encoded);
 
 	return result;
+}
+
+export async function insertImports(importedLinks: ImportedLink[]) {
+	const collectionInserts = Array.from(
+		new Set(importedLinks.map((l) => l.parent)),
+	).map((name) => ({
+		name,
+		order: 0, // TODO: Currently collection order isn't used so 0 is okay.
+	}));
+
+	const insertedCollections = await db
+		.insert(collections)
+		.values(collectionInserts)
+		.returning({ name: collections.name, id: collections.id });
+
+	const linkInserts = importedLinks.map((l, i) => ({
+		title: l.title,
+		description: l.description,
+		url: l.url,
+		parentCollectionId:
+			insertedCollections.find((c) => c.name === l.parent)?.id || null,
+		order: i * 100, // TODO: This is a heuristic to just give each a different order.
+	}));
+
+	await db.insert(links).values(linkInserts);
+
+	revalidatePath("/");
+	redirect("/");
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { parseRaindropImport } from "@/app/actions";
+import { insertImports, parseRaindropImport } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -193,13 +193,25 @@ export default function ImportRaindropPage() {
 		setSelectedLinks(links.map((l) => l.id));
 	}
 
+	async function onSubmitSelection() {
+		if (links === null) {
+			return;
+		}
+
+		await insertImports(
+			links.filter((l) => selectedLinks.includes(l.id)).map((l) => l.link),
+		);
+	}
+
 	if (linksByCollection !== null && links !== null) {
 		return (
 			<TooltipProvider>
 				<AnimatePresence>
 					<header className="text-xl mb-2 flex flex-row">
 						<span>Select links to import 👇</span>
-						<Button className="ml-auto">Continue</Button>
+						<Button className="ml-auto" onClick={onSubmitSelection}>
+							Continue
+						</Button>
 					</header>
 					<motion.div
 						initial={{ opacity: 0 }}
