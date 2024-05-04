@@ -182,6 +182,7 @@ function ImportLinks({
 		<AnimatePresence>
 			<Form {...form}>
 				<motion.form
+					key="import-links-form"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
@@ -318,6 +319,7 @@ function SelectLinks({
 					</Button>
 				</header>
 				<motion.div
+					key="imported-collections"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
@@ -389,9 +391,16 @@ function Edit({ collection, edit }: { collection: string; edit: Edit }) {
 		.exhaustive();
 }
 
-function EditableCollection({ collection }: { collection: string }) {
+function EditableCollection({
+	collection,
+	edit,
+	setEditForCollection,
+}: {
+	collection: string;
+	edit: Edit;
+	setEditForCollection: (edit: Edit) => void;
+}) {
 	const [open, setOpen] = useState(false);
-	const [value, setValue] = useState<Edit>({ type: "keep" });
 	const [literalValue, setLiteralValue] = useState<string>("");
 	const [search, setSearch] = useState<string>("");
 	const { optimisticCollections } = useContext(CollectionsContext);
@@ -412,7 +421,7 @@ function EditableCollection({ collection }: { collection: string }) {
 							aria-expanded={open}
 							className="w-96 justify-between"
 						>
-							<Edit collection={collection} edit={value} />
+							<Edit collection={collection} edit={edit} />
 							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 						</Button>
 					</PopoverTrigger>
@@ -434,14 +443,14 @@ function EditableCollection({ collection }: { collection: string }) {
 							<CommandGroup>
 								<CommandItem
 									onSelect={() => {
-										setValue({ type: "keep" });
+										setEditForCollection({ type: "keep" });
 										setOpen(false);
 									}}
 								>
 									<Check
 										className={clsx(
 											"mr-2 h-4 w-4",
-											value.type === "keep" ? "opacity-100" : "opacity-0",
+											edit.type === "keep" ? "opacity-100" : "opacity-0",
 										)}
 									/>
 									Create&nbsp;
@@ -451,7 +460,7 @@ function EditableCollection({ collection }: { collection: string }) {
 									<CommandItem
 										value="Rename"
 										onSelect={() => {
-											setValue({
+											setEditForCollection({
 												type: "rename",
 												old: collection,
 												new: search,
@@ -463,7 +472,7 @@ function EditableCollection({ collection }: { collection: string }) {
 										<Check
 											className={clsx(
 												"mr-2 h-4 w-4",
-												value.type === "rename" && value.new === search
+												edit.type === "rename" && edit.new === search
 													? "opacity-100"
 													: "opacity-0",
 											)}
@@ -479,7 +488,7 @@ function EditableCollection({ collection }: { collection: string }) {
 									<CommandItem
 										key={`editable-collection-${collection}-collapse-into-${c.id}-option`}
 										onSelect={() => {
-											setValue({
+											setEditForCollection({
 												type: "collapse",
 												into: c.id,
 											});
@@ -489,7 +498,7 @@ function EditableCollection({ collection }: { collection: string }) {
 										<Check
 											className={clsx(
 												"mr-2 h-4 w-4",
-												value.type === "collapse" && value.into === c.id
+												edit.type === "collapse" && edit.into === c.id
 													? "opacity-100"
 													: "opacity-0",
 											)}
@@ -525,6 +534,13 @@ function EditLinks({
 	const collections = Object.keys(linksByCollection);
 	const [edits, setEdits] = useState<Record<string, Edit>>({});
 
+	const setEditForCollection = useCallback(
+		(collection: string) => (edit: Edit) => {
+			setEdits((edits) => ({ ...edits, [collection]: edit }));
+		},
+		[],
+	);
+
 	return (
 		<TooltipProvider>
 			<AnimatePresence>
@@ -542,6 +558,7 @@ function EditLinks({
 					</Button>
 				</header>
 				<motion.div
+					key="editable-collections"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
@@ -551,6 +568,8 @@ function EditLinks({
 						<EditableCollection
 							key={`editable-collection-${c}`}
 							collection={c}
+							edit={edits[c] || { type: "keep" }}
+							setEditForCollection={setEditForCollection(c)}
 						/>
 					))}
 				</motion.div>
