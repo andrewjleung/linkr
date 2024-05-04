@@ -198,6 +198,10 @@ export async function parseRaindropImport(
 }
 
 export async function insertImports(importedLinks: ImportedLink[]) {
+	if (importedLinks.length < 1) {
+		// TODO: Do something
+	}
+
 	const collectionInserts = Array.from(
 		new Set(importedLinks.map((l) => l.parent)),
 	).map((name) => ({
