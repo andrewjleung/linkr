@@ -13,12 +13,14 @@ import {
 import { useGlobalForm } from "@/hooks/use-global-form";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
+import { createClient } from "@/lib/supabase/client";
 import { openedFormAtom, showSidebarAtom } from "@/state";
 import { useAtom } from "jotai";
 import {
 	Folder,
 	FolderPlus,
 	Home,
+	LogOut,
 	Plus,
 	SidebarClose,
 	SidebarOpen,
@@ -47,6 +49,29 @@ function ToggleSidebarCommand() {
 				<SidebarOpen className="mr-2 h-4 w-4" />
 			)}
 			<span>{showSidebar ? "Hide sidebar" : "Show sidebar"}</span>
+		</CommandItem>
+	);
+}
+
+function LogoutCommand({
+	setOpen,
+}: {
+	setOpen: ReturnType<typeof useGlobalForm>[1];
+}) {
+	const router = useRouter();
+
+	return (
+		<CommandItem
+			onSelect={() => {
+				setOpen(false);
+				const supabase = createClient();
+				supabase.auth.signOut();
+				router.push("/login");
+			}}
+			className="rounded-lg"
+		>
+			<LogOut className="mr-2 h-4 w-4" />
+			<span>Log out</span>
 		</CommandItem>
 	);
 }
@@ -99,14 +124,15 @@ export function CommandMenu() {
 						</CommandItem>
 						<RenameCollectionCommand setOpen={setOpen} />
 						<DeleteCollectionCommand setOpen={setOpen} />
-						<ToggleThemeCommand setOpen={setOpen} />
 						<ImportCommand setOpen={setOpen} />
+						<ToggleThemeCommand setOpen={setOpen} />
+						<LogoutCommand setOpen={setOpen} />
 					</CommandGroup>
 
 					<CommandGroup heading="Collections">
 						<CommandItem
 							onSelect={() => {
-								router.push("/");
+								router.push("/collections/home");
 								setOpen(false);
 							}}
 							className="rounded-md"

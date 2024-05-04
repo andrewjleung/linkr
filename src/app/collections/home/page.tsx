@@ -1,12 +1,13 @@
-import { validateCollection } from "@/app/actions";
 import { RenameCollectionForm } from "@/components/collection-form";
 import { CreateCollectionForm } from "@/components/collection-form";
+import { CommandMenu } from "@/components/command-menu";
+import { Container } from "@/components/container";
 import { CreateLinkForm } from "@/components/link-form";
 import { Links } from "@/components/links";
 import LinksProvider from "@/components/links-provider";
 import { db } from "@/database/database";
 import { links as linksSchema } from "@/database/schema";
-import { asc, eq } from "drizzle-orm";
+import { asc, isNull } from "drizzle-orm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,20 +15,17 @@ export const metadata: Metadata = {
 	description: "A home for your links.",
 };
 
-export default async function Page({ params }: { params: { id: string } }) {
-	const parentId = Number(params.id);
-
-	await validateCollection(parentId);
-
+export default async function CollectionsHomePage() {
 	const links = await db
 		.select()
 		.from(linksSchema)
-		.where(eq(linksSchema.parentCollectionId, parentId))
+		.where(isNull(linksSchema.parentCollectionId))
 		.orderBy(asc(linksSchema.order));
 
 	return (
 		<LinksProvider links={links}>
 			<Links />
+			<CommandMenu />
 			<CreateLinkForm />
 			<CreateCollectionForm />
 			<RenameCollectionForm />

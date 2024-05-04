@@ -1,6 +1,5 @@
 "use server";
 
-import { Readable } from "stream";
 import { db } from "@/database/database";
 import { collections, links } from "@/database/schema";
 import type { CollectionInsert, LinkInsert } from "@/database/types";
@@ -29,21 +28,21 @@ export async function createLink(link: Omit<LinkInsert, "order">) {
 			: lastLinkInCollection.order + ORDER_BUFFER;
 
 	const result = await db.insert(links).values({ ...link, order });
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 
 	return result;
 }
 
 export async function deleteLink(id: number) {
 	const result = await db.delete(links).where(eq(links.id, id));
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 
 	return result;
 }
 
 export async function updateLinkOrder(id: number, order: number) {
 	const result = await db.update(links).set({ order }).where(eq(links.id, id));
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 
 	return result;
 }
@@ -56,7 +55,7 @@ export async function editLink(
 		.update(links)
 		.set({ ...data, updatedAt: new Date(Date.now()) })
 		.where(eq(links.id, id));
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 
 	return result;
 }
@@ -80,7 +79,7 @@ export async function moveLink(id: number, parentCollectionId: number | null) {
 		.set({ parentCollectionId, order })
 		.where(eq(links.id, id));
 
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 	revalidatePath("/collections/[slug]", "page");
 
 	return result;
@@ -117,7 +116,7 @@ export async function createCollection(
 		.insert(collections)
 		.values({ ...collection, order })
 		.returning();
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 
 	return result;
 }
@@ -128,27 +127,25 @@ export async function renameCollection(id: number, name: string) {
 		.set({ name })
 		.where(eq(collections.id, id));
 
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 
 	return result;
 }
 
 export async function safeDeleteCollection(id: number) {
-	const updatedCollections = await db
+	await db
 		.update(collections)
 		.set({ parentCollectionId: null })
 		.where(eq(collections.parentCollectionId, id));
 
-	const updatedLinks = await db
+	await db
 		.update(links)
 		.set({ parentCollectionId: null })
 		.where(eq(links.parentCollectionId, id));
 
-	const deletedCollection = await db
-		.delete(collections)
-		.where(eq(collections.id, id));
+	await db.delete(collections).where(eq(collections.id, id));
 
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 	redirect("/");
 }
 
@@ -159,21 +156,17 @@ export async function unsafeDeleteCollection(id: number) {
 		.from(collections)
 		.where(eq(collections.parentCollectionId, id));
 
-	const deletedNestedCollections = await Promise.all(
+	await Promise.all(
 		nestedCollections.map(({ id }) => {
 			unsafeDeleteCollection(id);
 		}),
 	);
 
-	const deletedLinks = await db
-		.delete(links)
-		.where(eq(links.parentCollectionId, id));
+	await db.delete(links).where(eq(links.parentCollectionId, id));
 
-	const deletedCollection = await db
-		.delete(collections)
-		.where(eq(collections.id, id));
+	await db.delete(collections).where(eq(collections.id, id));
 
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 	redirect("/");
 }
 
@@ -183,7 +176,7 @@ export async function updateCollectionOrder(id: number, order: number) {
 		.set({ order })
 		.where(eq(collections.id, id));
 
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 
 	return result;
 }
@@ -225,6 +218,6 @@ export async function insertImports(importedLinks: ImportedLink[]) {
 
 	await db.insert(links).values(linkInserts);
 
-	revalidatePath("/");
+	revalidatePath("/collections/home");
 	redirect("/");
 }
