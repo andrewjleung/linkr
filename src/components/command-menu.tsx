@@ -26,6 +26,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { DeleteCollectionCommand } from "./commands/delete-collection-command";
+import { ImportCommand } from "./commands/import-command";
 import { QuickAddCommand } from "./commands/quick-add-command";
 import { RenameCollectionCommand } from "./commands/rename-collection-command";
 import { ToggleThemeCommand } from "./commands/toggle-theme-command";
@@ -49,12 +50,6 @@ function ToggleSidebarCommand() {
 		</CommandItem>
 	);
 }
-
-function ImportCommand({
-	setOpen,
-}: {
-	setOpen: ReturnType<typeof useGlobalForm>;
-}) {}
 
 const COMMAND_MENU_FORM = "command-menu";
 
@@ -105,6 +100,7 @@ export function CommandMenu() {
 						<RenameCollectionCommand setOpen={setOpen} />
 						<DeleteCollectionCommand setOpen={setOpen} />
 						<ToggleThemeCommand setOpen={setOpen} />
+						<ImportCommand />
 					</CommandGroup>
 
 					<CommandGroup heading="Collections">

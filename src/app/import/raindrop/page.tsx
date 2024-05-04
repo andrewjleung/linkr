@@ -129,15 +129,18 @@ type SelectableImportedLink = {
 	link: ImportedLink;
 };
 
-export default function ImportRaindropPage() {
-	const [links, setLinks] = useState<SelectableImportedLink[] | null>(null);
-	const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
+type PageState = "selection" | "editing";
+
+function ImportLinks({
+	setLinks,
+}: {
+	setLinks: React.Dispatch<
+		React.SetStateAction<SelectableImportedLink[] | null>
+	>;
+}) {
 	const form = useForm<z.infer<typeof raindropImportFormSchema>>({
 		resolver: zodResolver(raindropImportFormSchema),
 	});
-
-	const linksByCollection: Record<string, SelectableImportedLink[]> =
-		links === null ? null : Object.groupBy(links, (il) => il.link.parent);
 
 	async function onSubmit(values: z.infer<typeof raindropImportFormSchema>) {
 		const ab = await values.file.arrayBuffer();
@@ -148,112 +151,6 @@ export default function ImportRaindropPage() {
 				id: crypto.randomUUID(),
 				link: il,
 			})),
-		);
-	}
-
-	const setLinkSelected = useCallback((linkId: string, selected: boolean) => {
-		setSelectedLinks((selectedLinks) => {
-			if (selected && !selectedLinks.includes(linkId)) {
-				return [...selectedLinks, linkId];
-			}
-
-			if (!selected) {
-				return selectedLinks.filter((l) => l !== linkId);
-			}
-
-			return selectedLinks;
-		});
-	}, []);
-
-	function setCollectionSelected(name: string, selected: boolean) {
-		const collectionLinksIds = linksByCollection[name].map((l) => l.id);
-
-		if (selected) {
-			setSelectedLinks((sl) => [...sl, ...collectionLinksIds]);
-			return;
-		}
-
-		setSelectedLinks((sl) =>
-			sl.filter((id) => !collectionLinksIds.includes(id)),
-		);
-	}
-
-	function onSelectAll(c: CheckedState): void {
-		if (links === null) {
-			return;
-		}
-
-		const value = c.valueOf();
-
-		if (typeof value === "string" || !value) {
-			setSelectedLinks([]);
-			return;
-		}
-
-		setSelectedLinks(links.map((l) => l.id));
-	}
-
-	async function onSubmitSelection() {
-		if (links === null) {
-			return;
-		}
-
-		await insertImports(
-			links.filter((l) => selectedLinks.includes(l.id)).map((l) => l.link),
-		);
-	}
-
-	if (linksByCollection !== null && links !== null) {
-		return (
-			<TooltipProvider>
-				<AnimatePresence>
-					<header className="text-xl mb-2 flex flex-row">
-						<span>Select links to import 👇</span>
-						<Button
-							disabled={selectedLinks.length < 1}
-							className="ml-auto"
-							onClick={onSubmitSelection}
-						>
-							Continue
-						</Button>
-					</header>
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-					>
-						<ImportedCollections>
-							<div className="flex flex-row items-center gap-3 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
-								<Checkbox
-									id="select-all-checkbox"
-									checked={links.every((l) => selectedLinks.includes(l.id))}
-									onCheckedChange={onSelectAll}
-								/>
-								<label htmlFor="select-all-checkbox">All</label>
-							</div>
-							{Object.entries(linksByCollection).map(([name, links]) => (
-								<ImportedCollection
-									key={`imported-collection-${name}`}
-									name={name}
-									selected={links.every((l) => selectedLinks.includes(l.id))}
-									setCollectionSelected={setCollectionSelected}
-								>
-									<ImportedLinks>
-										{links.map((l) => (
-											<ImportedLinkComponent
-												key={`imported-link-${l.id}`}
-												link={l}
-												selected={selectedLinks.includes(l.id)}
-												setLinkSelected={setLinkSelected}
-											/>
-										))}
-									</ImportedLinks>
-								</ImportedCollection>
-							))}
-						</ImportedCollections>
-					</motion.div>
-				</AnimatePresence>
-			</TooltipProvider>
 		);
 	}
 
@@ -301,4 +198,166 @@ export default function ImportRaindropPage() {
 			</Form>
 		</AnimatePresence>
 	);
+}
+
+function SelectLinks({
+	links,
+	selectedLinks,
+	setSelectedLinks,
+	setPageState,
+}: {
+	links: SelectableImportedLink[];
+	selectedLinks: string[];
+	setSelectedLinks: React.Dispatch<React.SetStateAction<string[]>>;
+	setPageState: React.Dispatch<React.SetStateAction<PageState>>;
+}) {
+	const linksByCollection: Record<string, SelectableImportedLink[]> =
+		links === null ? null : Object.groupBy(links, (il) => il.link.parent);
+
+	function onSubmitSelection() {
+		if (links === null) {
+			return;
+		}
+
+		setPageState("editing");
+	}
+
+	function onSelectAll(c: CheckedState): void {
+		if (links === null) {
+			return;
+		}
+
+		const value = c.valueOf();
+
+		if (typeof value === "string" || !value) {
+			setSelectedLinks([]);
+			return;
+		}
+
+		setSelectedLinks(links.map((l) => l.id));
+	}
+
+	function setCollectionSelected(name: string, selected: boolean) {
+		const collectionLinksIds = linksByCollection[name].map((l) => l.id);
+
+		if (selected) {
+			setSelectedLinks((sl) => [...sl, ...collectionLinksIds]);
+			return;
+		}
+
+		setSelectedLinks((sl) =>
+			sl.filter((id) => !collectionLinksIds.includes(id)),
+		);
+	}
+
+	const setLinkSelected = useCallback(
+		(linkId: string, selected: boolean) => {
+			setSelectedLinks((selectedLinks) => {
+				if (selected && !selectedLinks.includes(linkId)) {
+					return [...selectedLinks, linkId];
+				}
+
+				if (!selected) {
+					return selectedLinks.filter((l) => l !== linkId);
+				}
+
+				return selectedLinks;
+			});
+		},
+		[setSelectedLinks],
+	);
+
+	return (
+		<TooltipProvider>
+			<AnimatePresence>
+				<header className="text-xl mb-2 flex flex-row items-center">
+					<span>Select links to import</span>
+					<span className="text-sm ml-4 text-neutral-500 pt-1">
+						{selectedLinks.length} / {links.length} selected
+					</span>
+					<Button
+						disabled={selectedLinks.length < 1}
+						className="ml-auto"
+						onClick={onSubmitSelection}
+					>
+						Continue
+					</Button>
+				</header>
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+				>
+					<ImportedCollections>
+						<div className="flex flex-row items-center gap-3 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
+							<Checkbox
+								id="select-all-checkbox"
+								checked={links.every((l) => selectedLinks.includes(l.id))}
+								onCheckedChange={onSelectAll}
+							/>
+							<label htmlFor="select-all-checkbox">All</label>
+						</div>
+						{Object.entries(linksByCollection).map(([name, links]) => (
+							<ImportedCollection
+								key={`imported-collection-${name}`}
+								name={name}
+								selected={links.every((l) => selectedLinks.includes(l.id))}
+								setCollectionSelected={setCollectionSelected}
+							>
+								<ImportedLinks>
+									{links.map((l) => (
+										<ImportedLinkComponent
+											key={`imported-link-${l.id}`}
+											link={l}
+											selected={selectedLinks.includes(l.id)}
+											setLinkSelected={setLinkSelected}
+										/>
+									))}
+								</ImportedLinks>
+							</ImportedCollection>
+						))}
+					</ImportedCollections>
+				</motion.div>
+			</AnimatePresence>
+		</TooltipProvider>
+	);
+}
+
+function EditLinks({ selectedLinks }: { selectedLinks: ImportedLink[] }) {
+	return (
+		<ul>
+			{selectedLinks.map((l) => (
+				<li key={`selected-imported-link-${crypto.randomUUID()}`}>{l.url}</li>
+			))}
+		</ul>
+	);
+}
+
+export default function ImportRaindropPage() {
+	const [pageState, setPageState] = useState<PageState>("selection");
+	const [links, setLinks] = useState<SelectableImportedLink[] | null>(null);
+	const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
+
+	if (pageState === "selection" && links !== null) {
+		return (
+			<SelectLinks
+				links={links}
+				selectedLinks={selectedLinks}
+				setSelectedLinks={setSelectedLinks}
+				setPageState={setPageState}
+			/>
+		);
+	}
+
+	if (pageState === "editing" && links !== null) {
+		return (
+			<EditLinks
+				selectedLinks={links
+					.filter((l) => selectedLinks.includes(l.id))
+					.map((l) => l.link)}
+			/>
+		);
+	}
+
+	return <ImportLinks setLinks={setLinks} />;
 }
