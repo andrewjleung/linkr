@@ -1,6 +1,7 @@
 import { CollectionsPicker } from "@/components/collections-picker";
 import CollectionsProvider from "@/components/collections-provider";
 import { CollectionsView } from "@/components/collections-view";
+import { CommandMenu } from "@/components/command-menu";
 import { CommandMenuButton } from "@/components/command-menu-button";
 import { MobileFooter } from "@/components/mobile-footer";
 import { QCProvider } from "@/components/query-client-provider";
@@ -63,6 +64,7 @@ export default async function RootLayout({
 									</div>
 									<footer className="h-8" />
 								</main>
+								<CommandMenu />
 								<Toaster position="bottom-center" />
 							</ThemeProvider>
 						</CollectionsProvider>

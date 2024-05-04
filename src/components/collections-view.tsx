@@ -2,18 +2,16 @@
 
 import { CreateCollectionForm } from "@/components/collection-form";
 import { Collections } from "@/components/collections";
-import { CommandMenu } from "./command-menu";
-import { useAtom } from "jotai";
 import { showSidebarAtom } from "@/state";
+import { useAtom } from "jotai";
 
 export function CollectionsView() {
-  const [showSidebar] = useAtom(showSidebarAtom);
+	const [showSidebar] = useAtom(showSidebarAtom);
 
-  return (
-    <>
-      {showSidebar ? <Collections /> : null}
-      <CreateCollectionForm />
-      <CommandMenu />
-    </>
-  );
+	return (
+		<>
+			{showSidebar ? <Collections /> : null}
+			<CreateCollectionForm />
+		</>
+	);
 }

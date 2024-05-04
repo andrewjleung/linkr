@@ -100,7 +100,7 @@ export function CommandMenu() {
 						<RenameCollectionCommand setOpen={setOpen} />
 						<DeleteCollectionCommand setOpen={setOpen} />
 						<ToggleThemeCommand setOpen={setOpen} />
-						<ImportCommand />
+						<ImportCommand setOpen={setOpen} />
 					</CommandGroup>
 
 					<CommandGroup heading="Collections">

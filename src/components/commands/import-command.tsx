@@ -1,12 +1,23 @@
+import type { useGlobalForm } from "@/hooks/use-global-form";
 import { Import } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CommandItem } from "../ui/command";
 
-export function ImportCommand() {
+export function ImportCommand({
+	setOpen,
+}: {
+	setOpen: ReturnType<typeof useGlobalForm>[1];
+}) {
 	const router = useRouter();
 
 	return (
-		<CommandItem onSelect={() => router.push("/import")} className="rounded-lg">
+		<CommandItem
+			onSelect={() => {
+				setOpen(false);
+				router.push("/import");
+			}}
+			className="rounded-lg"
+		>
 			<Import className="mr-2 h-4 w-4" />
 			<span>Import bookmarks</span>
 		</CommandItem>

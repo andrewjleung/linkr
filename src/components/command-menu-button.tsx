@@ -7,9 +7,7 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 
 export function CommandMenuButton({ className }: { className?: string }) {
-	const [openedForm, setOpenedForm] = useAtom(openedFormAtom);
-
-	console.log(openedForm);
+	const [, setOpenedForm] = useAtom(openedFormAtom);
 
 	return (
 		<Button

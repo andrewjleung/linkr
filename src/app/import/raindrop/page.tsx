@@ -4,6 +4,14 @@ import { insertImports, parseRaindropImport } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandSeparator,
+} from "@/components/ui/command";
+import {
 	Form,
 	FormControl,
 	FormField,
@@ -13,18 +21,33 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { Collection } from "@/database/types";
+import type { ConcreteCollection } from "@/hooks/use-optimistic-collections";
+import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import type { ImportedLink } from "@/services/import-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CheckedState } from "@radix-ui/react-checkbox";
+import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { Info, SquareArrowOutUpRight } from "lucide-react";
-import { useCallback, useState } from "react";
+import {
+	Check,
+	ChevronsUpDown,
+	Info,
+	SquareArrowOutUpRight,
+} from "lucide-react";
+import { useCallback, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
+import { match } from "ts-pattern";
 import { z } from "zod";
 
 const fileSchema = z.instanceof(File, { message: "Required" });
@@ -148,6 +171,7 @@ function ImportLinks({
 		const importedLinks = await parseRaindropImport(serialized);
 		setLinks(
 			importedLinks.map((il) => ({
+				// TODO: Using a random id here for the id may not be a great idea...
 				id: crypto.randomUUID(),
 				link: il,
 			})),
@@ -202,31 +226,26 @@ function ImportLinks({
 
 function SelectLinks({
 	links,
+	setLinks,
 	selectedLinks,
 	setSelectedLinks,
 	setPageState,
 }: {
 	links: SelectableImportedLink[];
+	setLinks: React.Dispatch<
+		React.SetStateAction<SelectableImportedLink[] | null>
+	>;
 	selectedLinks: string[];
 	setSelectedLinks: React.Dispatch<React.SetStateAction<string[]>>;
 	setPageState: React.Dispatch<React.SetStateAction<PageState>>;
 }) {
-	const linksByCollection: Record<string, SelectableImportedLink[]> =
-		links === null ? null : Object.groupBy(links, (il) => il.link.parent);
+	const linksByCollection = Object.groupBy(links, (il) => il.link.parent);
 
 	function onSubmitSelection() {
-		if (links === null) {
-			return;
-		}
-
 		setPageState("editing");
 	}
 
 	function onSelectAll(c: CheckedState): void {
-		if (links === null) {
-			return;
-		}
-
 		const value = c.valueOf();
 
 		if (typeof value === "string" || !value) {
@@ -238,7 +257,13 @@ function SelectLinks({
 	}
 
 	function setCollectionSelected(name: string, selected: boolean) {
-		const collectionLinksIds = linksByCollection[name].map((l) => l.id);
+		const collection = linksByCollection[name];
+
+		if (collection === undefined) {
+			return;
+		}
+
+		const collectionLinksIds = collection.map((l) => l.id);
 
 		if (selected) {
 			setSelectedLinks((sl) => [...sl, ...collectionLinksIds]);
@@ -276,8 +301,17 @@ function SelectLinks({
 						{selectedLinks.length} / {links.length} selected
 					</span>
 					<Button
+						className="ml-auto mr-2"
+						variant="outline"
+						onClick={() => {
+							setLinks(null);
+							setSelectedLinks([]);
+						}}
+					>
+						Back
+					</Button>
+					<Button
 						disabled={selectedLinks.length < 1}
-						className="ml-auto"
 						onClick={onSubmitSelection}
 					>
 						Continue
@@ -301,11 +335,13 @@ function SelectLinks({
 							<ImportedCollection
 								key={`imported-collection-${name}`}
 								name={name}
-								selected={links.every((l) => selectedLinks.includes(l.id))}
+								selected={(links || []).every((l) =>
+									selectedLinks.includes(l.id),
+								)}
 								setCollectionSelected={setCollectionSelected}
 							>
 								<ImportedLinks>
-									{links.map((l) => (
+									{(links || []).map((l) => (
 										<ImportedLinkComponent
 											key={`imported-link-${l.id}`}
 											link={l}
@@ -323,13 +359,203 @@ function SelectLinks({
 	);
 }
 
-function EditLinks({ selectedLinks }: { selectedLinks: ImportedLink[] }) {
+function Edit({ collection, edit }: { collection: string; edit: Edit }) {
+	const { optimisticCollections } = useContext(CollectionsContext);
+
+	return match(edit)
+		.with({ type: "rename" }, (res) => (
+			<div>
+				Rename to&nbsp;
+				<span className="font-semibold underline">{res.new}</span>
+			</div>
+		))
+		.with({ type: "collapse" }, (res) => {
+			const collection = optimisticCollections.find((c) => c.id === res.into);
+			const collectionName =
+				collection?.collection.name || "Collection not found";
+
+			return (
+				<div>
+					Collapse into&nbsp;
+					<span className="font-semibold underline">{collectionName}</span>
+				</div>
+			);
+		})
+		.with({ type: "keep" }, () => (
+			<div>
+				Create <span className="font-semibold underline">{collection}</span>
+			</div>
+		))
+		.exhaustive();
+}
+
+function EditableCollection({ collection }: { collection: string }) {
+	const [open, setOpen] = useState(false);
+	const [value, setValue] = useState<Edit>({ type: "keep" });
+	const [literalValue, setLiteralValue] = useState<string>("");
+	const [search, setSearch] = useState<string>("");
+	const { optimisticCollections } = useContext(CollectionsContext);
+
+	const concreteCollections = optimisticCollections.filter(
+		(c) => c.type === "concrete",
+	) as ConcreteCollection[];
+
 	return (
-		<ul>
-			{selectedLinks.map((l) => (
-				<li key={`selected-imported-link-${crypto.randomUUID()}`}>{l.url}</li>
-			))}
-		</ul>
+		<div className="flex flex-row items-center gap-2">
+			<span className="">{collection}</span>
+			<span className="w-96 ml-auto">
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
+						<Button
+							variant="outline"
+							role="combobox"
+							aria-expanded={open}
+							className="w-96 justify-between"
+						>
+							<Edit collection={collection} edit={value} />
+							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className="w-96 p-0">
+						<Command
+							value={literalValue}
+							onValueChange={setLiteralValue}
+							filter={(value, search) => {
+								if (value === "rename") return 1;
+								if (value.includes(search)) return 1;
+								return 0;
+							}}
+						>
+							<CommandInput
+								onValueChange={setSearch}
+								placeholder="Create, rename, or collapse this collection..."
+							/>
+							<CommandEmpty>No existing collections.</CommandEmpty>
+							<CommandGroup>
+								<CommandItem
+									onSelect={() => {
+										setValue({ type: "keep" });
+										setOpen(false);
+									}}
+								>
+									<Check
+										className={clsx(
+											"mr-2 h-4 w-4",
+											value.type === "keep" ? "opacity-100" : "opacity-0",
+										)}
+									/>
+									Create&nbsp;
+									<span className="font-semibold underline">{collection}</span>
+								</CommandItem>
+								{search.length > 0 ? (
+									<CommandItem
+										value="Rename"
+										onSelect={() => {
+											setValue({
+												type: "rename",
+												old: collection,
+												new: search,
+											});
+											setOpen(false);
+											setSearch("");
+										}}
+									>
+										<Check
+											className={clsx(
+												"mr-2 h-4 w-4",
+												value.type === "rename" && value.new === search
+													? "opacity-100"
+													: "opacity-0",
+											)}
+										/>
+										Rename to&nbsp;
+										<span className="font-semibold underline">{search}</span>
+									</CommandItem>
+								) : null}
+							</CommandGroup>
+							<CommandSeparator />
+							<CommandGroup>
+								{concreteCollections.map((c) => (
+									<CommandItem
+										key={`editable-collection-${collection}-collapse-into-${c.id}-option`}
+										onSelect={() => {
+											setValue({
+												type: "collapse",
+												into: c.id,
+											});
+											setOpen(false);
+										}}
+									>
+										<Check
+											className={clsx(
+												"mr-2 h-4 w-4",
+												value.type === "collapse" && value.into === c.id
+													? "opacity-100"
+													: "opacity-0",
+											)}
+										/>
+										Collapse into&nbsp;
+										<span className="font-semibold underline">
+											{c.collection.name}
+										</span>
+									</CommandItem>
+								))}
+							</CommandGroup>
+						</Command>
+					</PopoverContent>
+				</Popover>
+			</span>
+		</div>
+	);
+}
+
+type Edit = Rename | Collapse | Keep;
+type Rename = { type: "rename"; old: string; new: string };
+type Collapse = { type: "collapse"; into: Collection["id"] };
+type Keep = { type: "keep" };
+
+function EditLinks({
+	selectedLinks,
+	setPageState,
+}: {
+	selectedLinks: ImportedLink[];
+	setPageState: React.Dispatch<React.SetStateAction<PageState>>;
+}) {
+	const linksByCollection = Object.groupBy(selectedLinks, (il) => il.parent);
+	const collections = Object.keys(linksByCollection);
+	const [edits, setEdits] = useState<Record<string, Edit>>({});
+
+	return (
+		<TooltipProvider>
+			<AnimatePresence>
+				<header className="text-xl mb-4 flex flex-row items-center">
+					<span>Edit collections</span>
+					<Button
+						className="ml-auto mr-2"
+						variant="outline"
+						onClick={() => setPageState("selection")}
+					>
+						Back
+					</Button>
+					<Button className="" onClick={() => {}}>
+						Import
+					</Button>
+				</header>
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					className="flex flex-col gap-4"
+				>
+					{collections.map((c) => (
+						<EditableCollection
+							key={`editable-collection-${c}`}
+							collection={c}
+						/>
+					))}
+				</motion.div>
+			</AnimatePresence>
+		</TooltipProvider>
 	);
 }
 
@@ -342,6 +568,7 @@ export default function ImportRaindropPage() {
 		return (
 			<SelectLinks
 				links={links}
+				setLinks={setLinks}
 				selectedLinks={selectedLinks}
 				setSelectedLinks={setSelectedLinks}
 				setPageState={setPageState}
@@ -355,6 +582,7 @@ export default function ImportRaindropPage() {
 				selectedLinks={links
 					.filter((l) => selectedLinks.includes(l.id))
 					.map((l) => l.link)}
+				setPageState={setPageState}
 			/>
 		);
 	}
