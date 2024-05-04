@@ -1,12 +1,7 @@
 "use client";
 
-import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { env } from "../env.mjs";
@@ -29,6 +24,7 @@ export default function LoginPage() {
 	function onClick() {
 		login();
 	}
+
 	return (
 		<div className="w-full h-screen flex items-center justify-center lg:min-h-[600px] xl:min-h-[800px]">
 			<div className="flex items-center justify-center py-12">
@@ -38,7 +34,7 @@ export default function LoginPage() {
 					</div>
 					<div className="grid gap-4">
 						<div className="grid gap-2">
-							<Button type="submit" onSubmit={onClick} className="w-full">
+							<Button onClick={onClick} className="w-full">
 								Login with GitHub
 							</Button>
 						</div>
