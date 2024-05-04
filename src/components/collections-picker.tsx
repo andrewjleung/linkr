@@ -21,7 +21,6 @@ import {
 } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
-import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 
@@ -38,7 +37,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 		) as ConcreteCollection[];
 
 	return (
-		<div className={clsx(className)}>
+		<div className={cn(className)}>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<Button

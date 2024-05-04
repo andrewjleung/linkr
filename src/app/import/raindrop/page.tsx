@@ -34,10 +34,10 @@ import {
 import type { Collection } from "@/database/types";
 import type { ConcreteCollection } from "@/hooks/use-optimistic-collections";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
+import { cn } from "@/lib/utils";
 import type { ImportedLink } from "@/services/import-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CheckedState } from "@radix-ui/react-checkbox";
-import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {
 	Check,
@@ -448,7 +448,7 @@ function EditableCollection({
 									}}
 								>
 									<Check
-										className={clsx(
+										className={cn(
 											"mr-2 h-4 w-4",
 											edit.type === "keep" ? "opacity-100" : "opacity-0",
 										)}
@@ -470,7 +470,7 @@ function EditableCollection({
 										}}
 									>
 										<Check
-											className={clsx(
+											className={cn(
 												"mr-2 h-4 w-4",
 												edit.type === "rename" && edit.new === search
 													? "opacity-100"
@@ -496,7 +496,7 @@ function EditableCollection({
 										}}
 									>
 										<Check
-											className={clsx(
+											className={cn(
 												"mr-2 h-4 w-4",
 												edit.type === "collapse" && edit.into === c.id
 													? "opacity-100"

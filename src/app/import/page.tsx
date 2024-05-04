@@ -1,7 +1,7 @@
 "use client";
 
 import { buttonVariants } from "@/components/ui/button";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 
@@ -18,7 +18,7 @@ export default function ImportPage() {
 				<div className="flex flex-col gap-4 w-64">
 					<Link
 						href="/import/raindrop"
-						className={clsx(buttonVariants({ variant: "outline" }))}
+						className={cn(buttonVariants({ variant: "outline" }))}
 					>
 						Raindrop.io
 					</Link>

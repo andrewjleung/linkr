@@ -16,7 +16,7 @@ import {
 	type ConcreteCollection,
 } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import { Check, Folder, Home, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
@@ -37,7 +37,7 @@ export function MobileCollectionsPicker({ className }: { className?: string }) {
 		<>
 			<Button
 				variant="outline"
-				className={clsx("justify-start", className)}
+				className={cn("justify-start", className)}
 				onClick={() => setOpen(true)}
 			>
 				<Search className="mr-2 h-4 w-4" />

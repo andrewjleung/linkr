@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata = {
@@ -12,7 +13,11 @@ export default async function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className="min-h-screen dark:bg-neutral-950">{children}</body>
+			<body className="min-h-screen dark:bg-neutral-950">
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+					{children}
+				</ThemeProvider>
+			</body>
 		</html>
 	);
 }
