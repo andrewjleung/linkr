@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UseFormReturn, useForm } from "react-hook-form";
+import { type UseFormReturn, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,7 +27,7 @@ import { useKeyPress } from "@/hooks/use-keyboard";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import {
   CollectionsContext,
-  ConcreteCollection,
+  type ConcreteCollection,
   OptimisticCollections,
 } from "@/hooks/use-optimistic-collections";
 import { Collection } from "@/database/types";

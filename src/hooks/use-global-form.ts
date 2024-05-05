@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { openedFormAtom } from "@/state";
-import { Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 export function useGlobalForm(
   form: string

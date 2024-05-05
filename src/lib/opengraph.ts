@@ -1,8 +1,8 @@
 import "server-only";
 
 import { Link } from "@/database/types";
-import ogs, { ErrorResult, SuccessResult } from "open-graph-scraper";
-import { OgObject } from "open-graph-scraper/dist/lib/types";
+import ogs, { type ErrorResult, type SuccessResult } from "open-graph-scraper";
+import type { OgObject } from "open-graph-scraper/dist/lib/types";
 import { z } from "zod";
 
 function zipMap<T, R>(ts: T[], fn: (t: T) => R): [T, R][] {

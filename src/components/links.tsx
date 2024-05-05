@@ -1,12 +1,12 @@
 "use client";
 
 import LinkComponent from "@/components/link";
-import { ConcreteLink, LinksContext } from "@/hooks/use-optimistic-links";
+import { type ConcreteLink, LinksContext } from "@/hooks/use-optimistic-links";
 import { AnimatePresence } from "framer-motion";
 import {
   DragDropContext,
   Draggable,
-  DropResult,
+  type DropResult,
   Droppable,
 } from "@hello-pangea/dnd";
 import { useContext } from "react";

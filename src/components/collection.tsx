@@ -22,11 +22,11 @@ import {
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import {
   CollectionsContext,
-  OptimisticCollection,
+  type OptimisticCollection,
 } from "@/hooks/use-optimistic-collections";
 import LoadingIndicator from "@/components/loading-indicator";
 import { RenameCollectionForm } from "@/components/collection-form";
-import { Collection, CollectionInsert } from "@/database/types";
+import type { Collection, CollectionInsert } from "@/database/types";
 
 export function HomeCollection() {
   const parentId = useParentCollection();

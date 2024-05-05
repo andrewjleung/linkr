@@ -2,14 +2,14 @@ import { CollectionComponent, HomeCollection } from "@/components/collection";
 import { Separator } from "@/components/ui/separator";
 import {
   CollectionsContext,
-  ConcreteCollection,
+  type ConcreteCollection,
   OptimisticCollection,
   OptimisticCollections,
 } from "@/hooks/use-optimistic-collections";
 import {
   DragDropContext,
   Draggable,
-  DropResult,
+  type DropResult,
   Droppable,
 } from "@hello-pangea/dnd";
 import { useContext } from "react";

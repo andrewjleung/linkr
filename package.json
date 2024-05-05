@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "pnpm biome lint ./src",
     "db-push": "drizzle-kit push:pg"
   },
   "dependencies": {

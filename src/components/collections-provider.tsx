@@ -4,7 +4,7 @@ import {
   useOptimisticCollections,
   CollectionsContext,
 } from "@/hooks/use-optimistic-collections";
-import { Collection } from "@/database/types";
+import type { Collection } from "@/database/types";
 
 export default function CollectionsProvider({
   collections,

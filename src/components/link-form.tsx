@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UseFormReturn, useForm } from "react-hook-form";
+import { type UseFormReturn, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,7 +25,7 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { Textarea } from "@/components/ui/textarea";
 import { LinksContext } from "@/hooks/use-optimistic-links";
-import { Link } from "@/database/types";
+import type { Link } from "@/database/types";
 import { useGlobalForm } from "@/hooks/use-global-form";
 
 function isUrl(s: string): boolean {

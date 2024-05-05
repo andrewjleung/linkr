@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/database/types";
+import type { Link } from "@/database/types";
 import { LinksContext, useOptimisticLinks } from "@/hooks/use-optimistic-links";
 
 export default function LinksProvider({
