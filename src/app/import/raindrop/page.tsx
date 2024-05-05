@@ -31,11 +31,10 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { Collection } from "@/database/types";
 import type { ConcreteCollection } from "@/hooks/use-optimistic-collections";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import { cn } from "@/lib/utils";
-import type { ImportedLink } from "@/services/import-service";
+import type { Edit, ImportedLink } from "@/services/import-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import { AnimatePresence, motion } from "framer-motion";
@@ -45,8 +44,10 @@ import {
 	Info,
 	SquareArrowOutUpRight,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { match } from "ts-pattern";
 import { z } from "zod";
 
@@ -361,7 +362,10 @@ function SelectLinks({
 	);
 }
 
-function Edit({ collection, edit }: { collection: string; edit: Edit }) {
+function EditComponent({
+	collection,
+	edit,
+}: { collection: string; edit: Edit }) {
 	const { optimisticCollections } = useContext(CollectionsContext);
 
 	return match(edit)
@@ -388,6 +392,7 @@ function Edit({ collection, edit }: { collection: string; edit: Edit }) {
 				Create <span className="font-semibold underline">{collection}</span>
 			</div>
 		))
+		.with({ type: "home" }, () => <div>Collapse into the home collection</div>)
 		.exhaustive();
 }
 
@@ -426,7 +431,7 @@ function EditableCollection({
 							aria-expanded={open}
 							className="sm:w-96 w-64 justify-between"
 						>
-							<Edit collection={collection} edit={edit} />
+							<EditComponent collection={collection} edit={edit} />
 							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 						</Button>
 					</PopoverTrigger>
@@ -445,6 +450,7 @@ function EditableCollection({
 								placeholder="Create, rename, or collapse this collection..."
 							/>
 							<CommandEmpty>No existing collections.</CommandEmpty>
+
 							<CommandGroup>
 								<CommandItem
 									onSelect={() => {
@@ -487,8 +493,26 @@ function EditableCollection({
 									</CommandItem>
 								) : null}
 							</CommandGroup>
+
 							<CommandSeparator />
+
 							<CommandGroup>
+								<CommandItem
+									onSelect={() => {
+										setEditForCollection({
+											type: "home",
+										});
+										setOpen(false);
+									}}
+								>
+									<Check
+										className={cn(
+											"mr-2 h-4 w-4",
+											edit.type === "home" ? "opacity-100" : "opacity-0",
+										)}
+									/>
+									Collapse into the home collection
+								</CommandItem>
 								{concreteCollections.map((c) => (
 									<CommandItem
 										key={`editable-collection-${collection}-collapse-into-${c.id}-option`}
@@ -523,11 +547,6 @@ function EditableCollection({
 	);
 }
 
-type Edit = Rename | Collapse | Keep;
-type Rename = { type: "rename"; old: string; new: string };
-type Collapse = { type: "collapse"; into: Collection["id"] };
-type Keep = { type: "keep" };
-
 function EditLinks({
 	selectedLinks,
 	setPageState,
@@ -538,6 +557,7 @@ function EditLinks({
 	const linksByCollection = Object.groupBy(selectedLinks, (il) => il.parent);
 	const collections = Object.keys(linksByCollection);
 	const [edits, setEdits] = useState<Record<string, Edit>>({});
+	const router = useRouter();
 
 	const setEditForCollection = useCallback(
 		(collection: string) => (edit: Edit) => {
@@ -558,7 +578,16 @@ function EditLinks({
 					>
 						Back
 					</Button>
-					<Button className="" onClick={() => {}}>
+					<Button
+						className=""
+						onClick={() => {
+							insertImports(selectedLinks, edits);
+							router.push("/collections/home");
+							toast.success(
+								`Successfully imported ${selectedLinks.length} links`,
+							);
+						}}
+					>
 						Import
 					</Button>
 				</header>
