@@ -154,7 +154,6 @@ export function CommandMenu() {
 						<RenameCollectionCommand setOpen={setOpen} />
 						<DeleteCollectionCommand setOpen={setOpen} />
 						<ImportCommand setOpen={setOpen} />
-						<ToggleThemeCommand setOpen={setOpen} />
 						<LogoutCommand setOpen={setOpen} />
 					</CommandGroup>
 				</CommandList>

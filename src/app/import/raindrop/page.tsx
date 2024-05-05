@@ -297,7 +297,7 @@ function SelectLinks({
 		<TooltipProvider>
 			<AnimatePresence>
 				<header className="text-xl mb-2 flex flex-row items-center">
-					<span>Select links to import</span>
+					<span className="font-semibold">Select links to import</span>
 					<span className="text-sm ml-4 text-neutral-500 pt-1">
 						{selectedLinks.length} / {links.length} selected
 					</span>
@@ -393,10 +393,12 @@ function Edit({ collection, edit }: { collection: string; edit: Edit }) {
 
 function EditableCollection({
 	collection,
+	size,
 	edit,
 	setEditForCollection,
 }: {
 	collection: string;
+	size: number;
 	edit: Edit;
 	setEditForCollection: (edit: Edit) => void;
 }) {
@@ -410,22 +412,25 @@ function EditableCollection({
 	) as ConcreteCollection[];
 
 	return (
-		<div className="flex flex-row items-center gap-2">
-			<span className="">{collection}</span>
-			<span className="w-96 ml-auto">
+		<div className="outline outline-1 px-4 py-2 rounded-lg dark:outline-neutral-800 outline-neutral-200 flex flex-row items-center gap-2">
+			<div>
+				<span className="line-clamp-1">{collection}</span>
+				<span className="text-sm text-neutral-500">{size} links</span>
+			</div>
+			<span className="sm:w-96 w-64 ml-auto">
 				<Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
 						<Button
 							variant="outline"
 							role="combobox"
 							aria-expanded={open}
-							className="w-96 justify-between"
+							className="sm:w-96 w-64 justify-between"
 						>
 							<Edit collection={collection} edit={edit} />
 							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-96 p-0">
+					<PopoverContent className="sm:w-96 w-64 p-0">
 						<Command
 							value={literalValue}
 							onValueChange={setLiteralValue}
@@ -545,7 +550,7 @@ function EditLinks({
 		<TooltipProvider>
 			<AnimatePresence>
 				<header className="text-xl mb-4 flex flex-row items-center">
-					<span>Edit collections</span>
+					<span className="font-semibold">Edit collections</span>
 					<Button
 						className="ml-auto mr-2"
 						variant="outline"
@@ -567,6 +572,7 @@ function EditLinks({
 					{collections.map((c) => (
 						<EditableCollection
 							key={`editable-collection-${c}`}
+							size={linksByCollection[c]?.length || 0}
 							collection={c}
 							edit={edits[c] || { type: "keep" }}
 							setEditForCollection={setEditForCollection(c)}
