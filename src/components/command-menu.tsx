@@ -100,35 +100,6 @@ export function CommandMenu() {
 				<CommandList>
 					<CommandEmpty>No results found.</CommandEmpty>
 
-					<CommandGroup heading="Commands">
-						<QuickAddCommand setOpen={setOpen} />
-						<CommandItem
-							onSelect={() => {
-								setOpenedForm("create-link-form");
-							}}
-							className="rounded-md"
-						>
-							<Plus className="mr-2 h-4 w-4" />
-							<span>New link</span>
-							<CommandShortcut>Q</CommandShortcut>
-						</CommandItem>
-						<CommandItem
-							onSelect={() => {
-								setOpenedForm("create-collection-form");
-							}}
-							className="rounded-md"
-						>
-							<FolderPlus className="mr-2 h-4 w-4" />
-							<span>New collection</span>
-							<CommandShortcut>⇧Q</CommandShortcut>
-						</CommandItem>
-						<RenameCollectionCommand setOpen={setOpen} />
-						<DeleteCollectionCommand setOpen={setOpen} />
-						<ImportCommand setOpen={setOpen} />
-						<ToggleThemeCommand setOpen={setOpen} />
-						<LogoutCommand setOpen={setOpen} />
-					</CommandGroup>
-
 					<CommandGroup heading="Collections">
 						<CommandItem
 							onSelect={() => {
@@ -156,6 +127,35 @@ export function CommandMenu() {
 									<span>{c.collection.name}</span>
 								</CommandItem>
 							))}
+					</CommandGroup>
+
+					<CommandGroup heading="Commands">
+						<QuickAddCommand setOpen={setOpen} />
+						<CommandItem
+							onSelect={() => {
+								setOpenedForm("create-link-form");
+							}}
+							className="rounded-md"
+						>
+							<Plus className="mr-2 h-4 w-4" />
+							<span>New link</span>
+							<CommandShortcut>Q</CommandShortcut>
+						</CommandItem>
+						<CommandItem
+							onSelect={() => {
+								setOpenedForm("create-collection-form");
+							}}
+							className="rounded-md"
+						>
+							<FolderPlus className="mr-2 h-4 w-4" />
+							<span>New collection</span>
+							<CommandShortcut>⇧Q</CommandShortcut>
+						</CommandItem>
+						<RenameCollectionCommand setOpen={setOpen} />
+						<DeleteCollectionCommand setOpen={setOpen} />
+						<ImportCommand setOpen={setOpen} />
+						<ToggleThemeCommand setOpen={setOpen} />
+						<LogoutCommand setOpen={setOpen} />
 					</CommandGroup>
 				</CommandList>
 			</Command>
