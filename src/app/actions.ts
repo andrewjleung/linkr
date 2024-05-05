@@ -195,6 +195,4 @@ export async function insertImports(
 	edits: Record<string, Edit>,
 ) {
 	await importLinks(importedLinks, edits);
-	revalidatePath("/collections/home");
-	redirect("/");
 }

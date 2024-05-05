@@ -42,6 +42,7 @@ import {
 	Check,
 	ChevronsUpDown,
 	Info,
+	Loader,
 	SquareArrowOutUpRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -162,14 +163,18 @@ function ImportLinks({
 		React.SetStateAction<SelectableImportedLink[] | null>
 	>;
 }) {
+	const [loading, setLoading] = useState(false);
 	const form = useForm<z.infer<typeof raindropImportFormSchema>>({
 		resolver: zodResolver(raindropImportFormSchema),
 	});
 
 	async function onSubmit(values: z.infer<typeof raindropImportFormSchema>) {
+		setLoading(true);
 		const ab = await values.file.arrayBuffer();
 		const serialized = new TextDecoder().decode(ab);
 		const importedLinks = await parseRaindropImport(serialized);
+		setLoading(false);
+
 		setLinks(
 			importedLinks.map((il) => ({
 				// TODO: Using a random id here for the id may not be a great idea...
@@ -217,8 +222,15 @@ function ImportLinks({
 							</FormItem>
 						)}
 					/>
-					<Button type="submit" className="mt-4">
-						Import
+					<Button disabled={loading} type="submit" className="mt-4">
+						<span className={cn("opacity-100", { "opacity-0": loading })}>
+							Import
+						</span>
+						<Loader
+							className={cn("w-4 h-4 animate-spin absolute opacity-0", {
+								"opacity-100": loading,
+							})}
+						/>
 					</Button>
 				</motion.form>
 			</Form>
@@ -392,7 +404,6 @@ function EditComponent({
 				Create <span className="font-semibold underline">{collection}</span>
 			</div>
 		))
-		.with({ type: "home" }, () => <div>Collapse into the home collection</div>)
 		.exhaustive();
 }
 
@@ -500,7 +511,8 @@ function EditableCollection({
 								<CommandItem
 									onSelect={() => {
 										setEditForCollection({
-											type: "home",
+											type: "collapse",
+											into: null,
 										});
 										setOpen(false);
 									}}
@@ -508,7 +520,9 @@ function EditableCollection({
 									<Check
 										className={cn(
 											"mr-2 h-4 w-4",
-											edit.type === "home" ? "opacity-100" : "opacity-0",
+											edit.type === "collapse" && edit.into === null
+												? "opacity-100"
+												: "opacity-0",
 										)}
 									/>
 									Collapse into the home collection
@@ -557,6 +571,7 @@ function EditLinks({
 	const linksByCollection = Object.groupBy(selectedLinks, (il) => il.parent);
 	const collections = Object.keys(linksByCollection);
 	const [edits, setEdits] = useState<Record<string, Edit>>({});
+	const [loading, setLoading] = useState<boolean>(false);
 	const router = useRouter();
 
 	const setEditForCollection = useCallback(
@@ -580,15 +595,26 @@ function EditLinks({
 					</Button>
 					<Button
 						className=""
-						onClick={() => {
-							insertImports(selectedLinks, edits);
+						disabled={loading}
+						onClick={async () => {
+							setLoading(true);
+							await insertImports(selectedLinks, edits);
+							setLoading(false);
+
 							router.push("/collections/home");
 							toast.success(
 								`Successfully imported ${selectedLinks.length} links`,
 							);
 						}}
 					>
-						Import
+						<span className={cn("opacity-100", { "opacity-0": loading })}>
+							Import
+						</span>
+						<Loader
+							className={cn("w-4 h-4 animate-spin absolute opacity-0", {
+								"opacity-100": loading,
+							})}
+						/>
 					</Button>
 				</header>
 				<motion.div

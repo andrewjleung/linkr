@@ -6,7 +6,6 @@ import { parse } from "csv-parse";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import "server-only";
-import { match } from "ts-pattern";
 import { z } from "zod";
 
 const raindropCsvRecordSchema = z.object({
@@ -23,11 +22,13 @@ export type ImportedLink = Pick<LinkInsert, "title" | "url" | "description"> & {
 	parent: string;
 };
 
-export type Edit = Rename | Collapse | Keep | Home;
+export type Edit = Rename | Collapse | Keep;
 export type Rename = { type: "rename"; old: string; new: string };
-export type Collapse = { type: "collapse"; into: Collection["id"] };
+export type Collapse = {
+	type: "collapse";
+	into: Collection["parentCollectionId"];
+};
 export type Keep = { type: "keep" };
-export type Home = { type: "home" };
 
 export async function importFromRaindrop(
 	file: ArrayBuffer,
@@ -62,43 +63,69 @@ async function applyEdits(
 	> = {};
 
 	for (const [c, edit] of Object.entries(edits)) {
-		match(edit)
-			.with({ type: "rename" }, async (res) => {
-				if (res.new in createdRenames) {
-					originalCollectionsToIds[c] = createdRenames[res.new];
-					return;
-				}
-
+		if (edit.type === "rename") {
+			if (edit.new in createdRenames) {
+				originalCollectionsToIds[c] = createdRenames[edit.new];
+			} else {
 				const results = await db
 					.insert(collections)
-					.values({ name: res.new, order: 0 })
+					.values({ name: edit.new, order: 0 })
 					.returning({ id: collections.id });
 
-				const id = results[0].id;
-				createdRenames[res.new] = id;
-				originalCollectionsToIds[c] = id;
-				console.log(originalCollectionsToIds);
-			})
-			.with({ type: "collapse" }, (res) => {
-				originalCollectionsToIds[c] = res.into;
-			})
-			.with({ type: "keep" }, async () => {
-				const results = await db
-					.insert(collections)
-					.values({ name: c, order: 0 })
-					.returning({ id: collections.id });
+				createdRenames[edit.new] = results[0].id;
+				originalCollectionsToIds[c] = createdRenames[edit.new];
+			}
+		} else if (edit.type === "collapse") {
+			originalCollectionsToIds[c] = edit.into;
+		} else if (edit.type === "keep") {
+			const results = await db
+				.insert(collections)
+				.values({ name: c, order: 0 })
+				.returning({ id: collections.id });
 
-				const id = results[0].id;
-				originalCollectionsToIds[c] = id;
-			})
-			// TODO: This can just be a special case of collapse
-			.with({ type: "home" }, () => {
-				originalCollectionsToIds[c] = null;
-			})
-			.exhaustive();
+			originalCollectionsToIds[c] = results[0].id;
+		}
 	}
 
 	return originalCollectionsToIds;
+}
+
+function uneditedCollections(
+	importedLinks: ImportedLink[],
+	edits: Record<string, Edit>,
+) {
+	// TODO: Ensure empty string not allowed for name?
+	const collectionsFromLinks = Array.from(
+		new Set(importedLinks.map((l) => l.parent).filter(Boolean)),
+	);
+
+	const editedCollections = Object.keys(edits);
+	return collectionsFromLinks.filter((c) => !editedCollections.includes(c));
+}
+
+async function createCollectionsByName(
+	names: string[],
+): Promise<Record<string, Collection["id"]>> {
+	if (names.length < 1) {
+		return {};
+	}
+
+	const createdCollections = await db
+		.insert(collections)
+		.values(names.map((name) => ({ name, order: 0 })))
+		.returning({ id: collections.id, name: collections.name });
+
+	const result: Record<string, Collection["id"]> = {};
+
+	for (const { id, name } of createdCollections) {
+		if (name === null) {
+			continue;
+		}
+
+		result[name] = id;
+	}
+
+	return result;
 }
 
 export async function importLinks(
@@ -111,17 +138,21 @@ export async function importLinks(
 	}
 
 	const collectionIds = await applyEdits(edits);
-	// console.log("finally", collectionIds);
+	const remainingCollections = uneditedCollections(importedLinks, edits);
+	const remainingCollectionsIds =
+		await createCollectionsByName(remainingCollections);
 
-	// const linkInserts = importedLinks.map((l, i) => ({
-	// 	title: l.title,
-	// 	description: l.description,
-	// 	url: l.url,
-	// 	parentCollectionId: collectionIds[l.parent],
-	// 	order: i * 100, // TODO: This is a heuristic to just give each a different order.
-	// }));
-	//
-	// await db.insert(links).values(linkInserts);
+	const allCollectionIds = { ...collectionIds, ...remainingCollectionsIds };
+
+	const linkInserts = importedLinks.map((l) => ({
+		title: l.title,
+		description: l.description,
+		url: l.url,
+		parentCollectionId: allCollectionIds[l.parent],
+		order: 0,
+	}));
+
+	await db.insert(links).values(linkInserts);
 
 	revalidatePath("/collections/home");
 	redirect("/");
