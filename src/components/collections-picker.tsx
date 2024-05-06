@@ -59,13 +59,17 @@ export function CollectionsPicker({ className }: { className?: string }) {
 						variant="outline"
 						role="combobox"
 						aria-expanded={open}
-						className="w-[200px] justify-between"
+						className="w-[200px] justify-between flex flex-row "
 					>
-						{parentId === null
-							? "Home"
-							: concreteCollections.find((c) => c.id === parentId)?.collection
-									.name}
-						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+						<span className="line-clamp-1">
+							{parentId === null
+								? "Home"
+								: concreteCollections.find((c) => c.id === parentId)?.collection
+										.name}
+						</span>
+						<div className="ml-auto">
+							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+						</div>
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-[200px] p-0">

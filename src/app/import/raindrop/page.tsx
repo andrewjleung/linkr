@@ -390,7 +390,9 @@ function EditComponent({
 		.with({ type: "collapse" }, (res) => {
 			const collection = optimisticCollections.find((c) => c.id === res.into);
 			const collectionName =
-				collection?.collection.name || "Collection not found";
+				res.into === null
+					? "Home"
+					: collection?.collection.name || "Collection not found";
 
 			return (
 				<div>
