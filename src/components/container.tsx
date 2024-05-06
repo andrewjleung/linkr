@@ -7,7 +7,6 @@ import { MobileFooter } from "@/components/mobile-footer";
 import { QCProvider } from "@/components/query-client-provider";
 import Providers from "@/components/state-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Toaster } from "@/components/ui/sonner";
 import { db } from "@/database/database";
 import { collections as collectionsSchema } from "@/database/schema";
 import { createClient } from "@/lib/supabase/server";
@@ -48,13 +47,12 @@ export async function Container({ children }: { children: React.ReactNode }) {
 								</div>
 							</div>
 						</header>
-						<div className="mx-auto h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8">
+						<div className="mx-auto flex h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8">
 							{children}
 						</div>
 						<footer className="h-8" />
 					</main>
 					<CommandMenu />
-					<Toaster position="bottom-center" />
 				</CollectionsProvider>
 			</QCProvider>
 		</Providers>

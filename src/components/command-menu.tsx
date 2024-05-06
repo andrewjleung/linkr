@@ -10,7 +10,7 @@ import {
 	CommandList,
 	CommandShortcut,
 } from "@/components/ui/command";
-import { useGlobalForm } from "@/hooks/use-global-form";
+import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import { createClient } from "@/lib/supabase/client";
@@ -27,11 +27,11 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
+import { toast } from "sonner";
 import { DeleteCollectionCommand } from "./commands/delete-collection-command";
 import { ImportCommand } from "./commands/import-command";
 import { QuickAddCommand } from "./commands/quick-add-command";
 import { RenameCollectionCommand } from "./commands/rename-collection-command";
-import { ToggleThemeCommand } from "./commands/toggle-theme-command";
 
 function ToggleSidebarCommand() {
 	const [showSidebar, setShowSidebar] = useAtom(showSidebarAtom);
@@ -56,32 +56,31 @@ function ToggleSidebarCommand() {
 function LogoutCommand({
 	setOpen,
 }: {
-	setOpen: ReturnType<typeof useGlobalForm>[1];
+	setOpen: ReturnType<typeof useGlobalDialog>[1];
 }) {
 	const router = useRouter();
 
 	return (
 		<CommandItem
-			onSelect={() => {
+			onSelect={async () => {
 				setOpen(false);
 				const supabase = createClient();
-				supabase.auth.signOut();
+				await supabase.auth.signOut();
 				router.push("/login");
+				toast.info("You've been logged out.");
 			}}
 			className="rounded-lg"
 		>
 			<LogOut className="mr-2 h-4 w-4" />
-			<span>Log out</span>
+			<span>Logout</span>
 		</CommandItem>
 	);
 }
 
-const COMMAND_MENU_FORM = "command-menu";
-
 export function CommandMenu() {
 	const { optimisticCollections } = useContext(CollectionsContext);
 	const router = useRouter();
-	const [open, setOpen] = useGlobalForm(COMMAND_MENU_FORM);
+	const [open, setOpen] = useGlobalDialog("command-menu");
 	const [, setOpenedForm] = useAtom(openedFormAtom);
 
 	useKeyPress(
@@ -113,7 +112,11 @@ export function CommandMenu() {
 						</CommandItem>
 						{optimisticCollections
 							.filter((c) => c.type === "concrete")
-							.sort((c1, c2) => c1.collection.order - c2.collection.order)
+							.sort((a, b) =>
+								(a.collection.name || "").localeCompare(
+									b.collection.name || "",
+								),
+							)
 							.map((c) => (
 								<CommandItem
 									key={`collection-command-${c.id}`}

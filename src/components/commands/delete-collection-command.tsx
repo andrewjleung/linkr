@@ -9,7 +9,7 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { CommandItem } from "@/components/ui/command";
-import type { useGlobalForm } from "@/hooks/use-global-form";
+import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { FolderMinus } from "lucide-react";
@@ -18,7 +18,7 @@ import { useContext, useState } from "react";
 export function DeleteCollectionCommand({
 	setOpen,
 }: {
-	setOpen: ReturnType<typeof useGlobalForm>[1];
+	setOpen: ReturnType<typeof useGlobalDialog>[1];
 }) {
 	const { optimisticCollections, unsafeRemoveCollection } =
 		useContext(CollectionsContext);

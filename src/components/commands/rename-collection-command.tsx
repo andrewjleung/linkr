@@ -1,4 +1,4 @@
-import type { useGlobalForm } from "@/hooks/use-global-form";
+import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { openedFormAtom } from "@/state";
 import { useAtom } from "jotai";
@@ -8,7 +8,7 @@ import { CommandItem } from "../ui/command";
 export function RenameCollectionCommand({
 	setOpen,
 }: {
-	setOpen: ReturnType<typeof useGlobalForm>[1];
+	setOpen: ReturnType<typeof useGlobalDialog>[1];
 }) {
 	const parentId = useParentCollection();
 	const [, setOpenedForm] = useAtom(openedFormAtom);

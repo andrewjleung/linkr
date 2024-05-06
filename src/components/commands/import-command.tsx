@@ -1,4 +1,4 @@
-import type { useGlobalForm } from "@/hooks/use-global-form";
+import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { Import } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CommandItem } from "../ui/command";
@@ -6,7 +6,7 @@ import { CommandItem } from "../ui/command";
 export function ImportCommand({
 	setOpen,
 }: {
-	setOpen: ReturnType<typeof useGlobalForm>[1];
+	setOpen: ReturnType<typeof useGlobalDialog>[1];
 }) {
 	const router = useRouter();
 

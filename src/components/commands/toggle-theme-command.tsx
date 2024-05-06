@@ -1,4 +1,4 @@
-import type { useGlobalForm } from "@/hooks/use-global-form";
+import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { Moon, Sun, SunMoon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { CommandItem } from "../ui/command";
@@ -6,7 +6,7 @@ import { CommandItem } from "../ui/command";
 export function ToggleThemeCommand({
 	setOpen,
 }: {
-	setOpen: ReturnType<typeof useGlobalForm>[1];
+	setOpen: ReturnType<typeof useGlobalDialog>[1];
 }) {
 	const { theme, setTheme } = useTheme();
 

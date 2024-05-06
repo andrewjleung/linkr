@@ -1,5 +1,5 @@
 import { useClipboard } from "@/hooks/use-clipboard";
-import type { useGlobalForm } from "@/hooks/use-global-form";
+import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { LinksContext } from "@/hooks/use-optimistic-links";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { PlusCircle } from "lucide-react";
@@ -18,7 +18,7 @@ function isUrl(s: string): boolean {
 export function QuickAddCommand({
 	setOpen,
 }: {
-	setOpen: ReturnType<typeof useGlobalForm>[1];
+	setOpen: ReturnType<typeof useGlobalDialog>[1];
 }) {
 	const clipboard = useClipboard();
 	const parentId = useParentCollection();

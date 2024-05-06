@@ -9,6 +9,7 @@ import {
 	CommandGroup,
 	CommandInput,
 	CommandItem,
+	CommandSeparator,
 } from "@/components/ui/command";
 import {
 	Popover,
@@ -88,24 +89,33 @@ export function CollectionsPicker({ className }: { className?: string }) {
 								/>
 								Home
 							</CommandItem>
-							{concreteCollections.map((c) => (
-								<CommandItem
-									key={`collection-picker-${c.id}`}
-									className="rounded-md"
-									onSelect={() => {
-										router.push(`/collections/${c.id}`);
-										setOpen(false);
-									}}
-								>
-									<Check
-										className={cn(
-											"mr-2 h-4 w-4",
-											parentId === c.id ? "opacity-100" : "opacity-0",
-										)}
-									/>
-									{c.collection.name}
-								</CommandItem>
-							))}
+						</CommandGroup>
+
+						<CommandGroup>
+							{concreteCollections
+								.sort((a, b) =>
+									(a.collection.name || "").localeCompare(
+										b.collection.name || "",
+									),
+								)
+								.map((c) => (
+									<CommandItem
+										key={`collection-picker-${c.id}`}
+										className="rounded-md"
+										onSelect={() => {
+											router.push(`/collections/${c.id}`);
+											setOpen(false);
+										}}
+									>
+										<Check
+											className={cn(
+												"mr-2 h-4 w-4",
+												parentId === c.id ? "opacity-100" : "opacity-0",
+											)}
+										/>
+										{c.collection.name}
+									</CommandItem>
+								))}
 						</CommandGroup>
 					</Command>
 				</PopoverContent>

@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata = {
@@ -17,6 +18,7 @@ export default async function RootLayout({
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					{children}
 				</ThemeProvider>
+				<Toaster position="bottom-center" />
 			</body>
 		</html>
 	);

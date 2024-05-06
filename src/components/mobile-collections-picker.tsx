@@ -9,7 +9,7 @@ import {
 	CommandList,
 	CommandShortcut,
 } from "@/components/ui/command";
-import { useGlobalForm } from "@/hooks/use-global-form";
+import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import {
 	CollectionsContext,
 	type ConcreteCollection,
@@ -20,12 +20,10 @@ import { Check, Folder, Home, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
-const MOBILE_COLLECTIONS_PICKER = "mobile-collections-picker";
-
 export function MobileCollectionsPicker({ className }: { className?: string }) {
 	const parentId = useParentCollection();
 	const { optimisticCollections } = useContext(CollectionsContext);
-	const [open, setOpen] = useGlobalForm(MOBILE_COLLECTIONS_PICKER);
+	const [open, setOpen] = useGlobalDialog("mobile-collections-picker");
 	const router = useRouter();
 
 	const collection = optimisticCollections.find(
