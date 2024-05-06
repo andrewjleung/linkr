@@ -144,12 +144,12 @@ export async function importLinks(
 
 	const allCollectionIds = { ...collectionIds, ...remainingCollectionsIds };
 
-	const linkInserts = importedLinks.map((l) => ({
+	const linkInserts = importedLinks.map((l, i) => ({
 		title: l.title,
 		description: l.description,
 		url: l.url,
 		parentCollectionId: allCollectionIds[l.parent],
-		order: 0,
+		order: i,
 	}));
 
 	await db.insert(links).values(linkInserts);
