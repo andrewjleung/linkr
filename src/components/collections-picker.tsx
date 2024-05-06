@@ -22,7 +22,7 @@ import {
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export function CollectionsPicker({ className }: { className?: string }) {
 	const parentId = useParentCollection();
@@ -35,6 +35,20 @@ export function CollectionsPicker({ className }: { className?: string }) {
 		.sort(
 			(c1, c2) => c1.collection.order - c2.collection.order,
 		) as ConcreteCollection[];
+
+	useEffect(() => {
+		if (parentId !== null) {
+			router.prefetch("/collections/home");
+		}
+
+		for (const c of concreteCollections) {
+			if (c.id === parentId) {
+				continue;
+			}
+
+			router.prefetch(`/collections/${c.id}`);
+		}
+	}, [concreteCollections, router, parentId]);
 
 	return (
 		<div className={cn(className)}>

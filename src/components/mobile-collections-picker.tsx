@@ -7,7 +7,6 @@ import {
 	CommandInput,
 	CommandItem,
 	CommandList,
-	CommandSeparator,
 	CommandShortcut,
 } from "@/components/ui/command";
 import { useGlobalForm } from "@/hooks/use-global-form";

@@ -25,7 +25,7 @@ export function LinkSearcher({ className }: { className?: string }) {
 			<CommandList>
 				{optimisticLinks.map((l) => (
 					<CommandItem
-						key={`ink-searcher-${l.id}`}
+						key={`link-searcher-${l.id}`}
 						className="rounded-md"
 						onSelect={() => router.replace(l.link.url)}
 					>
