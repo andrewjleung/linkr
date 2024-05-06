@@ -78,31 +78,33 @@ export function Links() {
 	return (
 		<AnimatePresence>
 			<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-				<Droppable droppableId="LINK-LIST">
-					{(provided, snapshot) => (
-						<div ref={provided.innerRef} {...provided.droppableProps}>
-							{optimisticLinks.map((l, i) => (
-								<Draggable
-									key={`link-${l.id}`}
-									draggableId={`${l.type}-link-${l.id}`}
-									index={i}
-								>
-									{(provided, snapshot) => (
-										<div
-											ref={provided.innerRef}
-											{...provided.draggableProps}
-											{...provided.dragHandleProps}
-											className="mb-2"
-										>
-											<LinkComponent optimisticLink={l} />
-										</div>
-									)}
-								</Draggable>
-							))}
-							{provided.placeholder}
-						</div>
-					)}
-				</Droppable>
+				<div className="w-full">
+					<Droppable droppableId="LINK-LIST">
+						{(provided, snapshot) => (
+							<div ref={provided.innerRef} {...provided.droppableProps}>
+								{optimisticLinks.map((l, i) => (
+									<Draggable
+										key={`link-${l.id}`}
+										draggableId={`${l.type}-link-${l.id}`}
+										index={i}
+									>
+										{(provided, snapshot) => (
+											<div
+												ref={provided.innerRef}
+												{...provided.draggableProps}
+												{...provided.dragHandleProps}
+												className="mb-2"
+											>
+												<LinkComponent optimisticLink={l} />
+											</div>
+										)}
+									</Draggable>
+								))}
+								{provided.placeholder}
+							</div>
+						)}
+					</Droppable>
+				</div>
 			</DragDropContext>
 		</AnimatePresence>
 	);
