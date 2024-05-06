@@ -6,7 +6,8 @@ type FormKind =
 	| "create-link-form"
 	| "create-collection-form"
 	| "command-menu"
-	| "mobile-collections-picker";
+	| "mobile-collections-picker"
+	| "rename-collection-form";
 
 export function useGlobalDialog(
 	form: FormKind,
