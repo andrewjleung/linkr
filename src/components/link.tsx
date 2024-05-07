@@ -25,6 +25,7 @@ import hash from "object-hash";
 import { useContext, useState } from "react";
 import { z } from "zod";
 import { EditLinkForm } from "./link-form";
+import { Selectable } from "./selectable";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
@@ -32,9 +33,13 @@ const LINK_CUTOFF_LENGTH = 100;
 
 function LinkMenu({
 	link,
+	selected,
+	setSelected,
 	children,
 }: {
 	link: LinkSchema;
+	selected: boolean;
+	setSelected: React.Dispatch<React.SetStateAction<boolean>>;
 	children: React.ReactNode;
 }) {
 	const { removeOptimisticLink, moveOptimisticLink } = useContext(LinksContext);
@@ -49,6 +54,10 @@ function LinkMenu({
 
 	function onClickEdit() {
 		setEditLinkFormOpen(true);
+	}
+
+	function onClickSelect() {
+		setSelected((selecting) => !selecting);
 	}
 
 	function onClickDelete() {
@@ -66,6 +75,9 @@ function LinkMenu({
 				<ContextMenuContent className="w-48">
 					<ContextMenuItem inset onClick={onClickEdit}>
 						Edit
+					</ContextMenuItem>
+					<ContextMenuItem inset onClick={onClickSelect}>
+						{selected ? "Unselect" : "Select"}
 					</ContextMenuItem>
 					<ContextMenuItem inset onClick={onClickDelete}>
 						Delete
@@ -149,8 +161,10 @@ const OgSchema = z.object({
 
 function OptimisticLinkComponent({
 	optimisticLink,
+	showIcon,
 }: {
 	optimisticLink: OptimisticLink;
+	showIcon: boolean;
 }) {
 	const { data: og } = useQuery({
 		queryKey: ["og", optimisticLink.id],
@@ -184,18 +198,20 @@ function OptimisticLinkComponent({
             </div>*/}
 						<CardHeader className="p-3">
 							<CardTitle className="flex flex-row items-center justify-stretch gap-4">
-								<Avatar className="h-5 w-5">
-									<AvatarImage src={faviconUrl(link.url, og?.favicon)} />
-									<AvatarFallback>
-										<div
-											className={cn(
-												"h-full w-full scale-125 blur-sm",
-												GRADIENTS[hashLink(link) % GRADIENTS.length],
-											)}
-										/>
-									</AvatarFallback>
-								</Avatar>
-								<span className="flex-2 truncate text-sm">
+								{showIcon ? (
+									<Avatar className="h-5 w-5">
+										<AvatarImage src={faviconUrl(link.url, og?.favicon)} />
+										<AvatarFallback>
+											<div
+												className={cn(
+													"h-full w-full scale-125 blur-sm",
+													GRADIENTS[hashLink(link) % GRADIENTS.length],
+												)}
+											/>
+										</AvatarFallback>
+									</Avatar>
+								) : null}
+								<span className="flex-2 line-clamp-1 text-sm">
 									{title || displayUrl}
 								</span>
 								{title === null ? null : (
@@ -227,16 +243,43 @@ function OptimisticLinkComponent({
 
 export default function LinkComponent({
 	optimisticLink,
+	selecting,
+	selected,
+	showIcon,
+	setSelected,
 }: {
 	optimisticLink: OptimisticLink;
+	selecting: boolean;
+	selected: boolean;
+	showIcon: boolean;
+	setSelected: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	if (optimisticLink.type === "abstract") {
-		return <OptimisticLinkComponent optimisticLink={optimisticLink} />;
+		return (
+			<OptimisticLinkComponent
+				optimisticLink={optimisticLink}
+				showIcon={showIcon}
+			/>
+		);
 	}
 
 	return (
-		<LinkMenu link={optimisticLink.link}>
-			<OptimisticLinkComponent optimisticLink={optimisticLink} />
+		<LinkMenu
+			selected={selected}
+			setSelected={setSelected}
+			link={optimisticLink.link}
+		>
+			<Selectable
+				selecting={selecting}
+				selected={selected}
+				setSelected={setSelected}
+				className="flex flex-row items-center gap-2 pl-3"
+			>
+				<OptimisticLinkComponent
+					optimisticLink={optimisticLink}
+					showIcon={showIcon}
+				/>
+			</Selectable>
 		</LinkMenu>
 	);
 }

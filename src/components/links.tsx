@@ -2,7 +2,12 @@
 
 import LinkComponent from "@/components/link";
 import { Badge } from "@/components/ui/badge";
-import { type ConcreteLink, LinksContext } from "@/hooks/use-optimistic-links";
+import { useKeyPress } from "@/hooks/use-keyboard";
+import {
+	type ConcreteLink,
+	LinksContext,
+	type OptimisticLink,
+} from "@/hooks/use-optimistic-links";
 import { openedFormAtom } from "@/state";
 import {
 	DragDropContext,
@@ -12,11 +17,22 @@ import {
 } from "@hello-pangea/dnd";
 import { AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
-import { useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 
 export function Links() {
 	const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
 	const [, setOpenedForm] = useAtom(openedFormAtom);
+	const [selectedLinks, setSelectedLinks] = useState<number[]>([]);
+	const selecting = selectedLinks.length > 0;
+
+	useKeyPress(
+		{ shiftKey: false, metaKey: false, key: "Escape" },
+		(event) => {
+			event.preventDefault();
+			setSelectedLinks([]);
+		},
+		selectedLinks.length < 1,
+	);
 
 	function onDragStart() {}
 
@@ -46,9 +62,46 @@ export function Links() {
 		);
 	}
 
+	const selected = useCallback(
+		(link: OptimisticLink) => {
+			if (link.type === "abstract") {
+				return false;
+			}
+
+			return selectedLinks.includes(link.id);
+		},
+		[selectedLinks],
+	);
+
+	const setSelected = useCallback(
+		(link: OptimisticLink) =>
+			(selectedAction: React.SetStateAction<boolean>) => {
+				if (link.type === "abstract") {
+					return;
+				}
+
+				if (typeof selectedAction === "boolean") {
+					setSelectedLinks((sl) =>
+						selectedAction
+							? [...sl, link.id]
+							: sl.filter((id) => id !== link.id),
+					);
+					return;
+				}
+
+				const currentSelected = selected(link);
+				setSelectedLinks((sl) =>
+					selectedAction(currentSelected)
+						? [...sl, link.id]
+						: sl.filter((id) => id !== link.id),
+				);
+			},
+		[selected],
+	);
+
 	if (optimisticLinks.length < 1) {
 		return (
-			<div className="flex flex-1 items-center justify-center ">
+			<div className="flex flex-1 items-center justify-center">
 				<div className="flex flex-col gap-2 mb-24">
 					<div className="flex flex-row items-center">
 						<Badge
@@ -95,7 +148,13 @@ export function Links() {
 												{...provided.dragHandleProps}
 												className="mb-2"
 											>
-												<LinkComponent optimisticLink={l} />
+												<LinkComponent
+													optimisticLink={l}
+													showIcon={!selecting}
+													selecting={selecting}
+													selected={selected(l)}
+													setSelected={setSelected(l)}
+												/>
 											</div>
 										)}
 									</Draggable>
