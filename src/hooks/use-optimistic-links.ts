@@ -3,6 +3,8 @@ import {
 	deleteLink,
 	editLink,
 	moveLink,
+	undoLinkDeletion,
+	undoUnsafeCollectionDeletion,
 	updateLinkOrder,
 } from "@/app/actions";
 import type { Collection, Link, LinkInsert } from "@/database/types";
@@ -221,7 +223,12 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 
 	async function removeOptimisticLink(id: number) {
 		startTransition(() => updateOptimisticLinks({ type: "delete", id }));
-		toast.success("Link has been deleted.");
+		toast.success("Link has been deleted.", {
+			action: {
+				label: "Undo",
+				onClick: () => undoLinkDeletion(id),
+			},
+		});
 		await deleteLink(id);
 	}
 

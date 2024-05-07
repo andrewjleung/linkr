@@ -10,7 +10,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/database/database";
 import { collections as collectionsSchema } from "@/database/schema";
 import { createClient } from "@/lib/supabase/server";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export async function Container({ children }: { children: React.ReactNode }) {
@@ -28,6 +28,7 @@ export async function Container({ children }: { children: React.ReactNode }) {
 	const collections = await db
 		.select()
 		.from(collectionsSchema)
+		.where(eq(collectionsSchema.deleted, false))
 		.orderBy(asc(collectionsSchema.order));
 
 	return (

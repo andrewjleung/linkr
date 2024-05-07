@@ -5,7 +5,7 @@ import { collections, links } from "@/database/schema";
 import type { CollectionInsert, LinkInsert } from "@/database/types";
 import { importFromRaindrop, importLinks } from "@/services/import-service";
 import type { Edit, ImportedLink } from "@/services/import-service";
-import { desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -34,9 +34,22 @@ export async function createLink(link: Omit<LinkInsert, "order">) {
 }
 
 export async function deleteLink(id: number) {
-	const result = await db.delete(links).where(eq(links.id, id));
+	const result = await db
+		.update(links)
+		.set({ deleted: true })
+		.where(eq(links.id, id));
 	revalidatePath("/collections/home");
 
+	return result;
+}
+
+export async function undoLinkDeletion(id: number) {
+	const result = await db
+		.update(links)
+		.set({ deleted: false })
+		.where(eq(links.id, id));
+
+	revalidatePath("/collections/home");
 	return result;
 }
 
@@ -89,7 +102,7 @@ export async function validateCollection(id: number) {
 	const results = await db
 		.select({ id: collections.id })
 		.from(collections)
-		.where(eq(collections.id, id));
+		.where(and(eq(collections.id, id), eq(collections.deleted, false)));
 
 	if (results.length < 1) {
 		redirect("/");
@@ -143,7 +156,10 @@ export async function safeDeleteCollection(id: number) {
 		.set({ parentCollectionId: null })
 		.where(eq(links.parentCollectionId, id));
 
-	await db.delete(collections).where(eq(collections.id, id));
+	await db
+		.update(collections)
+		.set({ deleted: true })
+		.where(eq(collections.id, id));
 
 	revalidatePath("/collections/home");
 	redirect("/");
@@ -162,9 +178,42 @@ export async function unsafeDeleteCollection(id: number) {
 		}),
 	);
 
-	await db.delete(links).where(eq(links.parentCollectionId, id));
+	await db
+		.update(links)
+		.set({ deleted: true })
+		.where(eq(links.parentCollectionId, id));
 
-	await db.delete(collections).where(eq(collections.id, id));
+	await db
+		.update(collections)
+		.set({ deleted: true })
+		.where(eq(collections.id, id));
+
+	revalidatePath("/collections/home");
+	redirect("/");
+}
+
+export async function undoUnsafeCollectionDeletion(id: number) {
+	// TODO: This is going to run a ton of queries...
+	const nestedCollections = await db
+		.select({ id: collections.id })
+		.from(collections)
+		.where(eq(collections.parentCollectionId, id));
+
+	await Promise.all(
+		nestedCollections.map(({ id }) => {
+			undoUnsafeCollectionDeletion(id);
+		}),
+	);
+
+	await db
+		.update(links)
+		.set({ deleted: false })
+		.where(eq(links.parentCollectionId, id));
+
+	await db
+		.update(collections)
+		.set({ deleted: false })
+		.where(eq(collections.id, id));
 
 	revalidatePath("/collections/home");
 	redirect("/");

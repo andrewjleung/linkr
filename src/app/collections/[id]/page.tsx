@@ -6,7 +6,7 @@ import { Links } from "@/components/links";
 import LinksProvider from "@/components/links-provider";
 import { db } from "@/database/database";
 import { links as linksSchema } from "@/database/schema";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -22,7 +22,12 @@ export default async function Page({ params }: { params: { id: string } }) {
 	const links = await db
 		.select()
 		.from(linksSchema)
-		.where(eq(linksSchema.parentCollectionId, parentId))
+		.where(
+			and(
+				eq(linksSchema.parentCollectionId, parentId),
+				eq(linksSchema.deleted, false),
+			),
+		)
 		.orderBy(asc(linksSchema.order));
 
 	return (

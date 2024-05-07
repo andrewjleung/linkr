@@ -2,6 +2,7 @@ import {
 	createCollection,
 	renameCollection as renameCollectionAction,
 	safeDeleteCollection,
+	undoUnsafeCollectionDeletion,
 	unsafeDeleteCollection,
 	updateCollectionOrder,
 } from "@/app/actions";
@@ -212,6 +213,7 @@ export function useOptimisticCollections(
 	}
 
 	async function safeRemoveCollection(id: number) {
+		// TODO: Get rid of this?
 		startTransition(() => {
 			updateOptimisticCollections({ type: "delete", id });
 		});
@@ -223,7 +225,12 @@ export function useOptimisticCollections(
 		startTransition(() => {
 			updateOptimisticCollections({ type: "delete", id });
 		});
-		toast.success("Collection has been deleted.");
+		toast.success("Collection has been deleted.", {
+			action: {
+				label: "Undo",
+				onClick: () => undoUnsafeCollectionDeletion(id),
+			},
+		});
 		await unsafeDeleteCollection(id);
 	}
 

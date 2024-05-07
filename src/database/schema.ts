@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+	boolean,
 	doublePrecision,
 	integer,
 	pgTable,
@@ -15,6 +16,7 @@ export const links = pgTable("links", {
 	url: text("url").notNull(),
 	parentCollectionId: integer("parent_collection_id"),
 	order: doublePrecision("order").notNull(),
+	deleted: boolean("deleted").default(false),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
@@ -24,6 +26,7 @@ export const collections = pgTable("collections", {
 	name: text("name"),
 	parentCollectionId: integer("parent_collection_id"),
 	order: doublePrecision("order").notNull(),
+	deleted: boolean("deleted").default(false),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
