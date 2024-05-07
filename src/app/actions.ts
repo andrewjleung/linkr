@@ -12,7 +12,7 @@ import { redirect } from "next/navigation";
 // TODO: DRY this up...
 const ORDER_BUFFER = 100;
 
-export async function createLink(link: Omit<LinkInsert, "order">) {
+export async function createLink(link: Omit<LinkInsert, "order" | "deleted">) {
 	// TODO: Reset ordering numbers of links in collection
 	const lastLinkInCollection = await db.query.links.findFirst({
 		where:
@@ -110,7 +110,7 @@ export async function validateCollection(id: number) {
 }
 
 export async function createCollection(
-	collection: Omit<CollectionInsert, "order">,
+	collection: Omit<CollectionInsert, "order" | "deleted">,
 ) {
 	const lastCollectionInCollection = await db.query.collections.findFirst({
 		where:

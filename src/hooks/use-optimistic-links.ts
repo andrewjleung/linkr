@@ -219,7 +219,9 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 			.exhaustive(),
 	);
 
-	async function addOptimisticLink(link: Omit<LinkInsert, "order">) {
+	async function addOptimisticLink(
+		link: Omit<LinkInsert, "order" | "deleted">,
+	) {
 		startTransition(() => updateOptimisticLinks({ type: "add", link }));
 		toast.success("Link has been created.", { description: link.url });
 		await createLink(link);

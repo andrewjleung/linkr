@@ -99,7 +99,7 @@ export type OptimisticCollection = AbstractCollection | ConcreteCollection;
 export type OptimisticCollections = {
 	optimisticCollections: OptimisticCollection[];
 	addCollection: (
-		collection: Omit<CollectionInsert, "order">,
+		collection: Omit<CollectionInsert, "order" | "deleted">,
 	) => Promise<Collection>;
 	unsafeRemoveCollection: (id: number) => Promise<void>;
 	safeRemoveCollection: (id: number) => Promise<void>;
@@ -204,7 +204,9 @@ export function useOptimisticCollections(
 				.exhaustive(),
 	);
 
-	async function addCollection(collection: Omit<CollectionInsert, "order">) {
+	async function addCollection(
+		collection: Omit<CollectionInsert, "order" | "deleted">,
+	) {
 		startTransition(() => {
 			updateOptimisticCollections({ type: "add", collection });
 		});
