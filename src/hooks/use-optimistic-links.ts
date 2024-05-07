@@ -97,7 +97,9 @@ export type OptimisticLink = AbstractLink | ConcreteLink;
 
 export type OptimisticLinks = {
 	optimisticLinks: OptimisticLink[];
-	addOptimisticLink: (link: Omit<LinkInsert, "order">) => Promise<void>;
+	addOptimisticLink: (
+		link: Omit<LinkInsert, "order" | "deleted">,
+	) => Promise<void>;
 	removeOptimisticLink: (id: number) => Promise<void>;
 	reorderOptimisticLinks: (
 		id: number,
