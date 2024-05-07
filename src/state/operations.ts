@@ -1,6 +1,7 @@
 import { undoLinkDeletion, undoUnsafeCollectionDeletion } from "@/app/actions";
 import type { Collection, Link } from "@/database/types";
 import { atom } from "jotai";
+import { toast } from "sonner";
 
 export const HISTORY_LENGTH = 50;
 
@@ -31,6 +32,7 @@ export function deleteLinkOp(id: Link["id"]): UndoableOperation {
 		...operation,
 		undo: async () => {
 			await undoLinkDeletion(id);
+			toast.success("Undid link deletion");
 			return operation;
 		},
 	};
@@ -46,6 +48,7 @@ export function deleteCollectionOp(id: Collection["id"]): UndoableOperation {
 		...operation,
 		undo: async () => {
 			await undoUnsafeCollectionDeletion(id);
+			toast.success("Undid collection deletion");
 			return operation;
 		},
 	};

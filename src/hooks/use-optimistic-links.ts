@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { match } from "ts-pattern";
 import { useKeyPress } from "./use-keyboard";
 import { useParentCollection } from "./use-parent-collection";
-import { useUndoableOperations } from "./useUndoableOperations";
+import { useUndoableOperations } from "./use-undoable-operations";
 
 const ORDER_BUFFER = 100;
 
