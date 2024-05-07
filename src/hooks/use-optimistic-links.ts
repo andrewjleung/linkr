@@ -8,12 +8,15 @@ import {
 	updateLinkOrder,
 } from "@/app/actions";
 import type { Collection, Link, LinkInsert } from "@/database/types";
+import { deleteLinkOp } from "@/state/operations";
 import type { OgObject } from "open-graph-scraper/dist/lib/types";
 // @ts-ignore
 import { createContext, startTransition, useOptimistic } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
+import { useKeyPress } from "./use-keyboard";
 import { useParentCollection } from "./use-parent-collection";
+import { useUndoableOperations } from "./useUndoableOperations";
 
 const ORDER_BUFFER = 100;
 
@@ -196,6 +199,7 @@ function handleEdit(
 
 export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 	const parentId = useParentCollection();
+	const { push } = useUndoableOperations();
 
 	const concreteLinks: OptimisticLink[] = links.map((link) => ({
 		type: "concrete",
@@ -230,6 +234,7 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 			},
 		});
 		await deleteLink(id);
+		push(deleteLinkOp(id));
 	}
 
 	async function reorderOptimisticLinks(
