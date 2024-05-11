@@ -8,6 +8,7 @@ import {
 	LinksContext,
 	type OptimisticLink,
 } from "@/hooks/use-optimistic-links";
+import { cn } from "@/lib/utils";
 import { openedFormAtom } from "@/state";
 import {
 	DragDropContext,
@@ -17,21 +18,75 @@ import {
 } from "@hello-pangea/dnd";
 import { AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
+import { Move, Trash } from "lucide-react";
 import { useCallback, useContext, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
+import { Label } from "./ui/label";
+import { Separator } from "./ui/separator";
 
 export function Links() {
 	const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
 	const [, setOpenedForm] = useAtom(openedFormAtom);
 	const [selectedLinks, setSelectedLinks] = useState<number[]>([]);
-	const selecting = selectedLinks.length > 0;
+	const [selectMode, setSelectMode] = useState<boolean>(false);
+	const selecting = selectMode || selectedLinks.length > 0;
+	const [selectionCursor, setSelectionCursor] = useState(0);
 
 	useKeyPress(
 		{ shiftKey: false, metaKey: false, key: "Escape" },
 		(event) => {
 			event.preventDefault();
 			setSelectedLinks([]);
+			setSelectMode(false);
+			setSelectionCursor(0);
 		},
-		selectedLinks.length < 1,
+		!selectMode && selectedLinks.length < 1,
+	);
+
+	useKeyPress(
+		{ shiftKey: false, metaKey: false, key: "s" },
+		(event) => {
+			event.preventDefault();
+
+			if (optimisticLinks.length < 1) {
+				toast.info("No links to select.");
+				return;
+			}
+
+			setSelectMode(true);
+			setSelectionCursor(0);
+		},
+		selecting,
+	);
+
+	useKeyPress(
+		{ shiftKey: false, metaKey: false, key: "j" },
+		(event) => {
+			event.preventDefault();
+			setSelectionCursor((c) => Math.min(optimisticLinks.length - 1, c + 1));
+		},
+		!selecting,
+	);
+
+	useKeyPress(
+		{ shiftKey: false, metaKey: false, key: "k" },
+		(event) => {
+			event.preventDefault();
+			setSelectionCursor((c) => Math.max(0, c - 1));
+		},
+		!selecting,
+	);
+
+	useKeyPress(
+		{ shiftKey: false, metaKey: false, key: " " },
+		(event) => {
+			event.preventDefault();
+			console.log("foo");
+			setSelected(optimisticLinks[selectionCursor])((s) => !s);
+		},
+		!selecting,
 	);
 
 	function onDragStart() {}
@@ -128,43 +183,71 @@ export function Links() {
 		);
 	}
 
+	if (selecting) {
+		return (
+			<AnimatePresence>
+				<div className="w-full flex flex-col">
+					{optimisticLinks.map((l, i) => (
+						<div
+							key={`link-${l.id}`}
+							className={cn("mb-2 relative", {
+								"outline outline-neutral-400 dark:outline-neutral-600 rounded-lg":
+									selectionCursor === i,
+							})}
+						>
+							<LinkComponent
+								optimisticLink={l}
+								showIcon={!selecting}
+								selecting={selecting}
+								selected={selected(l)}
+								setSelected={setSelected(l)}
+							/>
+						</div>
+					))}
+				</div>
+			</AnimatePresence>
+		);
+	}
+
 	return (
 		<AnimatePresence>
-			<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-				<div className="w-full">
-					<Droppable droppableId="LINK-LIST">
-						{(provided, snapshot) => (
-							<div ref={provided.innerRef} {...provided.droppableProps}>
-								{optimisticLinks.map((l, i) => (
-									<Draggable
-										key={`link-${l.id}`}
-										draggableId={`${l.type}-link-${l.id}`}
-										index={i}
-									>
-										{(provided, snapshot) => (
-											<div
-												ref={provided.innerRef}
-												{...provided.draggableProps}
-												{...provided.dragHandleProps}
-												className="mb-2"
-											>
-												<LinkComponent
-													optimisticLink={l}
-													showIcon={!selecting}
-													selecting={selecting}
-													selected={selected(l)}
-													setSelected={setSelected(l)}
-												/>
-											</div>
-										)}
-									</Draggable>
-								))}
-								{provided.placeholder}
-							</div>
-						)}
-					</Droppable>
-				</div>
-			</DragDropContext>
+			<div className="w-full flex flex-col">
+				<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+					<div className="w-full">
+						<Droppable droppableId="LINK-LIST">
+							{(provided, snapshot) => (
+								<div ref={provided.innerRef} {...provided.droppableProps}>
+									{optimisticLinks.map((l, i) => (
+										<Draggable
+											key={`link-${l.id}`}
+											draggableId={`${l.type}-link-${l.id}`}
+											index={i}
+										>
+											{(provided, snapshot) => (
+												<div
+													ref={provided.innerRef}
+													{...provided.draggableProps}
+													{...provided.dragHandleProps}
+													className="mb-2"
+												>
+													<LinkComponent
+														optimisticLink={l}
+														showIcon={!selecting}
+														selecting={selecting}
+														selected={selected(l)}
+														setSelected={setSelected(l)}
+													/>
+												</div>
+											)}
+										</Draggable>
+									))}
+									{provided.placeholder}
+								</div>
+							)}
+						</Droppable>
+					</div>
+				</DragDropContext>
+			</div>
 		</AnimatePresence>
 	);
 }
