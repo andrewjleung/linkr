@@ -1,3 +1,4 @@
+import { undoUnsafeCollectionDeletion } from "@/app/actions";
 import { RenameCollectionForm } from "@/components/collection-form";
 import LoadingIndicator from "@/components/loading-indicator";
 import {
@@ -27,6 +28,7 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useContext, useState } from "react";
+import { toast } from "sonner";
 
 export function HomeCollection() {
 	const parentId = useParentCollection();
@@ -83,6 +85,13 @@ function ConcreteCollection({ collection }: { collection: Collection }) {
 		// TODO: Ask dialog to determine unsafe/safe deletion.
 
 		await unsafeRemoveCollection(collection.id);
+
+		toast.success("Collection has been deleted.", {
+			action: {
+				label: "Undo",
+				onClick: () => undoUnsafeCollectionDeletion(collection.id),
+			},
+		});
 	}
 
 	function onRename() {

@@ -1,3 +1,4 @@
+import { undoUnsafeCollectionDeletion } from "@/app/actions";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -14,6 +15,7 @@ import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { FolderMinus } from "lucide-react";
 import { useContext, useState } from "react";
+import { toast } from "sonner";
 
 export function DeleteCollectionCommand({
 	setOpen,
@@ -33,6 +35,13 @@ export function DeleteCollectionCommand({
 
 		if (parentId !== null) {
 			await unsafeRemoveCollection(parentId);
+
+			toast.success("Collection has been deleted.", {
+				action: {
+					label: "Undo",
+					onClick: () => undoUnsafeCollectionDeletion(parentId),
+				},
+			});
 		}
 	}
 

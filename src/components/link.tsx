@@ -1,3 +1,4 @@
+import { undoLinkDeletion } from "@/app/actions";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	ContextMenu,
@@ -23,6 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import hash from "object-hash";
 import { useContext, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
 import { EditLinkForm } from "./link-form";
 import { Selectable } from "./selectable";
@@ -60,12 +62,22 @@ function LinkMenu({
 		setSelected((selecting) => !selecting);
 	}
 
-	function onClickDelete() {
-		removeOptimisticLink(link.id);
+	async function onClickDelete() {
+		await removeOptimisticLink(link.id);
+
+		toast.success("Link has been deleted.", {
+			action: {
+				label: "Undo",
+				onClick: () => undoLinkDeletion(link.id),
+			},
+		});
 	}
 
-	function onClickMoveTo(collection: Collection | null) {
-		moveOptimisticLink(link, collection);
+	async function onClickMoveTo(collection: Collection | null) {
+		await moveOptimisticLink(link, collection);
+
+		const newParentName = collection?.name || "Home";
+		toast.success(`Link has been moved to collection "${newParentName}"`);
 	}
 
 	return (
@@ -193,9 +205,9 @@ function OptimisticLinkComponent({
 			<HoverCardTrigger asChild>
 				<Link href={link.url}>
 					<Card className="group relative border-none shadow-none ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
-						{/*<div className="absolute right-2 top-2 text-xs text-neutral-300 dark:text-neutral-700">
-              {link.order || "no order"}
-            </div>*/}
+						{/*<div className="absolute left-2 text-xs text-neutral-300 dark:text-neutral-700">
+							{link.order || "no order"}
+						</div> */}
 						<CardHeader className="p-3">
 							<CardTitle className="flex flex-row items-center justify-stretch gap-4">
 								{showIcon ? (

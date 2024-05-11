@@ -4,7 +4,6 @@ import {
 	editLink,
 	moveLink,
 	undoLinkDeletion,
-	undoUnsafeCollectionDeletion,
 	updateLinkOrder,
 } from "@/app/actions";
 import type { Collection, Link, LinkInsert } from "@/database/types";
@@ -12,9 +11,7 @@ import { deleteLinkOp } from "@/state/operations";
 import type { OgObject } from "open-graph-scraper/dist/lib/types";
 // @ts-ignore
 import { createContext, startTransition, useOptimistic } from "react";
-import { toast } from "sonner";
 import { match } from "ts-pattern";
-import { useKeyPress } from "./use-keyboard";
 import { useParentCollection } from "./use-parent-collection";
 import { useUndoableOperations } from "./use-undoable-operations";
 
@@ -225,7 +222,6 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 		link: Omit<LinkInsert, "order" | "deleted">,
 	) {
 		startTransition(() => updateOptimisticLinks({ type: "add", link }));
-		toast.success("Link has been created.", { description: link.url });
 		await createLink(link);
 	}
 
@@ -261,23 +257,19 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 
 	async function editOptimisticLink(id: Link["id"], edit: LinkEdit["edit"]) {
 		startTransition(() => updateOptimisticLinks({ type: "edit", id, edit }));
-		toast.success("Link has been edited.", { description: edit.url });
 		await editLink(id, edit);
 	}
 
 	async function moveOptimisticLink(link: Link, newParent: Collection | null) {
 		const newParentId = newParent?.id || null;
-		const newParentName = newParent?.name || "Home";
 
 		if (newParentId === parentId) {
-			toast.info("Link is already in this collection.");
 			return;
 		}
 
 		startTransition(() =>
 			updateOptimisticLinks({ type: "delete", id: link.id }),
 		);
-		toast.success(`Link has been moved to collection "${newParentName}"`);
 
 		await moveLink(link.id, newParentId);
 	}

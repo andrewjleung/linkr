@@ -133,7 +133,7 @@ export function CommandMenu() {
 					</CommandGroup>
 
 					<CommandGroup heading="Commands">
-						<QuickAddCommand setOpen={setOpen} />
+						{/* <QuickAddCommand setOpen={setOpen} /> */}
 						<CommandItem
 							onSelect={() => {
 								setOpenedForm("create-link-form");

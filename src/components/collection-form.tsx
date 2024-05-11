@@ -32,6 +32,7 @@ import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { type UseFormReturn, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 const collectionSchema = z.object({
@@ -69,8 +70,8 @@ export function RenameCollectionForm() {
 
 		// TODO: handle failure case
 		await renameCollection(collection.collection.id, values.name);
-
 		setLoading(false);
+		toast.success(`Collection has been renamed to ${values.name}`);
 	}
 
 	if (collection === undefined) {
@@ -124,9 +125,14 @@ export function CreateCollectionForm() {
 			parentCollectionId: null,
 		});
 
-		router.push(`/collections/${collection.id}`);
-
 		setLoading(false);
+
+		toast.success(`Collection "${collection.name}" has been created.`, {
+			action: {
+				label: "Go to",
+				onClick: () => router.push(`/collections/${collection.id}`),
+			},
+		});
 	}
 
 	return (

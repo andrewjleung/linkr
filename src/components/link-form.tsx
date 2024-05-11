@@ -26,6 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus } from "lucide-react";
 import { useContext, useState } from "react";
 import { type UseFormReturn, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 function isUrl(s: string): boolean {
@@ -98,6 +99,7 @@ export function EditLinkForm({
 		});
 
 		setLoading(false);
+		toast.success("Link has been edited.", { description: values.url });
 	}
 
 	return (
@@ -139,6 +141,7 @@ export function CreateLinkForm() {
 		});
 
 		setLoading(false);
+		toast.success("Link has been created.", { description: values.url });
 		// TODO: create tags as well...
 	};
 
