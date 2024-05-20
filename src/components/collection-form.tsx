@@ -92,12 +92,14 @@ export function RenameCollectionForm() {
 }
 
 const CREATE_COLLECTION_FORM = "create-collection-form";
+const CREATE_LINK_FORM = "create-link-form";
 
 export function CreateCollectionForm() {
 	const { addCollection } = useContext(CollectionsContext);
 	const [loading, setLoading] = useState(false);
 	const parentId = useParentCollection();
 	const [open, setOpen] = useGlobalDialog(CREATE_COLLECTION_FORM);
+	const [createLinkFormOpen] = useGlobalDialog(CREATE_LINK_FORM);
 	const router = useRouter();
 
 	const form = useForm<z.infer<typeof collectionSchema>>({
@@ -111,7 +113,7 @@ export function CreateCollectionForm() {
 			event.preventDefault();
 			setOpen(true);
 		},
-		open,
+		open || createLinkFormOpen,
 	);
 
 	async function onSubmit(values: z.infer<typeof collectionSchema>) {
