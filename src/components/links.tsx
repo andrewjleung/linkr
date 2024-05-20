@@ -30,8 +30,7 @@ export function Links() {
 	const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
 	const [, setOpenedForm] = useAtom(openedFormAtom);
 	const [selectedLinks, setSelectedLinks] = useState<number[]>([]);
-	const [selectMode, setSelectMode] = useState<boolean>(false);
-	const selecting = selectMode || selectedLinks.length > 0;
+	const selecting = selectedLinks.length > 0;
 	const [selectionCursor, setSelectionCursor] = useState(0);
 
 	useKeyPress(
@@ -39,26 +38,9 @@ export function Links() {
 		(event) => {
 			event.preventDefault();
 			setSelectedLinks([]);
-			setSelectMode(false);
 			setSelectionCursor(0);
 		},
-		!selectMode && selectedLinks.length < 1,
-	);
-
-	useKeyPress(
-		{ shiftKey: false, metaKey: false, key: "s" },
-		(event) => {
-			event.preventDefault();
-
-			if (optimisticLinks.length < 1) {
-				toast.info("No links to select.");
-				return;
-			}
-
-			setSelectMode(true);
-			setSelectionCursor(0);
-		},
-		selecting,
+		selectedLinks.length < 1,
 	);
 
 	useKeyPress(
@@ -83,7 +65,6 @@ export function Links() {
 		{ shiftKey: false, metaKey: false, key: " " },
 		(event) => {
 			event.preventDefault();
-			console.log("foo");
 			setSelected(optimisticLinks[selectionCursor])((s) => !s);
 		},
 		!selecting,
