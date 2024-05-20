@@ -227,12 +227,6 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 
 	async function removeOptimisticLink(id: number) {
 		startTransition(() => updateOptimisticLinks({ type: "delete", id }));
-		toast.success("Link has been deleted.", {
-			action: {
-				label: "Undo",
-				onClick: () => undoLinkDeletion(id),
-			},
-		});
 		await deleteLink(id);
 		push(deleteLinkOp(id));
 	}

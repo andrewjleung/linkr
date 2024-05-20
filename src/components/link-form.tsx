@@ -115,15 +115,12 @@ export function EditLinkForm({
 	);
 }
 
-const CREATE_LINK_FORM = "create-link-form";
-const CREATE_COLLECTION_FORM = "create-collection-form";
-
 export function CreateLinkForm() {
 	const { addOptimisticLink } = useContext(LinksContext);
 	const [loading, setLoading] = useState(false);
 	const parentId = useParentCollection();
-	const [open, setOpen] = useGlobalDialog(CREATE_LINK_FORM);
-	const [collectionFormOpen] = useGlobalDialog(CREATE_COLLECTION_FORM);
+	const [open, setOpen] = useGlobalDialog("create-link-form");
+	const [collectionFormOpen] = useGlobalDialog("create-collection-form");
 
 	const form = useForm<z.infer<typeof linkSchema>>({
 		resolver: zodResolver(linkSchema),
