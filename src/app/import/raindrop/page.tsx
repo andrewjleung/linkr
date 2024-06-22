@@ -175,6 +175,10 @@ function ImportLinks({
 		const importedLinks = await parseRaindropImport(serialized);
 		setLoading(false);
 
+		if (importedLinks === undefined) {
+			return;
+		}
+
 		setLinks(
 			importedLinks.map((il) => ({
 				// TODO: Using a random id here for the id may not be a great idea...
