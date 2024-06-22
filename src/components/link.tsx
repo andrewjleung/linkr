@@ -31,7 +31,7 @@ import { Selectable } from "./selectable";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
-const LINK_CUTOFF_LENGTH = 100;
+const LINK_CUTOFF_LENGTH = 50;
 
 function LinkMenu({
 	link,
