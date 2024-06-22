@@ -32,7 +32,6 @@ const createProtectedAction =
 	async (...params: T) => {
 		const li = await loggedIn();
 		if (!li) {
-			console.log("not logged in");
 			return;
 		}
 
