@@ -126,6 +126,11 @@ export function CreateCollectionForm() {
 
 		setLoading(false);
 
+		if (collection === undefined) {
+			toast.error("Failed to create collection, please try again.");
+			return;
+		}
+
 		toast.success(`Collection "${collection.name}" has been created.`, {
 			action: {
 				label: "Go to",

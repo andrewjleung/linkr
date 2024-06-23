@@ -95,7 +95,7 @@ export type OptimisticCollections = {
 	optimisticCollections: OptimisticCollection[];
 	addCollection: (
 		collection: Omit<CollectionInsert, "order" | "deleted">,
-	) => Promise<Collection>;
+	) => Promise<Collection | undefined>;
 	unsafeRemoveCollection: (id: number) => Promise<void>;
 	safeRemoveCollection: (id: number) => Promise<void>;
 	renameCollection: (id: number, newName: string) => Promise<void>;
@@ -209,7 +209,7 @@ export function useOptimisticCollections(
 		const response = await createCollection(collection);
 
 		// TODO: make this safe
-		return response[0];
+		return response?.[0];
 	}
 
 	async function safeRemoveCollection(id: number) {
