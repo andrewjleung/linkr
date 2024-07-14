@@ -16,7 +16,6 @@ export const links = pgTable("links", {
 	url: text("url").notNull(),
 	parentCollectionId: integer("parent_collection_id"),
 	order: doublePrecision("order").notNull(),
-	faviconUrl: text("faviconUrl"),
 	deleted: boolean("deleted").default(false),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt").defaultNow().notNull(),

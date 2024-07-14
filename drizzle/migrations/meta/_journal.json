@@ -15,6 +15,13 @@
       "when": 1720988456463,
       "tag": "0001_crazy_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1720993075883,
+      "tag": "0002_steady_logan",
+      "breakpoints": true
     }
   ]
 }
