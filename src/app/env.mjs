@@ -9,7 +9,6 @@ export const env = createEnv({
 	 */
 	server: {
 		DATABASE_URL: z.string().url(),
-		DIRECT_URL: z.string().url(),
 		DRIZZLE_DATABASE_URL: z.string().url(),
 		DB_HOST: z.string(),
 		DB_USER: z.string(),
@@ -40,7 +39,6 @@ export const env = createEnv({
 	 */
 	runtimeEnv: {
 		DATABASE_URL: process.env.DATABASE_URL,
-		DIRECT_URL: process.env.DIRECT_URL,
 		DRIZZLE_DATABASE_URL: process.env.DRIZZLE_DATABASE_URL,
 		DB_HOST: process.env.DB_HOST,
 		DB_USER: process.env.DB_USER,
