@@ -1,52 +1,51 @@
 import "server-only";
 
-import { Link } from "@/database/types";
-import ogs, { type ErrorResult, type SuccessResult } from "open-graph-scraper";
-import type { OgObject } from "open-graph-scraper/dist/lib/types";
-import { z } from "zod";
+import ogs, { type SuccessResult } from "open-graph-scraper";
 
 function zipMap<T, R>(ts: T[], fn: (t: T) => R): [T, R][] {
-  return ts.map((t) => [t, fn(t)]);
+	return ts.map((t) => [t, fn(t)]);
 }
 
 async function hoistPromise<L, R>(pair: [L, Promise<R>]): Promise<[L, R]> {
-  return [pair[0], await pair[1]];
+	return [pair[0], await pair[1]];
 }
 
 function zipMapAsync<T, R>(
-  ts: T[],
-  fn: (t: T) => Promise<R>
+	ts: T[],
+	fn: (t: T) => Promise<R>,
 ): Promise<PromiseSettledResult<[T, R]>[]> {
-  return Promise.allSettled(zipMap(ts, fn).map(hoistPromise));
+	return Promise.allSettled(zipMap(ts, fn).map(hoistPromise));
 }
 
-export async function getOgs(urls: string[]): Promise<[string, OgObject][]> {
-  const origins = urls.map((url) => new URL(url).origin);
-  const uniqueOrigins = Array.from(new Set(origins));
+export async function getOgs(
+	urls: string[],
+): Promise<[string, SuccessResult["result"]][]> {
+	const origins = urls.map((url) => new URL(url).origin);
+	const uniqueOrigins = Array.from(new Set(origins));
 
-  const originsAndResults = await zipMapAsync(uniqueOrigins, (origin) =>
-    ogs({ url: origin })
-  );
+	const originsAndResults = await zipMapAsync(uniqueOrigins, (origin) =>
+		ogs({ url: origin }),
+	);
 
-  const originsAndOgResults = originsAndResults.reduce(
-    (
-      acc: [string, OgObject][],
-      result: PromiseSettledResult<[string, SuccessResult | ErrorResult]>
-    ) => {
-      if (result.status === "rejected") {
-        return acc;
-      }
+	const originsAndOgResults = originsAndResults.reduce(
+		(
+			acc: [string, SuccessResult["result"]][],
+			result: PromiseSettledResult<[string, SuccessResult | ErrorResult]>,
+		) => {
+			if (result.status === "rejected") {
+				return acc;
+			}
 
-      const [origin, ogResult] = result.value;
+			const [origin, ogResult] = result.value;
 
-      if (ogResult.error) {
-        return acc;
-      }
+			if (ogResult.error) {
+				return acc;
+			}
 
-      return acc.concat([[origin, ogResult.result]]);
-    },
-    []
-  );
+			return acc.concat([[origin, ogResult.result]]);
+		},
+		[],
+	);
 
-  return originsAndOgResults;
+	return originsAndOgResults;
 }
