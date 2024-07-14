@@ -1,6 +1,6 @@
 import "server-only";
 
-import ogs, { type SuccessResult } from "open-graph-scraper";
+import ogs, { type ErrorResult, type SuccessResult } from "open-graph-scraper";
 
 function zipMap<T, R>(ts: T[], fn: (t: T) => R): [T, R][] {
 	return ts.map((t) => [t, fn(t)]);
