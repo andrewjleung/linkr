@@ -15,13 +15,13 @@ import { redirect } from "next/navigation";
 
 export async function Container({ children }: { children: React.ReactNode }) {
 	const supabase = createClient();
-	const { data, error } = await supabase.auth.getUser();
+	const { data, error } = await supabase.auth.getSession();
 
-	if (error || !data?.user) {
+	if (error || !data?.session?.user) {
 		redirect("/login");
 	}
 
-	if (data.user.id !== env.NEXT_PUBLIC_USER_ID) {
+	if (data.session.user.id !== env.NEXT_PUBLIC_USER_ID) {
 		redirect("/login");
 	}
 
