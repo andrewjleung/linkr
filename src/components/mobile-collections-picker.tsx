@@ -42,7 +42,10 @@ export function MobileCollectionsPicker({ className }: { className?: string }) {
 			</Button>
 			<CommandDialog open={open} onOpenChange={setOpen}>
 				<Command className="rounded-lg border-none shadow-md">
-					<CommandInput placeholder="Search collections..." />
+					<CommandInput
+						placeholder="Search collections..."
+						className="text-md"
+					/>
 					<CommandList>
 						<CommandEmpty>No results found.</CommandEmpty>
 
@@ -52,7 +55,7 @@ export function MobileCollectionsPicker({ className }: { className?: string }) {
 									router.push("/collections/home");
 									setOpen(false);
 								}}
-								className="rounded-md"
+								className="rounded-md text-md"
 							>
 								<Home className="mr-2 h-4 w-4" />
 								<span>Home</span>
@@ -72,7 +75,7 @@ export function MobileCollectionsPicker({ className }: { className?: string }) {
 											router.push(`/collections/${c.id}`);
 											setOpen(false);
 										}}
-										className="rounded-md"
+										className="rounded-md text-md"
 									>
 										<Folder className="mr-2 h-4 w-4" />
 										<span>{c.collection.name}</span>
