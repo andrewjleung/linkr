@@ -22,7 +22,7 @@ import {
 } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
 export function CollectionsPicker({ className }: { className?: string }) {
@@ -30,12 +30,19 @@ export function CollectionsPicker({ className }: { className?: string }) {
 	const { optimisticCollections } = useContext(CollectionsContext);
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
+	const pathname = usePathname();
 
 	const concreteCollections = optimisticCollections
 		.filter((c) => c.type === "concrete")
 		.sort(
 			(c1, c2) => c1.collection.order - c2.collection.order,
 		) as ConcreteCollection[];
+
+	const buttonText = pathname.startsWith("/import")
+		? "Import"
+		: parentId === null
+			? "Home"
+			: concreteCollections.find((c) => c.id === parentId)?.collection.name;
 
 	useEffect(() => {
 		if (parentId !== null) {
@@ -61,12 +68,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 						aria-expanded={open}
 						className="w-[200px] justify-between flex flex-row "
 					>
-						<span className="line-clamp-1">
-							{parentId === null
-								? "Home"
-								: concreteCollections.find((c) => c.id === parentId)?.collection
-										.name}
-						</span>
+						<span>{buttonText}</span>
 						<div className="ml-auto">
 							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 						</div>

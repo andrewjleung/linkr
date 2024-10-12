@@ -8,6 +8,7 @@ import {
 	CommandInput,
 	CommandItem,
 	CommandList,
+	CommandSeparator,
 	CommandShortcut,
 } from "@/components/ui/command";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
@@ -94,7 +95,7 @@ export function CommandMenu() {
 
 	return (
 		<CommandDialog open={open} onOpenChange={setOpen}>
-			<Command className="rounded-lg border-none shadow-md">
+			<Command className="rounded-lg border-none shadow-md h-64 sm:h-auto">
 				<CommandInput placeholder="Enter a command or search collections..." />
 				<CommandList>
 					<CommandEmpty>No results found.</CommandEmpty>
@@ -131,6 +132,8 @@ export function CommandMenu() {
 								</CommandItem>
 							))}
 					</CommandGroup>
+
+					<CommandSeparator />
 
 					<CommandGroup heading="Commands">
 						{/* <QuickAddCommand setOpen={setOpen} /> */}

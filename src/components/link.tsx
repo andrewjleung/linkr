@@ -232,14 +232,24 @@ function OptimisticLinkComponent({
 									</span>
 								)}
 								{optimisticLink.type === "concrete" ? (
-									<span className="flex-auto whitespace-nowrap text-end text-xs text-neutral-500">
-										{optimisticLink.link.createdAt
-											.toLocaleDateString("en-US", {
-												month: "long",
-												day: "numeric",
-											})
-											.replaceAll(",", "")}
-									</span>
+									<>
+										<span className="hidden sm:block flex-auto whitespace-nowrap text-end text-xs text-neutral-500">
+											{optimisticLink.link.createdAt
+												.toLocaleDateString("en-US", {
+													month: "long",
+													day: "numeric",
+												})
+												.replaceAll(",", "")}
+										</span>
+										<span className="sm:hidden flex-auto whitespace-nowrap text-end text-xs text-neutral-500">
+											{optimisticLink.link.createdAt
+												.toLocaleDateString("en-US", {
+													month: "short",
+													day: "numeric",
+												})
+												.replaceAll(",", "")}
+										</span>
+									</>
 								) : null}
 							</CardTitle>
 						</CardHeader>
