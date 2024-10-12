@@ -8,6 +8,16 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import {
+	Drawer,
+	DrawerClose,
+	DrawerContent,
+	DrawerDescription,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
 	Form,
 	FormControl,
 	FormField,
@@ -20,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { Link } from "@/database/types";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { LinksContext } from "@/hooks/use-optimistic-links";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -181,6 +192,77 @@ function LinkFormInner({
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	onSubmit: (values: z.infer<typeof linkSchema>) => Promise<void>;
 }) {
+	const isDesktop = useMediaQuery("(min-width: 768px)");
+
+	if (!isDesktop) {
+		return (
+			<Drawer open={open} onOpenChange={setOpen}>
+				<DrawerContent>
+					<DrawerHeader>
+						<DrawerTitle>{title}</DrawerTitle>
+					</DrawerHeader>
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="space-y-4 px-6 pb-6"
+						>
+							<FormField
+								control={form.control}
+								name="url"
+								render={({ field }) => (
+									<FormItem className="w-full">
+										<FormControl>
+											<Input {...field} placeholder="URL" />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="title"
+								render={({ field }) => (
+									<FormItem className="w-full">
+										<FormControl>
+											<Input {...field} placeholder="Title" />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="description"
+								render={({ field }) => (
+									<FormItem className="w-full">
+										<FormControl>
+											<Textarea {...field} placeholder="Description" />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<div className="flex justify-end">
+								<Button
+									disabled={loading}
+									size="icon"
+									className="mt-2"
+									type="submit"
+								>
+									{loading ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<Plus className="h-4 w-4" />
+									)}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</DrawerContent>
+			</Drawer>
+		);
+	}
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogContent>

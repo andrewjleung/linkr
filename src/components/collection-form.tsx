@@ -11,6 +11,16 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+	Drawer,
+	DrawerClose,
+	DrawerContent,
+	DrawerDescription,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
 	Form,
 	FormControl,
 	FormField,
@@ -21,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Collection } from "@/database/types";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import {
 	CollectionsContext,
 	type ConcreteCollection,
@@ -167,6 +178,53 @@ function CollectionFormInner({
 	loading: boolean;
 	onSubmit: (values: z.infer<typeof collectionSchema>) => Promise<void>;
 }) {
+	const isDesktop = useMediaQuery("(min-width: 768px)");
+
+	if (!isDesktop) {
+		return (
+			<Drawer open={open} onOpenChange={setOpen}>
+				<DrawerContent>
+					<DrawerHeader>
+						<DrawerTitle>{title}</DrawerTitle>
+					</DrawerHeader>
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="space-y-4 px-6 pb-6"
+						>
+							<FormField
+								control={form.control}
+								name="name"
+								render={({ field }) => (
+									<FormItem className="w-full">
+										<FormControl>
+											<Input {...field} placeholder="Collection" />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<div className="flex justify-end">
+								<Button
+									disabled={loading}
+									size="icon"
+									type="submit"
+									className="mb-auto ml-4"
+								>
+									{loading ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<Plus className="h-4 w-4" />
+									)}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</DrawerContent>
+			</Drawer>
+		);
+	}
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogContent>
