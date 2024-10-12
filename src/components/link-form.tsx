@@ -212,7 +212,7 @@ function LinkFormInner({
 								render={({ field }) => (
 									<FormItem className="w-full">
 										<FormControl>
-											<Input {...field} placeholder="URL" />
+											<Input {...field} placeholder="URL" className="text-md" />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -224,7 +224,11 @@ function LinkFormInner({
 								render={({ field }) => (
 									<FormItem className="w-full">
 										<FormControl>
-											<Input {...field} placeholder="Title" />
+											<Input
+												{...field}
+												placeholder="Title"
+												className="text-md"
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -236,7 +240,11 @@ function LinkFormInner({
 								render={({ field }) => (
 									<FormItem className="w-full">
 										<FormControl>
-											<Textarea {...field} placeholder="Description" />
+											<Textarea
+												{...field}
+												placeholder="Description"
+												className="text-md"
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>

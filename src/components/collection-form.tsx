@@ -198,7 +198,11 @@ function CollectionFormInner({
 								render={({ field }) => (
 									<FormItem className="w-full">
 										<FormControl>
-											<Input {...field} placeholder="Collection" />
+											<Input
+												{...field}
+												placeholder="Collection"
+												className="text-md"
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
