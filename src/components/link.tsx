@@ -199,7 +199,7 @@ function OptimisticLinkComponent({
 									<Avatar className="h-5 w-5">
 										<AvatarImage src={faviconUrl(link.url, og?.favicon)} />
 										<AvatarFallback className="bg-none">
-											<LinkIcon className="h-3 w-3 text-neutral-500" />
+											<LinkIcon className="h-3 w-3 text-neutral-400" />
 										</AvatarFallback>
 									</Avatar>
 								) : null}
@@ -207,13 +207,13 @@ function OptimisticLinkComponent({
 									{title || displayUrl}
 								</span>
 								{title === null ? null : (
-									<span className="hidden flex-1 whitespace-nowrap text-xs text-neutral-500 sm:block">
+									<span className="hidden flex-1 whitespace-nowrap text-xs dark:text-neutral-400 text-neutral-500 sm:block">
 										{displayUrl}
 									</span>
 								)}
 								{optimisticLink.type === "concrete" ? (
 									<>
-										<span className="hidden sm:block flex-auto whitespace-nowrap text-end text-xs text-neutral-500">
+										<span className="hidden sm:block flex-auto whitespace-nowrap text-end text-xs dark:text-neutral-400 text-neutral-500">
 											{optimisticLink.link.createdAt
 												.toLocaleDateString("en-US", {
 													month: "long",
