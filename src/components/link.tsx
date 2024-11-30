@@ -19,13 +19,12 @@ import {
 } from "@/hooks/use-optimistic-links";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { HoverCard } from "@radix-ui/react-hover-card";
-import { useQuery } from "@tanstack/react-query";
 import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { useContext, useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 import { EditLinkForm } from "./link-form";
+import { OpenGraphContext } from "./opengraph-provider";
 import { Selectable } from "./selectable";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
@@ -160,12 +159,6 @@ function faviconUrl(url: string, favicon = "/favicon.ico"): string {
 	return `${parsed.origin}${favicon}`;
 }
 
-const OgSchema = z.object({
-	ogTitle: z.optional(z.string()),
-	ogDescription: z.optional(z.string()),
-	favicon: z.optional(z.string()),
-});
-
 function OptimisticLinkComponent({
 	optimisticLink,
 	showIcon,
@@ -173,15 +166,12 @@ function OptimisticLinkComponent({
 	optimisticLink: OptimisticLink;
 	showIcon: boolean;
 }) {
-	const { data: og } = useQuery({
-		queryKey: ["og", optimisticLink.id],
-		queryFn: () =>
-			fetch(
-				`/api/opengraphs?url=${encodeURIComponent(optimisticLink.link.url)}`,
-			)
-				.then((res) => res.json())
-				.then((res) => OgSchema.parse(res.data)),
-	});
+	const ogs = useContext(OpenGraphContext);
+	const ogsMap = new Map(ogs);
+	const og =
+		optimisticLink.type === "concrete"
+			? ogsMap.get(optimisticLink.id)
+			: undefined;
 
 	const link = optimisticLink.link;
 	const title = link.title || og?.ogTitle || null;

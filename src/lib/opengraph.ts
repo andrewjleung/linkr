@@ -1,7 +1,17 @@
 import "server-only";
 
+import type { links as linksSchema } from "@/database/schema";
 import { kv } from "@vercel/kv";
-import ogs, { type ErrorResult, type SuccessResult } from "open-graph-scraper";
+import ogs, { type SuccessResult } from "open-graph-scraper";
+
+type Og = Pick<
+	SuccessResult["result"],
+	"ogTitle" | "ogDescription" | "favicon"
+>;
+
+type Link = typeof linksSchema.$inferSelect;
+
+type MaybeOg = { success: true; og: Og } | { success: false };
 
 function zipMap<T, R>(ts: T[], fn: (t: T, i: number) => R): [T, R][] {
 	return ts.map((t, i) => [t, fn(t, i)]);
@@ -18,55 +28,60 @@ function zipMapAsync<T, R>(
 	return Promise.allSettled(zipMap(ts, fn).map(hoistPromise));
 }
 
-function cacheKey(url: string): string {
-	return `linkr-url-${url}`;
+function cacheKey(link: Link): string {
+	return `linkr-link-og-${link.id}`;
 }
 
-export async function getOgs(
-	urls: string[],
-): Promise<[string, SuccessResult["result"]][]> {
-	const origins = urls.map((url) => new URL(url).origin);
-	const uniqueOrigins = Array.from(new Set(origins));
+export async function getOgs(links: Link[]): Promise<[number, Og][]> {
+	const cachedOgs = await kv.mget<MaybeOg[]>(links.map(cacheKey));
 
-	const cachedOgs = await kv.mget<ReturnType<typeof ogs>[]>(
-		uniqueOrigins.map((o) => cacheKey(o)),
-	);
-
-	const originsAndResults = await zipMapAsync(
-		uniqueOrigins,
-		async (origin, i): ReturnType<typeof ogs> => {
+	const linksAndResults = await zipMapAsync(
+		links,
+		async (link, i): Promise<MaybeOg> => {
 			const cached = cachedOgs[i];
 
 			if (cached !== null) {
 				return cached;
 			}
 
-			const result = await ogs({ url: origin });
-			await kv.set(cacheKey(origin), result, { ex: 60 * 60 * 24 });
+			const result = await ogs({ url: link.url });
 
-			return result;
+			if (result.error) {
+				await kv.set(cacheKey(link), { success: false }, { ex: 60 * 60 * 24 });
+				return { success: false };
+			}
+
+			const maybeOg = {
+				success: true,
+				og: {
+					ogTitle: result.result.ogTitle,
+					ogDescription: result.result.ogDescription,
+					favicon: result.result.favicon,
+				},
+			};
+
+			await kv.set(cacheKey(link), maybeOg, { ex: 60 * 60 * 24 });
+
+			return maybeOg;
 		},
 	);
 
-	const originsAndOgResults = originsAndResults.reduce(
-		(
-			acc: [string, SuccessResult["result"]][],
-			result: PromiseSettledResult<[string, SuccessResult | ErrorResult]>,
-		) => {
+	const linksAndOgResults = linksAndResults.reduce(
+		(acc: [number, Og][], result: PromiseSettledResult<[Link, MaybeOg]>) => {
 			if (result.status === "rejected") {
 				return acc;
 			}
 
-			const [origin, ogResult] = result.value;
+			const [link, maybeOg] = result.value;
 
-			if (ogResult.error) {
+			if (!maybeOg.success) {
 				return acc;
 			}
 
-			return acc.concat([[origin, ogResult.result]]);
+			return acc.concat([[link.id, maybeOg.og]]);
 		},
 		[],
 	);
 
-	return originsAndOgResults;
+	return linksAndOgResults;
 }
