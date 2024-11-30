@@ -9,6 +9,7 @@ import {
 	CommandGroup,
 	CommandInput,
 	CommandItem,
+	CommandSeparator,
 } from "@/components/ui/command";
 import {
 	Popover,
@@ -96,6 +97,8 @@ export function CollectionsPicker({ className }: { className?: string }) {
 								Home
 							</CommandItem>
 						</CommandGroup>
+
+						<CommandSeparator />
 
 						<CommandGroup>
 							{concreteCollections
