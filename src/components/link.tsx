@@ -197,7 +197,10 @@ function OptimisticLinkComponent({
 							<CardTitle className="flex flex-row items-center justify-stretch gap-4">
 								{showIcon ? (
 									<Avatar className="h-5 w-5">
-										<AvatarImage src={faviconUrl(link.url, og?.favicon)} />
+										<AvatarImage
+											src={faviconUrl(link.url, og?.favicon)}
+											alt={`${link.url} favicon`}
+										/>
 										<AvatarFallback className="bg-none">
 											<LinkIcon className="h-3 w-3 dark:text-neutral-400 text-neutral-600" />
 										</AvatarFallback>

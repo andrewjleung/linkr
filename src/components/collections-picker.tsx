@@ -9,7 +9,6 @@ import {
 	CommandGroup,
 	CommandInput,
 	CommandItem,
-	CommandSeparator,
 } from "@/components/ui/command";
 import {
 	Popover,
@@ -67,6 +66,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 						role="combobox"
 						aria-expanded={open}
 						className="w-[200px] justify-between flex flex-row "
+						aria-label={`Open collections picker, current collection is ${buttonText}`}
 					>
 						<span>{buttonText}</span>
 						<div className="ml-auto">

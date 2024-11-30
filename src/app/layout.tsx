@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import clsx from "clsx";
 import "./globals.css";
 
 export const metadata = {
@@ -14,7 +15,7 @@ export default async function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className="min-h-screen dark:bg-neutral-950">
+			<body className={clsx("min-h-screen dark:bg-neutral-950")}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					{children}
 				</ThemeProvider>
