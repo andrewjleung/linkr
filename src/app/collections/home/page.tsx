@@ -1,6 +1,3 @@
-import { RenameCollectionForm } from "@/components/collection-form";
-import { CreateCollectionForm } from "@/components/collection-form";
-import { CommandMenu } from "@/components/command-menu";
 import { CreateLinkForm } from "@/components/link-form";
 import { Links } from "@/components/links";
 import LinksProvider from "@/components/links-provider";
@@ -29,10 +26,7 @@ export default async function CollectionsHomePage() {
 	return (
 		<LinksProvider links={links}>
 			<Links />
-			<CommandMenu />
 			<CreateLinkForm />
-			<CreateCollectionForm />
-			<RenameCollectionForm />
 		</LinksProvider>
 	);
 }

@@ -191,7 +191,7 @@ function LinkFormInner({
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	onSubmit: (values: z.infer<typeof linkSchema>) => Promise<void>;
 }) {
-	const isDesktop = useMediaQuery("(min-width: 768px)");
+	const isDesktop = useMediaQuery("(min-width: 640px)");
 
 	if (!isDesktop) {
 		return (

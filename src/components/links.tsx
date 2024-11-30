@@ -18,27 +18,31 @@ import {
 } from "@hello-pangea/dnd";
 import { AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
-import { Move, Trash } from "lucide-react";
 import { useCallback, useContext, useState } from "react";
-import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import { Label } from "./ui/label";
-import { Separator } from "./ui/separator";
 
-export function Links() {
-	const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
-	const [, setOpenedForm] = useAtom(openedFormAtom);
+type UseLinkSelection = {
+	selectedLinks: number[];
+	selecting: boolean;
+	cursor: number;
+	setCursor: React.Dispatch<React.SetStateAction<number>>;
+	isLinkSelected: (optimisticLink: OptimisticLink) => boolean;
+	setIsLinkSelected: (
+		optimisticLink: OptimisticLink,
+		selected: React.SetStateAction<boolean>,
+	) => void;
+};
+
+function useLinkSelection(optimisticLinks: OptimisticLink[]): UseLinkSelection {
 	const [selectedLinks, setSelectedLinks] = useState<number[]>([]);
 	const selecting = selectedLinks.length > 0;
-	const [selectionCursor, setSelectionCursor] = useState(0);
+	const [cursor, setCursor] = useState(0);
 
 	useKeyPress(
 		{ shiftKey: false, metaKey: false, key: "Escape" },
 		(event) => {
 			event.preventDefault();
 			setSelectedLinks([]);
-			setSelectionCursor(0);
+			setCursor(0);
 		},
 		selectedLinks.length < 1,
 	);
@@ -47,7 +51,7 @@ export function Links() {
 		{ shiftKey: false, metaKey: false, key: "j" },
 		(event) => {
 			event.preventDefault();
-			setSelectionCursor((c) => Math.min(optimisticLinks.length - 1, c + 1));
+			setCursor((c) => Math.min(optimisticLinks.length - 1, c + 1));
 		},
 		!selecting,
 	);
@@ -56,7 +60,7 @@ export function Links() {
 		{ shiftKey: false, metaKey: false, key: "k" },
 		(event) => {
 			event.preventDefault();
-			setSelectionCursor((c) => Math.max(0, c - 1));
+			setCursor((c) => Math.max(0, c - 1));
 		},
 		!selecting,
 	);
@@ -65,10 +69,60 @@ export function Links() {
 		{ shiftKey: false, metaKey: false, key: " " },
 		(event) => {
 			event.preventDefault();
-			setSelected(optimisticLinks[selectionCursor])((s) => !s);
+			setIsLinkSelected(optimisticLinks[cursor], (s) => !s);
 		},
 		!selecting,
 	);
+
+	const isLinkSelected = useCallback(
+		(link: OptimisticLink) => {
+			if (link.type === "abstract") {
+				return false;
+			}
+
+			return selectedLinks.includes(link.id);
+		},
+		[selectedLinks],
+	);
+
+	const setIsLinkSelected = useCallback(
+		(link: OptimisticLink, selectedAction: React.SetStateAction<boolean>) => {
+			if (link.type === "abstract") {
+				return;
+			}
+
+			if (typeof selectedAction === "boolean") {
+				setSelectedLinks((sl) =>
+					selectedAction ? [...sl, link.id] : sl.filter((id) => id !== link.id),
+				);
+				return;
+			}
+
+			const currentSelected = isLinkSelected(link);
+			setSelectedLinks((sl) =>
+				selectedAction(currentSelected)
+					? [...sl, link.id]
+					: sl.filter((id) => id !== link.id),
+			);
+		},
+		[isLinkSelected],
+	);
+
+	return {
+		selectedLinks,
+		selecting,
+		cursor,
+		setCursor,
+		isLinkSelected,
+		setIsLinkSelected,
+	};
+}
+
+export function Links() {
+	const { optimisticLinks, reorderOptimisticLinks } = useContext(LinksContext);
+	const [, setOpenedForm] = useAtom(openedFormAtom);
+	const { selecting, cursor, isLinkSelected, setIsLinkSelected } =
+		useLinkSelection(optimisticLinks);
 
 	function onDragStart() {}
 
@@ -97,43 +151,6 @@ export function Links() {
 			result.destination.index,
 		);
 	}
-
-	const selected = useCallback(
-		(link: OptimisticLink) => {
-			if (link.type === "abstract") {
-				return false;
-			}
-
-			return selectedLinks.includes(link.id);
-		},
-		[selectedLinks],
-	);
-
-	const setSelected = useCallback(
-		(link: OptimisticLink) =>
-			(selectedAction: React.SetStateAction<boolean>) => {
-				if (link.type === "abstract") {
-					return;
-				}
-
-				if (typeof selectedAction === "boolean") {
-					setSelectedLinks((sl) =>
-						selectedAction
-							? [...sl, link.id]
-							: sl.filter((id) => id !== link.id),
-					);
-					return;
-				}
-
-				const currentSelected = selected(link);
-				setSelectedLinks((sl) =>
-					selectedAction(currentSelected)
-						? [...sl, link.id]
-						: sl.filter((id) => id !== link.id),
-				);
-			},
-		[selected],
-	);
 
 	if (optimisticLinks.length < 1) {
 		return (
@@ -173,15 +190,15 @@ export function Links() {
 							key={`link-${l.id}`}
 							className={cn("mb-2 relative", {
 								"outline outline-neutral-400 dark:outline-neutral-600 rounded-lg":
-									selectionCursor === i,
+									cursor === i,
 							})}
 						>
 							<LinkComponent
 								optimisticLink={l}
 								showIcon={!selecting}
 								selecting={selecting}
-								selected={selected(l)}
-								setSelected={setSelected(l)}
+								selected={isLinkSelected(l)}
+								onSelect={(selected) => setIsLinkSelected(l, selected)}
 							/>
 						</div>
 					))}
@@ -196,7 +213,7 @@ export function Links() {
 				<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
 					<div className="w-full">
 						<Droppable droppableId="LINK-LIST">
-							{(provided, snapshot) => (
+							{(provided, _snapshot) => (
 								<div ref={provided.innerRef} {...provided.droppableProps}>
 									{optimisticLinks.map((l, i) => (
 										<Draggable
@@ -204,7 +221,7 @@ export function Links() {
 											draggableId={`${l.type}-link-${l.id}`}
 											index={i}
 										>
-											{(provided, snapshot) => (
+											{(provided, _snapshot) => (
 												<div
 													ref={provided.innerRef}
 													{...provided.draggableProps}
@@ -215,8 +232,10 @@ export function Links() {
 														optimisticLink={l}
 														showIcon={!selecting}
 														selecting={selecting}
-														selected={selected(l)}
-														setSelected={setSelected(l)}
+														selected={isLinkSelected(l)}
+														onSelect={(selected) =>
+															setIsLinkSelected(l, selected)
+														}
 													/>
 												</div>
 											)}

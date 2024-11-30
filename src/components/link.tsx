@@ -24,7 +24,7 @@ import { HoverCard } from "@radix-ui/react-hover-card";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import hash from "object-hash";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { EditLinkForm } from "./link-form";
@@ -37,12 +37,12 @@ const LINK_CUTOFF_LENGTH = 50;
 function LinkMenu({
 	link,
 	selected,
-	setSelected,
+	onSelect,
 	children,
 }: {
 	link: LinkSchema;
 	selected: boolean;
-	setSelected: React.Dispatch<React.SetStateAction<boolean>>;
+	onSelect: (selected: boolean) => void;
 	children: React.ReactNode;
 }) {
 	const { removeOptimisticLink, moveOptimisticLink } = useContext(LinksContext);
@@ -61,7 +61,7 @@ function LinkMenu({
 	}
 
 	function onClickSelect() {
-		setSelected((selecting) => !selecting);
+		onSelect(true);
 	}
 
 	async function onClickDelete() {
@@ -90,12 +90,15 @@ function LinkMenu({
 					<ContextMenuItem inset onClick={onClickEdit}>
 						Edit
 					</ContextMenuItem>
+
 					<ContextMenuItem inset onClick={onClickSelect}>
 						{selected ? "Unselect" : "Select"}
 					</ContextMenuItem>
+
 					<ContextMenuItem inset onClick={onClickDelete}>
 						Delete
 					</ContextMenuItem>
+
 					<ContextMenuSub>
 						<ContextMenuSubTrigger inset>Move to</ContextMenuSubTrigger>
 						<ContextMenuSubContent className="w-48">
@@ -107,6 +110,7 @@ function LinkMenu({
 									{showMoveMenuSeparator ? <ContextMenuSeparator /> : null}
 								</>
 							)}
+
 							{optimisticCollections
 								.filter((c) => c.id !== parentId)
 								.map((c) => {
@@ -269,14 +273,14 @@ export default function LinkComponent({
 	optimisticLink,
 	selecting,
 	selected,
+	onSelect,
 	showIcon,
-	setSelected,
 }: {
 	optimisticLink: OptimisticLink;
 	selecting: boolean;
 	selected: boolean;
+	onSelect: (selected: boolean) => void;
 	showIcon: boolean;
-	setSelected: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	if (optimisticLink.type === "abstract") {
 		return (
@@ -290,13 +294,13 @@ export default function LinkComponent({
 	return (
 		<LinkMenu
 			selected={selected}
-			setSelected={setSelected}
+			onSelect={onSelect}
 			link={optimisticLink.link}
 		>
 			<Selectable
 				selecting={selecting}
 				selected={selected}
-				setSelected={setSelected}
+				onSelect={onSelect}
 				className="flex flex-row items-center gap-2 pl-3"
 			>
 				<OptimisticLinkComponent

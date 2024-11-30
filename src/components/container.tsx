@@ -1,4 +1,6 @@
 import { env } from "@/app/env.mjs";
+import { RenameCollectionForm } from "@/components/collection-form";
+import { CreateCollectionForm } from "@/components/collection-form";
 import { CollectionsPicker } from "@/components/collections-picker";
 import CollectionsProvider from "@/components/collections-provider";
 import { CommandMenu } from "@/components/command-menu";
@@ -45,15 +47,19 @@ export async function Container({ children }: { children: React.ReactNode }) {
 								</div>
 							</div>
 						</header>
-						<div className="mx-auto flex h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8 mb-4">
+
+						<div className="mx-auto flex h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8 mb-24">
 							{children}
 						</div>
-						<div className="sm:hidden sticky bottom-8 px-6">
+
+						<footer className="sm:hidden sticky bottom-8 px-6">
 							<MobileFooter />
-						</div>
-						<footer className="h-8" />
+						</footer>
 					</main>
+
 					<CommandMenu />
+					<CreateCollectionForm />
+					<RenameCollectionForm />
 				</CollectionsProvider>
 			</QCProvider>
 		</Providers>

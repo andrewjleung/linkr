@@ -5,24 +5,24 @@ export function Selectable({
 	children,
 	selecting,
 	selected,
-	setSelected,
+	onSelect,
 	className,
 }: {
 	children: React.ReactNode;
 	selecting: boolean;
 	selected: boolean;
-	setSelected: (selected: boolean) => void;
+	onSelect: (selected: boolean) => void;
 	className?: string;
 }) {
 	function onCheckedChange(c: CheckedState) {
 		const value = c.valueOf();
 
 		if (typeof value === "string") {
-			setSelected(false);
+			onSelect(false);
 			return;
 		}
 
-		setSelected(value);
+		onSelect(value);
 	}
 
 	if (!selecting) {

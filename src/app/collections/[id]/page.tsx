@@ -1,6 +1,4 @@
 import { validateCollection } from "@/app/actions";
-import { RenameCollectionForm } from "@/components/collection-form";
-import { CreateCollectionForm } from "@/components/collection-form";
 import { CreateLinkForm } from "@/components/link-form";
 import { Links } from "@/components/links";
 import LinksProvider from "@/components/links-provider";
@@ -34,8 +32,6 @@ export default async function Page({ params }: { params: { id: string } }) {
 		<LinksProvider links={links}>
 			<Links />
 			<CreateLinkForm />
-			<CreateCollectionForm />
-			<RenameCollectionForm />
 		</LinksProvider>
 	);
 }

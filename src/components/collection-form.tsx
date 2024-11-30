@@ -179,7 +179,7 @@ function CollectionFormInner({
 	loading: boolean;
 	onSubmit: (values: z.infer<typeof collectionSchema>) => Promise<void>;
 }) {
-	const isDesktop = useMediaQuery("(min-width: 768px)");
+	const isDesktop = useMediaQuery("(min-width: 640px)");
 
 	if (!isDesktop) {
 		return (
