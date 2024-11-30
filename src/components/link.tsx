@@ -199,7 +199,7 @@ function OptimisticLinkComponent({
 									<Avatar className="h-5 w-5">
 										<AvatarImage src={faviconUrl(link.url, og?.favicon)} />
 										<AvatarFallback className="bg-none">
-											<LinkIcon className="h-3 w-3 text-neutral-400" />
+											<LinkIcon className="h-3 w-3 dark:text-neutral-400 text-neutral-600" />
 										</AvatarFallback>
 									</Avatar>
 								) : null}
