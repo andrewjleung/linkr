@@ -25,7 +25,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import hash from "object-hash";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { EditLinkForm } from "./link-form";
@@ -49,8 +49,8 @@ function LinkMenu({
 	const { removeOptimisticLink, moveOptimisticLink } = useContext(LinksContext);
 	const { optimisticCollections } = useContext(CollectionsContext);
 
-	const [editLinkFormOpen, setEditLinkFormOpen] =
-		useGlobalDialog("edit-link-form");
+	const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
+	const [, setGlobalForm] = useGlobalDialog("edit-link-form");
 	const parentId = useParentCollection();
 
 	const showMoveMenuSeparator =
@@ -59,6 +59,7 @@ function LinkMenu({
 
 	function onClickEdit() {
 		setEditLinkFormOpen(true);
+		setGlobalForm(true);
 	}
 
 	function onClickSelect() {
@@ -135,7 +136,10 @@ function LinkMenu({
 			<EditLinkForm
 				link={link}
 				open={editLinkFormOpen}
-				setOpen={setEditLinkFormOpen}
+				onOpen={(open) => {
+					setEditLinkFormOpen(open);
+					setGlobalForm(open);
+				}}
 			/>
 		</>
 	);

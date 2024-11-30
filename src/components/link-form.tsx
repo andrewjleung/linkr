@@ -81,11 +81,11 @@ const DEFAULT_FORM_VALUES = {
 export function EditLinkForm({
 	link,
 	open,
-	setOpen,
+	onOpen,
 }: {
 	link: Link;
 	open: boolean;
-	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	onOpen: (open: boolean) => void;
 }) {
 	const { editOptimisticLink } = useContext(LinksContext);
 	const [loading, setLoading] = useState(false);
@@ -101,7 +101,7 @@ export function EditLinkForm({
 
 	async function onSubmit(values: z.infer<typeof linkSchema>) {
 		setLoading(true);
-		setOpen(false);
+		onOpen(false);
 
 		await editOptimisticLink(link.id, {
 			title: values.title || null,
@@ -120,7 +120,7 @@ export function EditLinkForm({
 			form={form}
 			loading={loading}
 			open={open}
-			setOpen={setOpen}
+			onOpen={onOpen}
 			onSubmit={onSubmit}
 		/>
 	);
@@ -170,7 +170,7 @@ export function CreateLinkForm() {
 			form={form}
 			loading={loading}
 			open={open}
-			setOpen={setOpen}
+			onOpen={(open) => setOpen(open)}
 			onSubmit={onSubmit}
 		/>
 	);
@@ -181,21 +181,21 @@ function LinkFormInner({
 	form,
 	loading,
 	open,
-	setOpen,
+	onOpen,
 	onSubmit,
 }: {
 	title: string;
 	form: UseFormReturn<z.infer<typeof linkSchema>>;
 	loading: boolean;
 	open: boolean;
-	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	onOpen: (open: boolean) => void;
 	onSubmit: (values: z.infer<typeof linkSchema>) => Promise<void>;
 }) {
 	const isDesktop = useMediaQuery("(min-width: 640px)");
 
 	if (!isDesktop) {
 		return (
-			<Drawer open={open} onOpenChange={setOpen}>
+			<Drawer open={open} onOpenChange={onOpen}>
 				<DrawerContent>
 					<DrawerHeader>
 						<DrawerTitle>{title}</DrawerTitle>
@@ -271,7 +271,7 @@ function LinkFormInner({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={onOpen}>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
