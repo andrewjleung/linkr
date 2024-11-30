@@ -22,6 +22,7 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
 import { HoverCard } from "@radix-ui/react-hover-card";
 import { useQuery } from "@tanstack/react-query";
+import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import hash from "object-hash";
 import { useContext } from "react";
@@ -158,19 +159,6 @@ function faviconUrl(url: string, favicon = "/favicon.ico"): string {
 	return `${parsed.origin}${favicon}`;
 }
 
-const GRADIENTS = [
-	"bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500",
-	"bg-[conic-gradient(at_bottom_left,_var(--tw-gradient-stops))] from-fuchsia-300 via-green-400 to-rose-700",
-	"bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-yellow-200 via-red-500 to-fuchsia-500",
-	"bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-700 via-orange-300 to-rose-800",
-	"bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-300 via-fuchsia-600 to-orange-600",
-	"bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-red-200 via-red-300 to-yellow-200",
-];
-
-function hashLink(link: AbstractLink["link"]): number {
-	return Number.parseInt(hash(link.url, { encoding: "hex" }), 16);
-}
-
 const OgSchema = z.object({
 	ogTitle: z.optional(z.string()),
 	ogDescription: z.optional(z.string()),
@@ -219,13 +207,8 @@ function OptimisticLinkComponent({
 								{showIcon ? (
 									<Avatar className="h-5 w-5">
 										<AvatarImage src={faviconUrl(link.url, og?.favicon)} />
-										<AvatarFallback>
-											<div
-												className={cn(
-													"h-full w-full scale-125 blur-sm",
-													GRADIENTS[hashLink(link) % GRADIENTS.length],
-												)}
-											/>
+										<AvatarFallback className="bg-none">
+											<LinkIcon className="h-3 w-3 text-neutral-500" />
 										</AvatarFallback>
 									</Avatar>
 								) : null}
