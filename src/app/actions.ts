@@ -4,9 +4,11 @@ import { env } from "@/app/env.mjs";
 import { db } from "@/database/database";
 import { collections, links } from "@/database/schema";
 import type { CollectionInsert, LinkInsert } from "@/database/types";
+import { cacheKey } from "@/lib/opengraph";
 import { createClient } from "@/lib/supabase/server";
 import { importFromRaindrop, importLinks } from "@/services/import-service";
 import type { Edit, ImportedLink } from "@/services/import-service";
+import { kv } from "@vercel/kv";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -103,6 +105,8 @@ export const editLink = createProtectedAction(
 			.set({ ...data, updatedAt: new Date(Date.now()) })
 			.where(eq(links.id, id));
 		revalidatePath("/collections/home");
+
+		await kv.del(cacheKey(id));
 
 		return result;
 	},

@@ -28,12 +28,12 @@ function zipMapAsync<T, R>(
 	return Promise.allSettled(zipMap(ts, fn).map(hoistPromise));
 }
 
-function cacheKey(link: Link): string {
-	return `linkr-link-og-${link.id}`;
+export function cacheKey(id: number): string {
+	return `linkr-link-og-${id}`;
 }
 
 export async function getOgs(links: Link[]): Promise<[number, Og][]> {
-	const cachedOgs = await kv.mget<MaybeOg[]>(links.map(cacheKey));
+	const cachedOgs = await kv.mget<MaybeOg[]>(links.map((l) => cacheKey(l.id)));
 
 	const linksAndResults = await zipMapAsync(
 		links,
@@ -47,7 +47,11 @@ export async function getOgs(links: Link[]): Promise<[number, Og][]> {
 			const result = await ogs({ url: link.url });
 
 			if (result.error) {
-				await kv.set(cacheKey(link), { success: false }, { ex: 60 * 60 * 24 });
+				await kv.set(
+					cacheKey(link.id),
+					{ success: false },
+					{ ex: 60 * 60 * 24 },
+				);
 				return { success: false };
 			}
 
@@ -60,7 +64,7 @@ export async function getOgs(links: Link[]): Promise<[number, Og][]> {
 				},
 			};
 
-			await kv.set(cacheKey(link), maybeOg, { ex: 60 * 60 * 24 });
+			await kv.set(cacheKey(link.id), maybeOg, { ex: 60 * 60 * 24 });
 
 			return maybeOg;
 		},
