@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
-
 export type KeyPress = Pick<KeyboardEvent, "shiftKey" | "metaKey" | "key">;
 
 export const useKeyPress = (

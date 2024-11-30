@@ -1,7 +1,5 @@
-import type { useGlobalDialog } from "@/hooks/use-global-dialog";
+import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { openedFormAtom } from "@/state";
-import { useAtom } from "jotai";
 import { FolderEdit } from "lucide-react";
 import { CommandItem } from "../ui/command";
 
@@ -11,7 +9,7 @@ export function RenameCollectionCommand({
 	setOpen: ReturnType<typeof useGlobalDialog>[1];
 }) {
 	const parentId = useParentCollection();
-	const [, setOpenedForm] = useAtom(openedFormAtom);
+	const [, setFormOpen] = useGlobalDialog("rename-collection-form");
 
 	if (parentId === null) return null;
 
@@ -19,7 +17,7 @@ export function RenameCollectionCommand({
 		<CommandItem
 			onSelect={() => {
 				setOpen(false);
-				setOpenedForm("rename-collection-form");
+				setFormOpen(true);
 			}}
 			className="rounded-md"
 		>

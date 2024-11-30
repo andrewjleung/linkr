@@ -106,8 +106,9 @@ export function CreateCollectionForm() {
 	const { addCollection } = useContext(CollectionsContext);
 	const [loading, setLoading] = useState(false);
 	const parentId = useParentCollection();
-	const [open, setOpen] = useGlobalDialog("create-collection-form");
-	const [createLinkFormOpen] = useGlobalDialog("create-link-form");
+	const [open, setOpen, anyFormOpen] = useGlobalDialog(
+		"create-collection-form",
+	);
 	const router = useRouter();
 
 	const form = useForm<z.infer<typeof collectionSchema>>({
@@ -121,7 +122,7 @@ export function CreateCollectionForm() {
 			event.preventDefault();
 			setOpen(true);
 		},
-		open || createLinkFormOpen,
+		open || anyFormOpen,
 	);
 
 	async function onSubmit(values: z.infer<typeof collectionSchema>) {

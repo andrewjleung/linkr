@@ -4,14 +4,15 @@ import type { Dispatch, SetStateAction } from "react";
 
 type FormKind =
 	| "create-link-form"
+	| "edit-link-form"
 	| "create-collection-form"
 	| "command-menu"
 	| "mobile-collections-picker"
 	| "rename-collection-form";
 
-export function useGlobalDialog(
-	form: FormKind,
-): [boolean, Dispatch<SetStateAction<boolean>>] {
+type UseGlobalDialog = [boolean, Dispatch<SetStateAction<boolean>>, boolean];
+
+export function useGlobalDialog(form: FormKind): UseGlobalDialog {
 	const [openedForm, setOpenedForm] = useAtom(openedFormAtom);
 
 	return [
@@ -24,5 +25,6 @@ export function useGlobalDialog(
 				setOpenedForm(derived ? form : null);
 			}
 		},
+		openedForm !== null,
 	];
 }

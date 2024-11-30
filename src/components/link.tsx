@@ -11,6 +11,7 @@ import {
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import type { Collection, Link as LinkSchema } from "@/database/types";
+import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import {
 	type AbstractLink,
@@ -47,7 +48,8 @@ function LinkMenu({
 	const { removeOptimisticLink, moveOptimisticLink } = useContext(LinksContext);
 	const { optimisticCollections } = useContext(CollectionsContext);
 
-	const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);
+	const [editLinkFormOpen, setEditLinkFormOpen] =
+		useGlobalDialog("edit-link-form");
 	const parentId = useParentCollection();
 
 	const showMoveMenuSeparator =
