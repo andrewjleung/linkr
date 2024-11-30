@@ -14,17 +14,14 @@ import type { Collection, Link as LinkSchema } from "@/database/types";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import {
-	type AbstractLink,
 	LinksContext,
 	type OptimisticLink,
 } from "@/hooks/use-optimistic-links";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { cn } from "@/lib/utils";
 import { HoverCard } from "@radix-ui/react-hover-card";
 import { useQuery } from "@tanstack/react-query";
 import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
-import hash from "object-hash";
 import { useContext, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
