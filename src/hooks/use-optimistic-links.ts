@@ -1,44 +1,20 @@
-import {
-	createLink,
-	deleteLink,
-	editLink,
-	moveLink,
-	undoLinkDeletion,
-	updateLinkOrder,
-} from "@/app/actions";
 import type { Collection, Link, LinkInsert } from "@/database/types";
+import { orderForReorderedElement } from "@/lib/order";
 import { deleteLinkOp } from "@/state/operations";
+import type {
+	LinkAdd,
+	LinkDelete,
+	LinkEdit,
+	LinkReorder,
+	LinkStore,
+	LinkUpdate,
+} from "@/store";
 import type { SuccessResult } from "open-graph-scraper";
 // @ts-ignore
 import { createContext, startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
 import { useParentCollection } from "./use-parent-collection";
 import { useUndoableOperations } from "./use-undoable-operations";
-
-const ORDER_BUFFER = 100;
-
-function orderForReorderedElement(
-	orders: number[],
-	source: number,
-	destination: number,
-): number {
-	if (destination === 0) {
-		return orders[0] / 2;
-	}
-	if (destination >= orders.length - 1) {
-		return orders[orders.length - 1] + ORDER_BUFFER;
-	}
-
-	if (destination < source) {
-		const before = orders[destination - 1];
-		const after = orders[destination];
-		return (after - before) / 2 + before;
-	}
-
-	const before = orders[destination];
-	const after = orders[destination + 1];
-	return (after - before) / 2 + before;
-}
 
 const DEFAULT_LINKS_CONTEXT: OptimisticLinks = {
 	optimisticLinks: [],
@@ -52,30 +28,6 @@ const DEFAULT_LINKS_CONTEXT: OptimisticLinks = {
 export const LinksContext = createContext<OptimisticLinks>(
 	DEFAULT_LINKS_CONTEXT,
 );
-
-type LinkAdd = {
-	type: "add";
-	link: Omit<LinkInsert, "order">;
-};
-
-type LinkDelete = {
-	type: "delete";
-	id: number;
-};
-
-type LinkReorder = {
-	type: "reorder";
-	sourceIndex: number;
-	destinationIndex: number;
-};
-
-type LinkEdit = {
-	type: "edit";
-	id: Link["id"];
-	edit: Pick<Link, "title" | "url" | "description">;
-};
-
-type LinkUpdate = LinkAdd | LinkDelete | LinkReorder | LinkEdit;
 
 export type AbstractLink = {
 	type: "abstract";
@@ -196,11 +148,11 @@ function handleEdit(
 	};
 }
 
-export function useOptimisticLinks(links: Link[]): OptimisticLinks {
+export function useOptimisticLinks(linkStore: LinkStore): OptimisticLinks {
 	const parentId = useParentCollection();
 	const { push } = useUndoableOperations();
 
-	const concreteLinks: OptimisticLink[] = links.map((link) => ({
+	const concreteLinks: OptimisticLink[] = linkStore.links.map((link) => ({
 		type: "concrete",
 		id: link.id,
 		link,
@@ -222,12 +174,12 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 		link: Omit<LinkInsert, "order" | "deleted">,
 	) {
 		startTransition(() => updateOptimisticLinks({ type: "add", link }));
-		await createLink(link);
+		await linkStore.addLink(link);
 	}
 
 	async function removeOptimisticLink(id: number) {
 		startTransition(() => updateOptimisticLinks({ type: "delete", id }));
-		await deleteLink(id);
+		await linkStore.removeLink(id);
 		push(deleteLinkOp(id));
 	}
 
@@ -246,12 +198,12 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 			destinationIndex,
 		);
 
-		await updateLinkOrder(id, order);
+		await linkStore.reorderLink(id, order);
 	}
 
 	async function editOptimisticLink(id: Link["id"], edit: LinkEdit["edit"]) {
 		startTransition(() => updateOptimisticLinks({ type: "edit", id, edit }));
-		await editLink(id, edit);
+		await linkStore.editLink(id, edit);
 	}
 
 	async function moveOptimisticLink(link: Link, newParent: Collection | null) {
@@ -265,7 +217,7 @@ export function useOptimisticLinks(links: Link[]): OptimisticLinks {
 			updateOptimisticLinks({ type: "delete", id: link.id }),
 		);
 
-		await moveLink(link.id, newParentId);
+		await linkStore.moveLink(link.id, newParent?.id || null);
 	}
 
 	return {

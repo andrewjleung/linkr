@@ -51,7 +51,7 @@ export default function LoginPage() {
 								</div>
 							</div>
 							<div className="mt-4 text-center text-sm">
-								Sign-in is restricted to specific users.
+								Login is restricted to specific users.
 							</div>
 						</div>
 					</div>

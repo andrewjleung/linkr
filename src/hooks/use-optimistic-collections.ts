@@ -176,6 +176,7 @@ function handleReorder(
 
 export function useOptimisticCollections(
 	collections: Collection[],
+	demo?: boolean,
 ): OptimisticCollections {
 	const concreteCollections: OptimisticCollection[] = collections.map(
 		(collection) => ({
