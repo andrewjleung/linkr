@@ -39,8 +39,8 @@ export default function LoginPage() {
 					exit={{ opacity: 0 }}
 					className="w-full h-screen flex flex-col items-center justify-center lg:min-h-[600px] xl:min-h-[800px] z-10 relative"
 				>
-					<div className="flex items-center justify-center py-12">
-						<div className="mx-auto grid w-[350px] gap-6">
+					<div className="flex items-center justify-center">
+						<div className="mx-auto grid w-[350px] gap-6 z-10">
 							<div className="grid gap-2 text-center">
 								<h1 className="text-3xl font-bold">Welcome to linkr 👋</h1>
 							</div>
@@ -51,17 +51,16 @@ export default function LoginPage() {
 									</Button>
 								</div>
 							</div>
-							<div className="mt-4 text-center text-sm">
-								Login is restricted to specific users.
-								<br />
+							<div className="text-center text-sm mt-4">
+								Login is restricted.
 								<Link
 									href="/demo/collections/home"
 									className={clsx(
 										buttonVariants({ variant: "outline" }),
-										"mt-4",
+										"ml-3",
 									)}
 								>
-									Demo
+									Try a Demo!
 								</Link>
 							</div>
 						</div>
