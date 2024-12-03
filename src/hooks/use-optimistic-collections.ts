@@ -1,40 +1,16 @@
-import {
-	createCollection,
-	renameCollection as renameCollectionAction,
-	safeDeleteCollection,
-	unsafeDeleteCollection,
-	updateCollectionOrder,
-} from "@/app/actions";
 import type { Collection, CollectionInsert } from "@/database/types";
+import { orderForReorderedElement } from "@/lib/order";
+import type {
+	CollectionAdd,
+	CollectionDelete,
+	CollectionRename,
+	CollectionReorder,
+	CollectionRepository,
+	CollectionUpdate,
+} from "@/repository/collection-repository";
 // @ts-ignore
 import { createContext, startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
-
-const ORDER_BUFFER = 100;
-
-function orderForReorderedElement(
-	orders: number[],
-	source: number,
-	destination: number,
-): number {
-	if (destination === 0) {
-		return orders[0] / 2;
-	}
-
-	if (destination >= orders.length - 1) {
-		return orders[orders.length - 1] + ORDER_BUFFER;
-	}
-
-	if (destination < source) {
-		const before = orders[destination - 1];
-		const after = orders[destination];
-		return (after - before) / 2 + before;
-	}
-
-	const before = orders[destination];
-	const after = orders[destination + 1];
-	return (after - before) / 2 + before;
-}
 
 const DEFAULT_COLLECTIONS_CONTEXT: OptimisticCollections = {
 	optimisticCollections: [],
@@ -47,35 +23,6 @@ const DEFAULT_COLLECTIONS_CONTEXT: OptimisticCollections = {
 };
 
 export const CollectionsContext = createContext(DEFAULT_COLLECTIONS_CONTEXT);
-
-type CollectionAdd = {
-	type: "add";
-	collection: Omit<CollectionInsert, "order">;
-};
-
-type CollectionDelete = {
-	type: "delete";
-	id: Collection["id"];
-};
-
-type CollectionRename = {
-	type: "rename";
-	id: Collection["id"];
-	newName: string;
-};
-
-type CollectionReorder = {
-	type: "reorder";
-	id: Collection["id"];
-	sourceIndex: number;
-	destinationIndex: number;
-};
-
-type CollectionUpdate =
-	| CollectionAdd
-	| CollectionDelete
-	| CollectionRename
-	| CollectionReorder;
 
 export type AbstractCollection = {
 	type: "abstract";
@@ -175,16 +122,15 @@ function handleReorder(
 }
 
 export function useOptimisticCollections(
-	collections: Collection[],
-	demo?: boolean,
+	collectionRepository: CollectionRepository,
 ): OptimisticCollections {
-	const concreteCollections: OptimisticCollection[] = collections.map(
-		(collection) => ({
+	const concreteCollections: OptimisticCollection[] = collectionRepository
+		.collections()
+		.map((collection) => ({
 			type: "concrete",
 			id: collection.id,
 			collection,
-		}),
-	);
+		}));
 
 	const [optimisticCollections, updateOptimisticCollections] = useOptimistic<
 		OptimisticCollection[],
@@ -207,10 +153,9 @@ export function useOptimisticCollections(
 			updateOptimisticCollections({ type: "add", collection });
 		});
 
-		const response = await createCollection(collection);
+		const response = await collectionRepository.addCollection(collection);
 
-		// TODO: make this safe
-		return response?.[0];
+		return response;
 	}
 
 	async function safeRemoveCollection(id: number) {
@@ -219,7 +164,7 @@ export function useOptimisticCollections(
 			updateOptimisticCollections({ type: "delete", id });
 		});
 
-		await safeDeleteCollection(id);
+		await collectionRepository.safeRemoveCollection(id);
 	}
 
 	async function unsafeRemoveCollection(id: number) {
@@ -227,7 +172,7 @@ export function useOptimisticCollections(
 			updateOptimisticCollections({ type: "delete", id });
 		});
 
-		await unsafeDeleteCollection(id);
+		await collectionRepository.unsafeRemoveCollection(id);
 	}
 
 	async function renameCollection(id: number, newName: string) {
@@ -235,7 +180,7 @@ export function useOptimisticCollections(
 			updateOptimisticCollections({ type: "rename", id, newName });
 		});
 
-		await renameCollectionAction(id, newName);
+		await collectionRepository.renameCollection(id, newName);
 	}
 
 	async function reorderCollection(
@@ -258,7 +203,7 @@ export function useOptimisticCollections(
 			destinationIndex,
 		);
 
-		await updateCollectionOrder(id, order);
+		await collectionRepository.reorderCollection(id, order);
 	}
 
 	return {

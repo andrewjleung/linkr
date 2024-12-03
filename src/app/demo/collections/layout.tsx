@@ -3,22 +3,19 @@
 import { RenameCollectionForm } from "@/components/collection-form";
 import { CreateCollectionForm } from "@/components/collection-form";
 import { CollectionsPicker } from "@/components/collections-picker";
-import CollectionsProvider from "@/components/collections-provider";
+import { DemoCollectionsProvider } from "@/components/collections-provider";
 import { CommandMenu } from "@/components/command-menu";
 import { CommandMenuButton } from "@/components/command-menu-button";
 import { MobileFooter } from "@/components/mobile-footer";
 import Providers from "@/components/state-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useCollectionStore } from "./state";
 
-function Container({ children }: { children: React.ReactNode }) {
-	const collections = useCollectionStore((state) => state.collections)
-		.filter((c) => !c.deleted)
-		.sort((a, b) => a.order - b.order);
-
+export default function CollectionsLayout({
+	children,
+}: { children: React.ReactNode }) {
 	return (
 		<Providers>
-			<CollectionsProvider collections={collections}>
+			<DemoCollectionsProvider>
 				<main className="relative flex min-h-screen flex-col">
 					<header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800 hidden sm:block">
 						<div className="container flex h-16 max-w-5xl flex-row items-center">
@@ -42,13 +39,7 @@ function Container({ children }: { children: React.ReactNode }) {
 				<CommandMenu />
 				<CreateCollectionForm />
 				<RenameCollectionForm />
-			</CollectionsProvider>
+			</DemoCollectionsProvider>
 		</Providers>
 	);
-}
-
-export default function CollectionsLayout({
-	children,
-}: { children: React.ReactNode }) {
-	return <Container>{children}</Container>;
 }

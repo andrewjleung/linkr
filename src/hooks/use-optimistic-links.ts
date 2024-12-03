@@ -1,18 +1,19 @@
 import type { Collection, Link, LinkInsert } from "@/database/types";
 import { orderForReorderedElement } from "@/lib/order";
-import { deleteLinkOp } from "@/state/operations";
 import type {
 	LinkAdd,
 	LinkDelete,
 	LinkEdit,
 	LinkReorder,
-	LinkStore,
+	LinkRepository,
 	LinkUpdate,
-} from "@/store";
+} from "@/repository/link-repository";
+import { deleteLinkOp } from "@/state/operations";
 import type { SuccessResult } from "open-graph-scraper";
 // @ts-ignore
 import { createContext, startTransition, useOptimistic } from "react";
 import { match } from "ts-pattern";
+import type { LinkStoreApi } from "./use-link-store";
 import { useParentCollection } from "./use-parent-collection";
 import { useUndoableOperations } from "./use-undoable-operations";
 
@@ -57,8 +58,8 @@ export type OptimisticLinks = {
 	) => Promise<void>;
 	editOptimisticLink: (id: Link["id"], edit: LinkEdit["edit"]) => Promise<void>;
 	moveOptimisticLink: (
-		link: Link,
-		newParent: Collection | null,
+		id: Link["id"],
+		parentId: Collection["id"] | null,
 	) => Promise<void>;
 };
 
@@ -148,15 +149,19 @@ function handleEdit(
 	};
 }
 
-export function useOptimisticLinks(linkStore: LinkStore): OptimisticLinks {
+export function useOptimisticLinks(
+	linkRepository: LinkRepository,
+): OptimisticLinks {
 	const parentId = useParentCollection();
 	const { push } = useUndoableOperations();
 
-	const concreteLinks: OptimisticLink[] = linkStore.links.map((link) => ({
-		type: "concrete",
-		id: link.id,
-		link,
-	}));
+	const concreteLinks: OptimisticLink[] = linkRepository
+		.links()
+		.map((link) => ({
+			type: "concrete",
+			id: link.id,
+			link,
+		}));
 
 	const [optimisticLinks, updateOptimisticLinks] = useOptimistic<
 		OptimisticLink[],
@@ -174,12 +179,12 @@ export function useOptimisticLinks(linkStore: LinkStore): OptimisticLinks {
 		link: Omit<LinkInsert, "order" | "deleted">,
 	) {
 		startTransition(() => updateOptimisticLinks({ type: "add", link }));
-		await linkStore.addLink(link);
+		await linkRepository.addLink(link);
 	}
 
 	async function removeOptimisticLink(id: number) {
 		startTransition(() => updateOptimisticLinks({ type: "delete", id }));
-		await linkStore.removeLink(id);
+		await linkRepository.removeLink(id);
 		push(deleteLinkOp(id));
 	}
 
@@ -198,26 +203,25 @@ export function useOptimisticLinks(linkStore: LinkStore): OptimisticLinks {
 			destinationIndex,
 		);
 
-		await linkStore.reorderLink(id, order);
+		await linkRepository.reorderLink(id, order);
 	}
 
 	async function editOptimisticLink(id: Link["id"], edit: LinkEdit["edit"]) {
 		startTransition(() => updateOptimisticLinks({ type: "edit", id, edit }));
-		await linkStore.editLink(id, edit);
+		await linkRepository.editLink(id, edit);
 	}
 
-	async function moveOptimisticLink(link: Link, newParent: Collection | null) {
-		const newParentId = newParent?.id || null;
-
+	async function moveOptimisticLink(
+		id: Link["id"],
+		newParentId: Collection["id"] | null,
+	) {
 		if (newParentId === parentId) {
 			return;
 		}
 
-		startTransition(() =>
-			updateOptimisticLinks({ type: "delete", id: link.id }),
-		);
+		startTransition(() => updateOptimisticLinks({ type: "delete", id }));
 
-		await linkStore.moveLink(link.id, newParent?.id || null);
+		await linkRepository.moveLink(id, newParentId);
 	}
 
 	return {
@@ -227,5 +231,22 @@ export function useOptimisticLinks(linkStore: LinkStore): OptimisticLinks {
 		reorderOptimisticLinks,
 		editOptimisticLink,
 		moveOptimisticLink,
+	};
+}
+
+export function wrapLinkStore(store: LinkStoreApi): OptimisticLinks {
+	const state = store.getState();
+
+	return {
+		optimisticLinks: state.links().map((l) => ({
+			type: "concrete",
+			id: l.id,
+			link: l,
+		})),
+		addOptimisticLink: state.addLink,
+		removeOptimisticLink: state.removeLink,
+		reorderOptimisticLinks: state.reorderLink,
+		editOptimisticLink: state.editLink,
+		moveOptimisticLink: state.moveLink,
 	};
 }

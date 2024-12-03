@@ -6,7 +6,7 @@ import {
 	updateLinkOrder,
 } from "@/app/actions";
 import type { Link } from "@/database/types";
-import type { LinkStore } from ".";
+import type { LinkRepository } from "./link-repository";
 
 function discard<U extends unknown[], R>(fn: (...args: U) => Promise<R>) {
 	return (...args: U) =>
@@ -15,9 +15,9 @@ function discard<U extends unknown[], R>(fn: (...args: U) => Promise<R>) {
 		});
 }
 
-export default function databaseLinkStore(links: Link[]): LinkStore {
+export default function databaseLinkStore(links: Link[]): LinkRepository {
 	return {
-		links,
+		links: links,
 		addLink: discard(createLink),
 		removeLink: discard(deleteLink),
 		reorderLink: discard(updateLinkOrder),

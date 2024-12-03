@@ -24,8 +24,8 @@ export type LinkEdit = {
 
 export type LinkUpdate = LinkAdd | LinkDelete | LinkReorder | LinkEdit;
 
-export type LinkStore = {
-	links: Link[];
+export type LinkRepository = {
+	links: () => Link[];
 	addLink: (link: Omit<LinkInsert, "order" | "deleted">) => Promise<void>;
 	removeLink: (id: number) => Promise<void>;
 	reorderLink: (id: number, order: number) => Promise<void>;

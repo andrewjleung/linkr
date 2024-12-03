@@ -16,6 +16,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { useDemo } from "@/hooks/use-demo";
 import {
 	CollectionsContext,
 	type ConcreteCollection,
@@ -31,6 +32,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
 	const pathname = usePathname();
+	const { demoLink } = useDemo();
 
 	const concreteCollections = optimisticCollections
 		.filter((c) => c.type === "concrete")
@@ -46,7 +48,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 
 	useEffect(() => {
 		if (parentId !== null) {
-			router.prefetch("/collections/home");
+			router.prefetch(demoLink("/collections/home"));
 		}
 
 		for (const c of concreteCollections) {
@@ -56,7 +58,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 
 			router.prefetch(`/collections/${c.id}`);
 		}
-	}, [concreteCollections, router, parentId]);
+	}, [concreteCollections, demoLink, router, parentId]);
 
 	return (
 		<div className={cn(className)}>
@@ -84,7 +86,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 								key={"collection-picker-home"}
 								className="rounded-md"
 								onSelect={() => {
-									router.push("/collections/home");
+									router.push(demoLink("/collections/home"));
 									setOpen(false);
 								}}
 							>
@@ -112,7 +114,7 @@ export function CollectionsPicker({ className }: { className?: string }) {
 										key={`collection-picker-${c.id}`}
 										className="rounded-md"
 										onSelect={() => {
-											router.push(`/collections/${c.id}`);
+											router.push(demoLink(`/collections/${c.id}`));
 											setOpen(false);
 										}}
 									>

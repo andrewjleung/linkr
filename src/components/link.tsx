@@ -74,7 +74,10 @@ function LinkMenu({
 	}
 
 	async function onClickMoveTo(collection: Collection | null) {
-		await moveOptimisticLink(link, collection);
+		await moveOptimisticLink(
+			link.id,
+			collection === null ? null : collection.id,
+		);
 
 		const newParentName = collection?.name || "Home";
 		toast.success(`Link has been moved to collection "${newParentName}"`);

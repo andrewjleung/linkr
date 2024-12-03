@@ -11,6 +11,7 @@ import {
 	CommandSeparator,
 	CommandShortcut,
 } from "@/components/ui/command";
+import { useDemo } from "@/hooks/use-demo";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
@@ -21,6 +22,7 @@ import {
 	Folder,
 	FolderPlus,
 	Home,
+	LogIn,
 	LogOut,
 	Plus,
 	SidebarClose,
@@ -78,11 +80,33 @@ function LogoutCommand({
 	);
 }
 
+function LoginCommand({
+	setOpen,
+}: {
+	setOpen: ReturnType<typeof useGlobalDialog>[1];
+}) {
+	const router = useRouter();
+
+	return (
+		<CommandItem
+			onSelect={() => {
+				setOpen(false);
+				router.push("/login");
+			}}
+			className="rounded-lg"
+		>
+			<LogIn className="mr-2 h-4 w-4" />
+			<span>Login</span>
+		</CommandItem>
+	);
+}
+
 export function CommandMenu() {
 	const { optimisticCollections } = useContext(CollectionsContext);
 	const router = useRouter();
 	const [open, setOpen] = useGlobalDialog("command-menu");
 	const [, setOpenedForm] = useAtom(openedFormAtom);
+	const { isDemo, demoLink } = useDemo();
 
 	useKeyPress(
 		{ shiftKey: false, metaKey: true, key: "k" },
@@ -103,7 +127,7 @@ export function CommandMenu() {
 					<CommandGroup heading="Collections">
 						<CommandItem
 							onSelect={() => {
-								router.push("/collections/home");
+								router.push(demoLink("/collections/home"));
 								setOpen(false);
 							}}
 							className="rounded-md"
@@ -122,7 +146,7 @@ export function CommandMenu() {
 								<CommandItem
 									key={`collection-command-${c.id}`}
 									onSelect={() => {
-										router.push(`/collections/${c.id}`);
+										router.push(demoLink(`/collections/${c.id}`));
 										setOpen(false);
 									}}
 									className="rounded-md"
@@ -159,8 +183,9 @@ export function CommandMenu() {
 						</CommandItem>
 						<RenameCollectionCommand setOpen={setOpen} />
 						<DeleteCollectionCommand setOpen={setOpen} />
-						<ImportCommand setOpen={setOpen} />
-						<LogoutCommand setOpen={setOpen} />
+						{isDemo ? null : <ImportCommand setOpen={setOpen} />}
+						{isDemo ? null : <LogoutCommand setOpen={setOpen} />}
+						{isDemo ? <LoginCommand setOpen={setOpen} /> : null}
 					</CommandGroup>
 				</CommandList>
 			</Command>

@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Collection } from "@/database/types";
+import { useDemo } from "@/hooks/use-demo";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -110,6 +111,7 @@ export function CreateCollectionForm() {
 		"create-collection-form",
 	);
 	const router = useRouter();
+	const { demoLink } = useDemo();
 
 	const form = useForm<z.infer<typeof collectionSchema>>({
 		resolver: zodResolver(collectionSchema),
@@ -146,7 +148,7 @@ export function CreateCollectionForm() {
 		toast.success(`Collection "${collection.name}" has been created.`, {
 			action: {
 				label: "Go to",
-				onClick: () => router.push(`/collections/${collection.id}`),
+				onClick: () => router.push(demoLink(`/collections/${collection.id}`)),
 			},
 		});
 	}

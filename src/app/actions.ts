@@ -171,7 +171,8 @@ export const createCollection = createProtectedAction(
 			.returning();
 		revalidatePath("/collections/home");
 
-		return result;
+		// TODO: make this safe
+		return result[0];
 	},
 );
 

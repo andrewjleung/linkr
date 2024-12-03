@@ -1,11 +1,19 @@
 "use client";
 
-import { useLinkStore } from "@/app/demo/collections/state";
 import type { Link } from "@/database/types";
-import { LinksContext, useOptimisticLinks } from "@/hooks/use-optimistic-links";
-import databaseLinkStore from "@/store/database-link-store";
+import { useLinkStore } from "@/hooks/use-link-store";
+import {
+	LinksContext,
+	type OptimisticLinks,
+	useOptimisticLinks,
+} from "@/hooks/use-optimistic-links";
+import { useParentCollection } from "@/hooks/use-parent-collection";
+import { orderForReorderedElement } from "@/lib/order";
+import databaseLinkStore from "@/repository/database-link-store";
+import type { LinkRepository } from "@/repository/link-repository";
+import { useCallback } from "react";
 
-function DatabaseLinksProvider({
+export function DatabaseLinksProvider({
 	links,
 	children,
 }: {
@@ -18,33 +26,46 @@ function DatabaseLinksProvider({
 	return <LinksContext.Provider value={ol}>{children}</LinksContext.Provider>;
 }
 
-function DemoLinksProvider({
-	links,
+export function DemoLinksProvider({
 	children,
 }: {
-	links: Link[];
 	children: React.ReactNode;
 }) {
-	const linkStore = useLinkStore(links)();
-	const ol = useOptimisticLinks(linkStore);
+	const parentId = useParentCollection();
+	const linkRepository = useLinkStore(parentId);
+	const wrap = useCallback(
+		(linkRepository: LinkRepository): OptimisticLinks => {
+			return {
+				optimisticLinks: linkRepository.links().map((l) => ({
+					type: "concrete",
+					id: l.id,
+					link: l,
+				})),
+				addOptimisticLink: linkRepository.addLink,
+				removeOptimisticLink: linkRepository.removeLink,
+				reorderOptimisticLinks: async (
+					id: number,
+					sourceIndex,
+					destinationIndex,
+				) => {
+					const order = orderForReorderedElement(
+						linkRepository.links().map((l) => l.order),
+						sourceIndex,
+						destinationIndex,
+					);
 
-	return <LinksContext.Provider value={ol}>{children}</LinksContext.Provider>;
-}
-
-export default function LinksProvider({
-	links,
-	store,
-	children,
-}: {
-	links: Link[];
-	store?: "database" | "demo";
-	children: React.ReactNode;
-}) {
-	if (store === "demo") {
-		return <DemoLinksProvider links={links}>{children}</DemoLinksProvider>;
-	}
+					linkRepository.reorderLink(id, order);
+				},
+				editOptimisticLink: linkRepository.editLink,
+				moveOptimisticLink: linkRepository.moveLink,
+			};
+		},
+		[],
+	);
 
 	return (
-		<DatabaseLinksProvider links={links}>{children}</DatabaseLinksProvider>
+		<LinksContext.Provider value={wrap(linkRepository)}>
+			{children}
+		</LinksContext.Provider>
 	);
 }

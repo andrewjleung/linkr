@@ -2,7 +2,6 @@ import { env } from "@/app/env.mjs";
 import { RenameCollectionForm } from "@/components/collection-form";
 import { CreateCollectionForm } from "@/components/collection-form";
 import { CollectionsPicker } from "@/components/collections-picker";
-import CollectionsProvider from "@/components/collections-provider";
 import { CommandMenu } from "@/components/command-menu";
 import { CommandMenuButton } from "@/components/command-menu-button";
 import { MobileFooter } from "@/components/mobile-footer";
@@ -14,6 +13,7 @@ import { collections as collectionsSchema } from "@/database/schema";
 import { createClient } from "@/lib/supabase/server";
 import { asc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { DatabaseCollectionsProvider } from "./collections-provider";
 
 export async function Container({ children }: { children: React.ReactNode }) {
 	const supabase = createClient();
@@ -36,7 +36,7 @@ export async function Container({ children }: { children: React.ReactNode }) {
 	return (
 		<Providers>
 			<QCProvider>
-				<CollectionsProvider collections={collections}>
+				<DatabaseCollectionsProvider collections={collections}>
 					<main className="relative flex min-h-screen flex-col">
 						<header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800 hidden sm:block">
 							<div className="container flex h-16 max-w-5xl flex-row items-center">
@@ -60,7 +60,7 @@ export async function Container({ children }: { children: React.ReactNode }) {
 					<CommandMenu />
 					<CreateCollectionForm />
 					<RenameCollectionForm />
-				</CollectionsProvider>
+				</DatabaseCollectionsProvider>
 			</QCProvider>
 		</Providers>
 	);

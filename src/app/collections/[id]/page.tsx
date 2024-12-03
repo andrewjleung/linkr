@@ -1,7 +1,7 @@
 import { validateCollection } from "@/app/actions";
 import { CreateLinkForm } from "@/components/link-form";
 import { Links } from "@/components/links";
-import LinksProvider from "@/components/links-provider";
+import { DatabaseLinksProvider } from "@/components/links-provider";
 import OpenGraphProvider from "@/components/opengraph-provider";
 import { db } from "@/database/database";
 import { links as linksSchema } from "@/database/schema";
@@ -33,11 +33,11 @@ export default async function Page({ params }: { params: { id: string } }) {
 	const ogs = await getOgs(links);
 
 	return (
-		<LinksProvider links={links}>
+		<DatabaseLinksProvider links={links}>
 			<OpenGraphProvider ogs={ogs}>
 				<Links />
 				<CreateLinkForm />
 			</OpenGraphProvider>
-		</LinksProvider>
+		</DatabaseLinksProvider>
 	);
 }
