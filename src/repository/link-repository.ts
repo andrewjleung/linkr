@@ -22,7 +22,17 @@ export type LinkEdit = {
 	edit: Pick<Link, "title" | "url" | "description">;
 };
 
-export type LinkUpdate = LinkAdd | LinkDelete | LinkReorder | LinkEdit;
+export type LinkDeleteUndo = {
+	type: "undo-delete";
+	id: number;
+};
+
+export type LinkUpdate =
+	| LinkAdd
+	| LinkDelete
+	| LinkReorder
+	| LinkEdit
+	| LinkDeleteUndo;
 
 export type LinkRepository = {
 	links: () => Link[];

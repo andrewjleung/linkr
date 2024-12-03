@@ -3,6 +3,7 @@ import { orderForReorderedElement } from "@/lib/order";
 import type {
 	LinkAdd,
 	LinkDelete,
+	LinkDeleteUndo,
 	LinkEdit,
 	LinkReorder,
 	LinkRepository,
@@ -153,6 +154,12 @@ function handleEdit(
 	};
 }
 
+function handleDeleteUndo(
+	state: OptimisticLink[],
+): (deleteUndo: LinkDeleteUndo) => OptimisticLink[] {
+	return () => state; // TODO: find a way to do this optimistically
+}
+
 export function useOptimisticLinks(
 	linkRepository: LinkRepository,
 ): OptimisticLinks {
@@ -176,6 +183,7 @@ export function useOptimisticLinks(
 			.with({ type: "delete" }, handleDelete(state))
 			.with({ type: "reorder" }, handleReorder(state))
 			.with({ type: "edit" }, handleEdit(state))
+			.with({ type: "undo-delete" }, handleDeleteUndo(state))
 			.exhaustive(),
 	);
 
@@ -236,6 +244,11 @@ export function useOptimisticLinks(
 		await linkRepository.moveLink(id, newParentId);
 	}
 
+	async function undoLinkDeletion(id: Link["id"]) {
+		startTransition(() => updateOptimisticLinks({ type: "undo-delete", id }));
+		await linkRepository.undoLinkDeletion(id);
+	}
+
 	return {
 		optimisticLinks,
 		addOptimisticLink,
@@ -243,5 +256,6 @@ export function useOptimisticLinks(
 		reorderOptimisticLinks,
 		editOptimisticLink,
 		moveOptimisticLink,
+		undoLinkDeletion,
 	};
 }
