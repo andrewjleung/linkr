@@ -1,8 +1,9 @@
 "use client";
 
 import { AuroraBackground } from "@/components/ui/aurora-background";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -52,13 +53,17 @@ export default function LoginPage() {
 							</div>
 							<div className="mt-4 text-center text-sm">
 								Login is restricted to specific users.
+								<br />
+								<Link
+									href="/demo/collections/home"
+									className={clsx(
+										buttonVariants({ variant: "outline" }),
+										"mt-4",
+									)}
+								>
+									Demo
+								</Link>
 							</div>
-							<Link
-								href="/demo/collections/home"
-								className="mt-4 text-center text-sm"
-							>
-								Demo
-							</Link>
 						</div>
 					</div>
 					<footer className="absolute flex justify-center bottom-0 left-0 w-full text-neutral-500 p-6">
