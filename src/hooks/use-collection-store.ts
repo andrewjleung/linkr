@@ -1,6 +1,7 @@
 import type { Collection } from "@/database/types";
 import { ORDER_BUFFER } from "@/lib/order";
 import type { CollectionRepository } from "@/repository/collection-repository";
+import { COLLECTION_DATA } from "@/repository/demo-data";
 import { create, createStore, useStore } from "zustand";
 import { createLinkStore } from "./use-link-store";
 
@@ -35,7 +36,7 @@ function setCollection(
 export const useUnderlyingCollectionStore = create<{
 	collections: Collection[];
 }>(() => ({
-	collections: [],
+	collections: COLLECTION_DATA,
 }));
 
 export const createCollectionStore = () =>

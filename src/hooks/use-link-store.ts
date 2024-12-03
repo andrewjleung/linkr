@@ -1,5 +1,6 @@
 import type { Link } from "@/database/types";
 import { ORDER_BUFFER } from "@/lib/order";
+import { LINK_DATA } from "@/repository/demo-data";
 import type { LinkRepository } from "@/repository/link-repository";
 import { create, createStore, useStore } from "zustand";
 
@@ -39,7 +40,7 @@ function filterAndSortLinks(
 }
 
 export const useUnderlyingLinkStore = create<{ links: Link[] }>(() => ({
-	links: [],
+	links: LINK_DATA,
 }));
 
 export const createLinkStore = (parentCollectionId: number | null) =>
