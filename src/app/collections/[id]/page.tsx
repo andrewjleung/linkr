@@ -10,34 +10,34 @@ import { and, asc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-	title: "linkr",
-	description: "A home for your links.",
+  title: "linkr",
+  description: "A home for your links.",
 };
 
 export default async function Page({ params }: { params: { id: string } }) {
-	const parentId = Number(params.id);
+  const parentId = Number(params.id);
 
-	await validateCollection(parentId);
+  await validateCollection(parentId);
 
-	const links = await db
-		.select()
-		.from(linksSchema)
-		.where(
-			and(
-				eq(linksSchema.parentCollectionId, parentId),
-				eq(linksSchema.deleted, false),
-			),
-		)
-		.orderBy(asc(linksSchema.order));
+  const links = await db
+    .select()
+    .from(linksSchema)
+    .where(
+      and(
+        eq(linksSchema.parentCollectionId, parentId),
+        eq(linksSchema.deleted, false),
+      ),
+    )
+    .orderBy(asc(linksSchema.order));
 
-	const ogs = await getOgs(links);
+  const ogs = await getOgs(links);
 
-	return (
-		<DatabaseLinksProvider links={links}>
-			<OpenGraphProvider ogs={ogs}>
-				<Links />
-				<CreateLinkForm />
-			</OpenGraphProvider>
-		</DatabaseLinksProvider>
-	);
+  return (
+    <DatabaseLinksProvider links={links}>
+      <OpenGraphProvider ogs={ogs}>
+        <Links />
+        <CreateLinkForm />
+      </OpenGraphProvider>
+    </DatabaseLinksProvider>
+  );
 }

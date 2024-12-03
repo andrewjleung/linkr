@@ -6,58 +6,58 @@ export const HISTORY_LENGTH = 50;
 
 export type Operation = DeleteLink;
 export type UndoableOperation = Operation & {
-	undo: () => Promise<void>;
+  undo: () => Promise<void>;
 };
 
 export type DeleteLink = {
-	type: "delete-link";
-	linkId: Link["id"];
+  type: "delete-link";
+  linkId: Link["id"];
 };
 
 type UndoableOperations = {
-	push: (op: UndoableOperation) => void;
-	undo: () => Promise<void>;
+  push: (op: UndoableOperation) => void;
+  undo: () => Promise<void>;
 };
 
 export function useUndoableOperations(): UndoableOperations {
-	const [undoableOperations, setUndoableOperations] = useState<
-		UndoableOperation[]
-	>([]);
+  const [undoableOperations, setUndoableOperations] = useState<
+    UndoableOperation[]
+  >([]);
 
-	console.log(undoableOperations);
+  console.log(undoableOperations);
 
-	const push: UndoableOperations["push"] = useCallback(
-		(op: UndoableOperation) => {
-			setUndoableOperations((ops) => {
-				if (ops.length >= HISTORY_LENGTH) {
-					const [_, ...rest] = ops;
-					return [...rest, op];
-				}
+  const push: UndoableOperations["push"] = useCallback(
+    (op: UndoableOperation) => {
+      setUndoableOperations((ops) => {
+        if (ops.length >= HISTORY_LENGTH) {
+          const [_, ...rest] = ops;
+          return [...rest, op];
+        }
 
-				return [...ops, op];
-			});
-		},
-		[],
-	);
+        return [...ops, op];
+      });
+    },
+    [],
+  );
 
-	const undo: UndoableOperations["undo"] = useCallback(async () => {
-		if (undoableOperations.length < 1) {
-			return;
-		}
+  const undo: UndoableOperations["undo"] = useCallback(async () => {
+    if (undoableOperations.length < 1) {
+      return;
+    }
 
-		const op = undoableOperations[undoableOperations.length - 1];
-		setUndoableOperations((ops) => ops.slice(0, ops.length - 1));
+    const op = undoableOperations[undoableOperations.length - 1];
+    setUndoableOperations((ops) => ops.slice(0, ops.length - 1));
 
-		op.undo();
-	}, [undoableOperations]);
+    op.undo();
+  }, [undoableOperations]);
 
-	// useKeyPress({ shiftKey: false, metaKey: false, key: "z" }, (event) => {
-	// 	event.preventDefault();
-	// 	undo();
-	// });
+  // useKeyPress({ shiftKey: false, metaKey: false, key: "z" }, (event) => {
+  // 	event.preventDefault();
+  // 	undo();
+  // });
 
-	return {
-		push,
-		undo,
-	};
+  return {
+    push,
+    undo,
+  };
 }

@@ -16,52 +16,52 @@ import { redirect } from "next/navigation";
 import { DatabaseCollectionsProvider } from "./collections-provider";
 
 export async function Container({ children }: { children: React.ReactNode }) {
-	const supabase = createClient();
-	const { data, error } = await supabase.auth.getSession();
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.getSession();
 
-	if (error || !data?.session?.user) {
-		redirect("/login");
-	}
+  if (error || !data?.session?.user) {
+    redirect("/login");
+  }
 
-	if (data.session.user.id !== env.NEXT_PUBLIC_USER_ID) {
-		redirect("/login");
-	}
+  if (data.session.user.id !== env.NEXT_PUBLIC_USER_ID) {
+    redirect("/login");
+  }
 
-	const collections = await db
-		.select()
-		.from(collectionsSchema)
-		.where(eq(collectionsSchema.deleted, false))
-		.orderBy(asc(collectionsSchema.order));
+  const collections = await db
+    .select()
+    .from(collectionsSchema)
+    .where(eq(collectionsSchema.deleted, false))
+    .orderBy(asc(collectionsSchema.order));
 
-	return (
-		<Providers>
-			<QCProvider>
-				<DatabaseCollectionsProvider collections={collections}>
-					<main className="relative flex min-h-screen flex-col">
-						<header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800 hidden sm:block">
-							<div className="container flex h-16 max-w-5xl flex-row items-center">
-								<CollectionsPicker className="mx-auto hidden sm:mx-0 sm:block" />
-								<CommandMenuButton className="ml-auto hidden sm:block" />
-								<div className="ml-2 mt-0 hidden justify-self-end sm:block">
-									<ThemeToggle />
-								</div>
-							</div>
-						</header>
+  return (
+    <Providers>
+      <QCProvider>
+        <DatabaseCollectionsProvider collections={collections}>
+          <main className="relative flex min-h-screen flex-col">
+            <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800 hidden sm:block">
+              <div className="container flex h-16 max-w-5xl flex-row items-center">
+                <CollectionsPicker className="mx-auto hidden sm:mx-0 sm:block" />
+                <CommandMenuButton className="ml-auto hidden sm:block" />
+                <div className="ml-2 mt-0 hidden justify-self-end sm:block">
+                  <ThemeToggle />
+                </div>
+              </div>
+            </header>
 
-						<div className="mx-auto flex h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8 mb-24">
-							{children}
-						</div>
+            <div className="mx-auto flex h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8 mb-24">
+              {children}
+            </div>
 
-						<footer className="sm:hidden sticky bottom-8 px-6">
-							<MobileFooter />
-						</footer>
-					</main>
+            <footer className="sm:hidden sticky bottom-8 px-6">
+              <MobileFooter />
+            </footer>
+          </main>
 
-					<CommandMenu />
-					<CreateCollectionForm />
-					<RenameCollectionForm />
-				</DatabaseCollectionsProvider>
-			</QCProvider>
-		</Providers>
-	);
+          <CommandMenu />
+          <CreateCollectionForm />
+          <RenameCollectionForm />
+        </DatabaseCollectionsProvider>
+      </QCProvider>
+    </Providers>
+  );
 }

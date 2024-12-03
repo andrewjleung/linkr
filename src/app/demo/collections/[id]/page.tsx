@@ -10,23 +10,23 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Page() {
-	const { collections } = useCollectionStore();
-	const router = useRouter();
-	const parentId = useParentCollection();
-	const collection = collections().find((c) => c.id === parentId);
+  const { collections } = useCollectionStore();
+  const router = useRouter();
+  const parentId = useParentCollection();
+  const collection = collections().find((c) => c.id === parentId);
 
-	useEffect(() => {
-		if (collection === undefined) {
-			router.replace("/demo/collections/home");
-		}
-	}, [router, collection]);
+  useEffect(() => {
+    if (collection === undefined) {
+      router.replace("/demo/collections/home");
+    }
+  }, [router, collection]);
 
-	return (
-		<DemoLinksProvider>
-			<OpenGraphProvider ogs={[]}>
-				<Links />
-				<CreateLinkForm />
-			</OpenGraphProvider>
-		</DemoLinksProvider>
-	);
+  return (
+    <DemoLinksProvider>
+      <OpenGraphProvider ogs={[]}>
+        <Links />
+        <CreateLinkForm />
+      </OpenGraphProvider>
+    </DemoLinksProvider>
+  );
 }

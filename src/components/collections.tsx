@@ -21,7 +21,7 @@ export function Collections() {
   function onDragEnd(result: DropResult) {
     if (optimisticCollections.some((c) => c.type === "abstract")) {
       console.error(
-        "cannot reorder collections while not all collections are persisted"
+        "cannot reorder collections while not all collections are persisted",
       );
       return;
     }
@@ -41,7 +41,7 @@ export function Collections() {
     reorderCollection(
       collection.collection.id,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
   }
 

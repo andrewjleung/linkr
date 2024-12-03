@@ -4,32 +4,32 @@ import { insertImports, parseRaindropImport } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-	CommandSeparator,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandSeparator,
 } from "@/components/ui/command";
 import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { ConcreteCollection } from "@/hooks/use-optimistic-collections";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
@@ -39,11 +39,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-	Check,
-	ChevronsUpDown,
-	Info,
-	Loader,
-	SquareArrowOutUpRight,
+  Check,
+  ChevronsUpDown,
+  Info,
+  Loader,
+  SquareArrowOutUpRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useContext, useState } from "react";
@@ -55,623 +55,623 @@ import { z } from "zod";
 const fileSchema = z.instanceof(File, { message: "Required" });
 
 const raindropImportFormSchema = z.object({
-	file: fileSchema.refine(
-		(file) => file.size > 0,
-		"File size must be greater than 0",
-	),
+  file: fileSchema.refine(
+    (file) => file.size > 0,
+    "File size must be greater than 0",
+  ),
 });
 
 function ImportedCollections({ children }: { children: React.ReactNode }) {
-	return <div className="flex flex-col">{children}</div>;
+  return <div className="flex flex-col">{children}</div>;
 }
 
 function ImportedCollection({
-	name,
-	children,
-	selected,
-	setCollectionSelected,
+  name,
+  children,
+  selected,
+  setCollectionSelected,
 }: {
-	name: string;
-	children: React.ReactNode;
-	selected: boolean;
-	setCollectionSelected: (name: string, selected: boolean) => void;
+  name: string;
+  children: React.ReactNode;
+  selected: boolean;
+  setCollectionSelected: (name: string, selected: boolean) => void;
 }) {
-	function onChange(c: CheckedState): void {
-		const value = c.valueOf();
+  function onChange(c: CheckedState): void {
+    const value = c.valueOf();
 
-		if (typeof value === "string") {
-			setCollectionSelected(name, false);
-			return;
-		}
+    if (typeof value === "string") {
+      setCollectionSelected(name, false);
+      return;
+    }
 
-		setCollectionSelected(name, value);
-	}
+    setCollectionSelected(name, value);
+  }
 
-	const id = `selectable-imported-collection-${name}`;
+  const id = `selectable-imported-collection-${name}`;
 
-	return (
-		<div>
-			<div className="flex flex-row items-center gap-3 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
-				<Checkbox id={id} checked={selected} onCheckedChange={onChange} />
-				<label htmlFor={id}>{name}</label>
-			</div>
-			{children}
-		</div>
-	);
+  return (
+    <div>
+      <div className="flex flex-row items-center gap-3 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
+        <Checkbox id={id} checked={selected} onCheckedChange={onChange} />
+        <label htmlFor={id}>{name}</label>
+      </div>
+      {children}
+    </div>
+  );
 }
 
 function ImportedLinks({ children }: { children: React.ReactNode }) {
-	return <div className="flex flex-col">{children}</div>;
+  return <div className="flex flex-col">{children}</div>;
 }
 
 function ImportedLinkComponent({
-	link,
-	selected,
-	setLinkSelected,
+  link,
+  selected,
+  setLinkSelected,
 }: {
-	link: SelectableImportedLink;
-	selected: boolean;
-	setLinkSelected: (linkId: string, selected: boolean) => void;
+  link: SelectableImportedLink;
+  selected: boolean;
+  setLinkSelected: (linkId: string, selected: boolean) => void;
 }) {
-	function onChange(c: CheckedState): void {
-		const value = c.valueOf();
+  function onChange(c: CheckedState): void {
+    const value = c.valueOf();
 
-		if (typeof value === "string") {
-			setLinkSelected(link.id, false);
-			return;
-		}
+    if (typeof value === "string") {
+      setLinkSelected(link.id, false);
+      return;
+    }
 
-		setLinkSelected(link.id, value);
-	}
+    setLinkSelected(link.id, value);
+  }
 
-	const id = `selectable-imported-link-${link.id}`;
+  const id = `selectable-imported-link-${link.id}`;
 
-	return (
-		<span className="flex flex-row items-center gap-3 ml-4 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
-			<Checkbox id={id} checked={selected} onCheckedChange={onChange} />
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<label htmlFor={id} className="line-clamp-1 text-sm">
-						{link.link.url}
-					</label>
-				</TooltipTrigger>
-				<TooltipContent>{link.link.url}</TooltipContent>
-			</Tooltip>
-			<a
-				href={link.link.url}
-				className="ml-auto dark:hover:text-blue-600 transition-all ease-out hover:text-blue-500 dark:text-neutral-700 text-neutral-500"
-				target="_blank"
-				rel="noreferrer"
-			>
-				<SquareArrowOutUpRight className="w-4 h-4" />
-			</a>
-		</span>
-	);
+  return (
+    <span className="flex flex-row items-center gap-3 ml-4 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
+      <Checkbox id={id} checked={selected} onCheckedChange={onChange} />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <label htmlFor={id} className="line-clamp-1 text-sm">
+            {link.link.url}
+          </label>
+        </TooltipTrigger>
+        <TooltipContent>{link.link.url}</TooltipContent>
+      </Tooltip>
+      <a
+        href={link.link.url}
+        className="ml-auto dark:hover:text-blue-600 transition-all ease-out hover:text-blue-500 dark:text-neutral-700 text-neutral-500"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <SquareArrowOutUpRight className="w-4 h-4" />
+      </a>
+    </span>
+  );
 }
 
 type SelectableImportedLink = {
-	id: string;
-	link: ImportedLink;
+  id: string;
+  link: ImportedLink;
 };
 
 type PageState = "selection" | "editing";
 
 function ImportLinks({
-	setLinks,
+  setLinks,
 }: {
-	setLinks: React.Dispatch<
-		React.SetStateAction<SelectableImportedLink[] | null>
-	>;
+  setLinks: React.Dispatch<
+    React.SetStateAction<SelectableImportedLink[] | null>
+  >;
 }) {
-	const [loading, setLoading] = useState(false);
-	const form = useForm<z.infer<typeof raindropImportFormSchema>>({
-		resolver: zodResolver(raindropImportFormSchema),
-	});
+  const [loading, setLoading] = useState(false);
+  const form = useForm<z.infer<typeof raindropImportFormSchema>>({
+    resolver: zodResolver(raindropImportFormSchema),
+  });
 
-	async function onSubmit(values: z.infer<typeof raindropImportFormSchema>) {
-		setLoading(true);
-		const ab = await values.file.arrayBuffer();
-		const serialized = new TextDecoder().decode(ab);
-		const importedLinks = await parseRaindropImport(serialized);
-		setLoading(false);
+  async function onSubmit(values: z.infer<typeof raindropImportFormSchema>) {
+    setLoading(true);
+    const ab = await values.file.arrayBuffer();
+    const serialized = new TextDecoder().decode(ab);
+    const importedLinks = await parseRaindropImport(serialized);
+    setLoading(false);
 
-		if (importedLinks === undefined) {
-			return;
-		}
+    if (importedLinks === undefined) {
+      return;
+    }
 
-		setLinks(
-			importedLinks.map((il) => ({
-				// TODO: Using a random id here for the id may not be a great idea...
-				id: crypto.randomUUID(),
-				link: il,
-			})),
-		);
-	}
+    setLinks(
+      importedLinks.map((il) => ({
+        // TODO: Using a random id here for the id may not be a great idea...
+        id: crypto.randomUUID(),
+        link: il,
+      })),
+    );
+  }
 
-	return (
-		<AnimatePresence>
-			<Form {...form}>
-				<motion.form
-					key="import-links-form"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					onSubmit={form.handleSubmit(onSubmit)}
-					className="mx-auto mt-12 flex flex-col w-96"
-				>
-					<FormField
-						control={form.control}
-						name="file"
-						render={({ field: { value, onChange, ...fieldProps } }) => (
-							<FormItem>
-								<FormLabel className="flex flex-row items-center">
-									Upload a backup CSV from Raindrop
-									<a
-										href="https://help.raindrop.io/backups#downloading-a-backup"
-										className="ml-2"
-										target="_blank"
-										rel="noreferrer"
-									>
-										<Info className="h-4 w-4" />
-									</a>
-								</FormLabel>
-								<FormControl>
-									<Input
-										{...fieldProps}
-										type="file"
-										onChange={(event) => onChange(event.target.files?.[0])}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<Button disabled={loading} type="submit" className="mt-4">
-						<span className={cn("opacity-100", { "opacity-0": loading })}>
-							Import
-						</span>
-						<Loader
-							className={cn("w-4 h-4 animate-spin absolute opacity-0", {
-								"opacity-100": loading,
-							})}
-						/>
-					</Button>
-				</motion.form>
-			</Form>
-		</AnimatePresence>
-	);
+  return (
+    <AnimatePresence>
+      <Form {...form}>
+        <motion.form
+          key="import-links-form"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mx-auto mt-12 flex flex-col w-96"
+        >
+          <FormField
+            control={form.control}
+            name="file"
+            render={({ field: { value, onChange, ...fieldProps } }) => (
+              <FormItem>
+                <FormLabel className="flex flex-row items-center">
+                  Upload a backup CSV from Raindrop
+                  <a
+                    href="https://help.raindrop.io/backups#downloading-a-backup"
+                    className="ml-2"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <Info className="h-4 w-4" />
+                  </a>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...fieldProps}
+                    type="file"
+                    onChange={(event) => onChange(event.target.files?.[0])}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button disabled={loading} type="submit" className="mt-4">
+            <span className={cn("opacity-100", { "opacity-0": loading })}>
+              Import
+            </span>
+            <Loader
+              className={cn("w-4 h-4 animate-spin absolute opacity-0", {
+                "opacity-100": loading,
+              })}
+            />
+          </Button>
+        </motion.form>
+      </Form>
+    </AnimatePresence>
+  );
 }
 
 function SelectLinks({
-	links,
-	setLinks,
-	selectedLinks,
-	setSelectedLinks,
-	setPageState,
+  links,
+  setLinks,
+  selectedLinks,
+  setSelectedLinks,
+  setPageState,
 }: {
-	links: SelectableImportedLink[];
-	setLinks: React.Dispatch<
-		React.SetStateAction<SelectableImportedLink[] | null>
-	>;
-	selectedLinks: string[];
-	setSelectedLinks: React.Dispatch<React.SetStateAction<string[]>>;
-	setPageState: React.Dispatch<React.SetStateAction<PageState>>;
+  links: SelectableImportedLink[];
+  setLinks: React.Dispatch<
+    React.SetStateAction<SelectableImportedLink[] | null>
+  >;
+  selectedLinks: string[];
+  setSelectedLinks: React.Dispatch<React.SetStateAction<string[]>>;
+  setPageState: React.Dispatch<React.SetStateAction<PageState>>;
 }) {
-	const linksByCollection = Object.groupBy(links, (il) => il.link.parent);
+  const linksByCollection = Object.groupBy(links, (il) => il.link.parent);
 
-	function onSubmitSelection() {
-		setPageState("editing");
-	}
+  function onSubmitSelection() {
+    setPageState("editing");
+  }
 
-	function onSelectAll(c: CheckedState): void {
-		const value = c.valueOf();
+  function onSelectAll(c: CheckedState): void {
+    const value = c.valueOf();
 
-		if (typeof value === "string" || !value) {
-			setSelectedLinks([]);
-			return;
-		}
+    if (typeof value === "string" || !value) {
+      setSelectedLinks([]);
+      return;
+    }
 
-		setSelectedLinks(links.map((l) => l.id));
-	}
+    setSelectedLinks(links.map((l) => l.id));
+  }
 
-	function setCollectionSelected(name: string, selected: boolean) {
-		const collection = linksByCollection[name];
+  function setCollectionSelected(name: string, selected: boolean) {
+    const collection = linksByCollection[name];
 
-		if (collection === undefined) {
-			return;
-		}
+    if (collection === undefined) {
+      return;
+    }
 
-		const collectionLinksIds = collection.map((l) => l.id);
+    const collectionLinksIds = collection.map((l) => l.id);
 
-		if (selected) {
-			setSelectedLinks((sl) => [...sl, ...collectionLinksIds]);
-			return;
-		}
+    if (selected) {
+      setSelectedLinks((sl) => [...sl, ...collectionLinksIds]);
+      return;
+    }
 
-		setSelectedLinks((sl) =>
-			sl.filter((id) => !collectionLinksIds.includes(id)),
-		);
-	}
+    setSelectedLinks((sl) =>
+      sl.filter((id) => !collectionLinksIds.includes(id)),
+    );
+  }
 
-	const setLinkSelected = useCallback(
-		(linkId: string, selected: boolean) => {
-			setSelectedLinks((selectedLinks) => {
-				if (selected && !selectedLinks.includes(linkId)) {
-					return [...selectedLinks, linkId];
-				}
+  const setLinkSelected = useCallback(
+    (linkId: string, selected: boolean) => {
+      setSelectedLinks((selectedLinks) => {
+        if (selected && !selectedLinks.includes(linkId)) {
+          return [...selectedLinks, linkId];
+        }
 
-				if (!selected) {
-					return selectedLinks.filter((l) => l !== linkId);
-				}
+        if (!selected) {
+          return selectedLinks.filter((l) => l !== linkId);
+        }
 
-				return selectedLinks;
-			});
-		},
-		[setSelectedLinks],
-	);
+        return selectedLinks;
+      });
+    },
+    [setSelectedLinks],
+  );
 
-	return (
-		<TooltipProvider>
-			<AnimatePresence>
-				<header className="text-xl mb-2 flex flex-row items-center">
-					<span className="font-semibold">Select links to import</span>
-					<span className="text-sm ml-4 text-neutral-500 pt-1">
-						{selectedLinks.length} / {links.length} selected
-					</span>
-					<Button
-						className="ml-auto mr-2"
-						variant="outline"
-						onClick={() => {
-							setLinks(null);
-							setSelectedLinks([]);
-						}}
-					>
-						Back
-					</Button>
-					<Button
-						disabled={selectedLinks.length < 1}
-						onClick={onSubmitSelection}
-					>
-						Continue
-					</Button>
-				</header>
-				<motion.div
-					key="imported-collections"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-				>
-					<ImportedCollections>
-						<div className="flex flex-row items-center gap-3 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
-							<Checkbox
-								id="select-all-checkbox"
-								checked={links.every((l) => selectedLinks.includes(l.id))}
-								onCheckedChange={onSelectAll}
-							/>
-							<label htmlFor="select-all-checkbox">All</label>
-						</div>
-						{Object.entries(linksByCollection).map(([name, links]) => (
-							<ImportedCollection
-								key={`imported-collection-${name}`}
-								name={name}
-								selected={(links || []).every((l) =>
-									selectedLinks.includes(l.id),
-								)}
-								setCollectionSelected={setCollectionSelected}
-							>
-								<ImportedLinks>
-									{(links || []).map((l) => (
-										<ImportedLinkComponent
-											key={`imported-link-${l.id}`}
-											link={l}
-											selected={selectedLinks.includes(l.id)}
-											setLinkSelected={setLinkSelected}
-										/>
-									))}
-								</ImportedLinks>
-							</ImportedCollection>
-						))}
-					</ImportedCollections>
-				</motion.div>
-			</AnimatePresence>
-		</TooltipProvider>
-	);
+  return (
+    <TooltipProvider>
+      <AnimatePresence>
+        <header className="text-xl mb-2 flex flex-row items-center">
+          <span className="font-semibold">Select links to import</span>
+          <span className="text-sm ml-4 text-neutral-500 pt-1">
+            {selectedLinks.length} / {links.length} selected
+          </span>
+          <Button
+            className="ml-auto mr-2"
+            variant="outline"
+            onClick={() => {
+              setLinks(null);
+              setSelectedLinks([]);
+            }}
+          >
+            Back
+          </Button>
+          <Button
+            disabled={selectedLinks.length < 1}
+            onClick={onSubmitSelection}
+          >
+            Continue
+          </Button>
+        </header>
+        <motion.div
+          key="imported-collections"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <ImportedCollections>
+            <div className="flex flex-row items-center gap-3 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
+              <Checkbox
+                id="select-all-checkbox"
+                checked={links.every((l) => selectedLinks.includes(l.id))}
+                onCheckedChange={onSelectAll}
+              />
+              <label htmlFor="select-all-checkbox">All</label>
+            </div>
+            {Object.entries(linksByCollection).map(([name, links]) => (
+              <ImportedCollection
+                key={`imported-collection-${name}`}
+                name={name}
+                selected={(links || []).every((l) =>
+                  selectedLinks.includes(l.id),
+                )}
+                setCollectionSelected={setCollectionSelected}
+              >
+                <ImportedLinks>
+                  {(links || []).map((l) => (
+                    <ImportedLinkComponent
+                      key={`imported-link-${l.id}`}
+                      link={l}
+                      selected={selectedLinks.includes(l.id)}
+                      setLinkSelected={setLinkSelected}
+                    />
+                  ))}
+                </ImportedLinks>
+              </ImportedCollection>
+            ))}
+          </ImportedCollections>
+        </motion.div>
+      </AnimatePresence>
+    </TooltipProvider>
+  );
 }
 
 function EditComponent({
-	collection,
-	edit,
+  collection,
+  edit,
 }: { collection: string; edit: Edit }) {
-	const { optimisticCollections } = useContext(CollectionsContext);
+  const { optimisticCollections } = useContext(CollectionsContext);
 
-	return match(edit)
-		.with({ type: "rename" }, (res) => (
-			<div>
-				Rename to&nbsp;
-				<span className="font-semibold underline">{res.new}</span>
-			</div>
-		))
-		.with({ type: "collapse" }, (res) => {
-			const collection = optimisticCollections.find((c) => c.id === res.into);
-			const collectionName =
-				res.into === null
-					? "Home"
-					: collection?.collection.name || "Collection not found";
+  return match(edit)
+    .with({ type: "rename" }, (res) => (
+      <div>
+        Rename to&nbsp;
+        <span className="font-semibold underline">{res.new}</span>
+      </div>
+    ))
+    .with({ type: "collapse" }, (res) => {
+      const collection = optimisticCollections.find((c) => c.id === res.into);
+      const collectionName =
+        res.into === null
+          ? "Home"
+          : collection?.collection.name || "Collection not found";
 
-			return (
-				<div>
-					Collapse into&nbsp;
-					<span className="font-semibold underline">{collectionName}</span>
-				</div>
-			);
-		})
-		.with({ type: "keep" }, () => (
-			<div>
-				Create <span className="font-semibold underline">{collection}</span>
-			</div>
-		))
-		.exhaustive();
+      return (
+        <div>
+          Collapse into&nbsp;
+          <span className="font-semibold underline">{collectionName}</span>
+        </div>
+      );
+    })
+    .with({ type: "keep" }, () => (
+      <div>
+        Create <span className="font-semibold underline">{collection}</span>
+      </div>
+    ))
+    .exhaustive();
 }
 
 function EditableCollection({
-	collection,
-	size,
-	edit,
-	setEditForCollection,
+  collection,
+  size,
+  edit,
+  setEditForCollection,
 }: {
-	collection: string;
-	size: number;
-	edit: Edit;
-	setEditForCollection: (edit: Edit) => void;
+  collection: string;
+  size: number;
+  edit: Edit;
+  setEditForCollection: (edit: Edit) => void;
 }) {
-	const [open, setOpen] = useState(false);
-	const [literalValue, setLiteralValue] = useState<string>("");
-	const [search, setSearch] = useState<string>("");
-	const { optimisticCollections } = useContext(CollectionsContext);
+  const [open, setOpen] = useState(false);
+  const [literalValue, setLiteralValue] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+  const { optimisticCollections } = useContext(CollectionsContext);
 
-	const concreteCollections = optimisticCollections.filter(
-		(c) => c.type === "concrete",
-	) as ConcreteCollection[];
+  const concreteCollections = optimisticCollections.filter(
+    (c) => c.type === "concrete",
+  ) as ConcreteCollection[];
 
-	return (
-		<div className="outline outline-1 px-4 py-2 rounded-lg dark:outline-neutral-800 outline-neutral-200 flex flex-row items-center gap-2">
-			<div>
-				<span className="line-clamp-1">{collection}</span>
-				<span className="text-sm text-neutral-500">{size} links</span>
-			</div>
-			<span className="sm:w-96 w-64 ml-auto">
-				<Popover open={open} onOpenChange={setOpen}>
-					<PopoverTrigger asChild>
-						<Button
-							variant="outline"
-							role="combobox"
-							aria-expanded={open}
-							className="sm:w-96 w-64 justify-between"
-						>
-							<EditComponent collection={collection} edit={edit} />
-							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="sm:w-96 w-64 p-0">
-						<Command
-							value={literalValue}
-							onValueChange={setLiteralValue}
-							filter={(value, search) => {
-								if (value === "rename") return 1;
-								if (value.includes(search)) return 1;
-								return 0;
-							}}
-						>
-							<CommandInput
-								onValueChange={setSearch}
-								placeholder="Create, rename, or collapse this collection..."
-							/>
-							<CommandEmpty>No existing collections.</CommandEmpty>
+  return (
+    <div className="outline outline-1 px-4 py-2 rounded-lg dark:outline-neutral-800 outline-neutral-200 flex flex-row items-center gap-2">
+      <div>
+        <span className="line-clamp-1">{collection}</span>
+        <span className="text-sm text-neutral-500">{size} links</span>
+      </div>
+      <span className="sm:w-96 w-64 ml-auto">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="sm:w-96 w-64 justify-between"
+            >
+              <EditComponent collection={collection} edit={edit} />
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="sm:w-96 w-64 p-0">
+            <Command
+              value={literalValue}
+              onValueChange={setLiteralValue}
+              filter={(value, search) => {
+                if (value === "rename") return 1;
+                if (value.includes(search)) return 1;
+                return 0;
+              }}
+            >
+              <CommandInput
+                onValueChange={setSearch}
+                placeholder="Create, rename, or collapse this collection..."
+              />
+              <CommandEmpty>No existing collections.</CommandEmpty>
 
-							<CommandGroup>
-								<CommandItem
-									onSelect={() => {
-										setEditForCollection({ type: "keep" });
-										setOpen(false);
-									}}
-								>
-									<Check
-										className={cn(
-											"mr-2 h-4 w-4",
-											edit.type === "keep" ? "opacity-100" : "opacity-0",
-										)}
-									/>
-									Create&nbsp;
-									<span className="font-semibold underline">{collection}</span>
-								</CommandItem>
-								{search.length > 0 ? (
-									<CommandItem
-										value="Rename"
-										onSelect={() => {
-											setEditForCollection({
-												type: "rename",
-												old: collection,
-												new: search,
-											});
-											setOpen(false);
-											setSearch("");
-										}}
-									>
-										<Check
-											className={cn(
-												"mr-2 h-4 w-4",
-												edit.type === "rename" && edit.new === search
-													? "opacity-100"
-													: "opacity-0",
-											)}
-										/>
-										Rename to&nbsp;
-										<span className="font-semibold underline">{search}</span>
-									</CommandItem>
-								) : null}
-							</CommandGroup>
+              <CommandGroup>
+                <CommandItem
+                  onSelect={() => {
+                    setEditForCollection({ type: "keep" });
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      edit.type === "keep" ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  Create&nbsp;
+                  <span className="font-semibold underline">{collection}</span>
+                </CommandItem>
+                {search.length > 0 ? (
+                  <CommandItem
+                    value="Rename"
+                    onSelect={() => {
+                      setEditForCollection({
+                        type: "rename",
+                        old: collection,
+                        new: search,
+                      });
+                      setOpen(false);
+                      setSearch("");
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        edit.type === "rename" && edit.new === search
+                          ? "opacity-100"
+                          : "opacity-0",
+                      )}
+                    />
+                    Rename to&nbsp;
+                    <span className="font-semibold underline">{search}</span>
+                  </CommandItem>
+                ) : null}
+              </CommandGroup>
 
-							<CommandSeparator />
+              <CommandSeparator />
 
-							<CommandGroup>
-								<CommandItem
-									onSelect={() => {
-										setEditForCollection({
-											type: "collapse",
-											into: null,
-										});
-										setOpen(false);
-									}}
-								>
-									<Check
-										className={cn(
-											"mr-2 h-4 w-4",
-											edit.type === "collapse" && edit.into === null
-												? "opacity-100"
-												: "opacity-0",
-										)}
-									/>
-									Collapse into the home collection
-								</CommandItem>
-								{concreteCollections.map((c) => (
-									<CommandItem
-										key={`editable-collection-${collection}-collapse-into-${c.id}-option`}
-										onSelect={() => {
-											setEditForCollection({
-												type: "collapse",
-												into: c.id,
-											});
-											setOpen(false);
-										}}
-									>
-										<Check
-											className={cn(
-												"mr-2 h-4 w-4",
-												edit.type === "collapse" && edit.into === c.id
-													? "opacity-100"
-													: "opacity-0",
-											)}
-										/>
-										Collapse into&nbsp;
-										<span className="font-semibold underline">
-											{c.collection.name}
-										</span>
-									</CommandItem>
-								))}
-							</CommandGroup>
-						</Command>
-					</PopoverContent>
-				</Popover>
-			</span>
-		</div>
-	);
+              <CommandGroup>
+                <CommandItem
+                  onSelect={() => {
+                    setEditForCollection({
+                      type: "collapse",
+                      into: null,
+                    });
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      edit.type === "collapse" && edit.into === null
+                        ? "opacity-100"
+                        : "opacity-0",
+                    )}
+                  />
+                  Collapse into the home collection
+                </CommandItem>
+                {concreteCollections.map((c) => (
+                  <CommandItem
+                    key={`editable-collection-${collection}-collapse-into-${c.id}-option`}
+                    onSelect={() => {
+                      setEditForCollection({
+                        type: "collapse",
+                        into: c.id,
+                      });
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        edit.type === "collapse" && edit.into === c.id
+                          ? "opacity-100"
+                          : "opacity-0",
+                      )}
+                    />
+                    Collapse into&nbsp;
+                    <span className="font-semibold underline">
+                      {c.collection.name}
+                    </span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </span>
+    </div>
+  );
 }
 
 function EditLinks({
-	selectedLinks,
-	setPageState,
+  selectedLinks,
+  setPageState,
 }: {
-	selectedLinks: ImportedLink[];
-	setPageState: React.Dispatch<React.SetStateAction<PageState>>;
+  selectedLinks: ImportedLink[];
+  setPageState: React.Dispatch<React.SetStateAction<PageState>>;
 }) {
-	const linksByCollection = Object.groupBy(selectedLinks, (il) => il.parent);
-	const collections = Object.keys(linksByCollection);
-	const [edits, setEdits] = useState<Record<string, Edit>>({});
-	const [loading, setLoading] = useState<boolean>(false);
-	const router = useRouter();
+  const linksByCollection = Object.groupBy(selectedLinks, (il) => il.parent);
+  const collections = Object.keys(linksByCollection);
+  const [edits, setEdits] = useState<Record<string, Edit>>({});
+  const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
-	const setEditForCollection = useCallback(
-		(collection: string) => (edit: Edit) => {
-			setEdits((edits) => ({ ...edits, [collection]: edit }));
-		},
-		[],
-	);
+  const setEditForCollection = useCallback(
+    (collection: string) => (edit: Edit) => {
+      setEdits((edits) => ({ ...edits, [collection]: edit }));
+    },
+    [],
+  );
 
-	return (
-		<TooltipProvider>
-			<AnimatePresence>
-				<header className="text-xl mb-4 flex flex-row items-center">
-					<span className="font-semibold">Edit collections</span>
-					<Button
-						className="ml-auto mr-2"
-						variant="outline"
-						onClick={() => setPageState("selection")}
-					>
-						Back
-					</Button>
-					<Button
-						className=""
-						disabled={loading}
-						onClick={async () => {
-							setLoading(true);
-							await insertImports(selectedLinks, edits);
-							setLoading(false);
+  return (
+    <TooltipProvider>
+      <AnimatePresence>
+        <header className="text-xl mb-4 flex flex-row items-center">
+          <span className="font-semibold">Edit collections</span>
+          <Button
+            className="ml-auto mr-2"
+            variant="outline"
+            onClick={() => setPageState("selection")}
+          >
+            Back
+          </Button>
+          <Button
+            className=""
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              await insertImports(selectedLinks, edits);
+              setLoading(false);
 
-							router.push("/collections/home");
-							toast.success(
-								`Successfully imported ${selectedLinks.length} links`,
-							);
-						}}
-					>
-						<span className={cn("opacity-100", { "opacity-0": loading })}>
-							Import
-						</span>
-						<Loader
-							className={cn("w-4 h-4 animate-spin absolute opacity-0", {
-								"opacity-100": loading,
-							})}
-						/>
-					</Button>
-				</header>
-				<motion.div
-					key="editable-collections"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					className="flex flex-col gap-4"
-				>
-					{collections.map((c) => (
-						<EditableCollection
-							key={`editable-collection-${c}`}
-							size={linksByCollection[c]?.length || 0}
-							collection={c}
-							edit={edits[c] || { type: "keep" }}
-							setEditForCollection={setEditForCollection(c)}
-						/>
-					))}
-				</motion.div>
-			</AnimatePresence>
-		</TooltipProvider>
-	);
+              router.push("/collections/home");
+              toast.success(
+                `Successfully imported ${selectedLinks.length} links`,
+              );
+            }}
+          >
+            <span className={cn("opacity-100", { "opacity-0": loading })}>
+              Import
+            </span>
+            <Loader
+              className={cn("w-4 h-4 animate-spin absolute opacity-0", {
+                "opacity-100": loading,
+              })}
+            />
+          </Button>
+        </header>
+        <motion.div
+          key="editable-collections"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex flex-col gap-4"
+        >
+          {collections.map((c) => (
+            <EditableCollection
+              key={`editable-collection-${c}`}
+              size={linksByCollection[c]?.length || 0}
+              collection={c}
+              edit={edits[c] || { type: "keep" }}
+              setEditForCollection={setEditForCollection(c)}
+            />
+          ))}
+        </motion.div>
+      </AnimatePresence>
+    </TooltipProvider>
+  );
 }
 
 export default function ImportRaindropPage() {
-	const [pageState, setPageState] = useState<PageState>("selection");
-	const [links, setLinks] = useState<SelectableImportedLink[] | null>(null);
-	const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
+  const [pageState, setPageState] = useState<PageState>("selection");
+  const [links, setLinks] = useState<SelectableImportedLink[] | null>(null);
+  const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
 
-	if (pageState === "selection" && links !== null) {
-		return (
-			<SelectLinks
-				links={links}
-				setLinks={setLinks}
-				selectedLinks={selectedLinks}
-				setSelectedLinks={setSelectedLinks}
-				setPageState={setPageState}
-			/>
-		);
-	}
+  if (pageState === "selection" && links !== null) {
+    return (
+      <SelectLinks
+        links={links}
+        setLinks={setLinks}
+        selectedLinks={selectedLinks}
+        setSelectedLinks={setSelectedLinks}
+        setPageState={setPageState}
+      />
+    );
+  }
 
-	if (pageState === "editing" && links !== null) {
-		return (
-			<EditLinks
-				selectedLinks={links
-					.filter((l) => selectedLinks.includes(l.id))
-					.map((l) => l.link)}
-				setPageState={setPageState}
-			/>
-		);
-	}
+  if (pageState === "editing" && links !== null) {
+    return (
+      <EditLinks
+        selectedLinks={links
+          .filter((l) => selectedLinks.includes(l.id))
+          .map((l) => l.link)}
+        setPageState={setPageState}
+      />
+    );
+  }
 
-	return <ImportLinks setLinks={setLinks} />;
+  return <ImportLinks setLinks={setLinks} />;
 }

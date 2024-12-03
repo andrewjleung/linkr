@@ -1,7 +1,7 @@
 import { Container } from "@/components/container";
 
 export default function CollectionsLayout({
-	children,
+  children,
 }: { children: React.ReactNode }) {
-	return <Container>{children}</Container>;
+  return <Container>{children}</Container>;
 }

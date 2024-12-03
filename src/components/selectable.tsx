@@ -2,37 +2,37 @@ import type { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "./ui/checkbox";
 
 export function Selectable({
-	children,
-	selecting,
-	selected,
-	onSelect,
-	className,
+  children,
+  selecting,
+  selected,
+  onSelect,
+  className,
 }: {
-	children: React.ReactNode;
-	selecting: boolean;
-	selected: boolean;
-	onSelect: (selected: boolean) => void;
-	className?: string;
+  children: React.ReactNode;
+  selecting: boolean;
+  selected: boolean;
+  onSelect: (selected: boolean) => void;
+  className?: string;
 }) {
-	function onCheckedChange(c: CheckedState) {
-		const value = c.valueOf();
+  function onCheckedChange(c: CheckedState) {
+    const value = c.valueOf();
 
-		if (typeof value === "string") {
-			onSelect(false);
-			return;
-		}
+    if (typeof value === "string") {
+      onSelect(false);
+      return;
+    }
 
-		onSelect(value);
-	}
+    onSelect(value);
+  }
 
-	if (!selecting) {
-		return <>{children}</>;
-	}
+  if (!selecting) {
+    return <>{children}</>;
+  }
 
-	return (
-		<div className={className}>
-			<Checkbox checked={selected} onCheckedChange={onCheckedChange} />
-			<div className="w-full">{children}</div>
-		</div>
-	);
+  return (
+    <div className={className}>
+      <Checkbox checked={selected} onCheckedChange={onCheckedChange} />
+      <div className="w-full">{children}</div>
+    </div>
+  );
 }

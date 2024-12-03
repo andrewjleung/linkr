@@ -6,12 +6,12 @@ import { showSidebarAtom } from "@/state";
 import { useAtom } from "jotai";
 
 export function CollectionsView() {
-	const [showSidebar] = useAtom(showSidebarAtom);
+  const [showSidebar] = useAtom(showSidebarAtom);
 
-	return (
-		<>
-			{showSidebar ? <Collections /> : null}
-			<CreateCollectionForm />
-		</>
-	);
+  return (
+    <>
+      {showSidebar ? <Collections /> : null}
+      <CreateCollectionForm />
+    </>
+  );
 }

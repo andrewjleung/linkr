@@ -4,23 +4,23 @@ import clsx from "clsx";
 import "./globals.css";
 
 export const metadata = {
-	title: "linkr",
-	description: "a home for your links.",
+  title: "linkr",
+  description: "a home for your links.",
 };
 
 export default async function RootLayout({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body className={clsx("min-h-screen dark:bg-neutral-950")}>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					{children}
-				</ThemeProvider>
-				<Toaster position="bottom-center" />
-			</body>
-		</html>
-	);
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={clsx("min-h-screen dark:bg-neutral-950")}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
+        <Toaster position="bottom-center" />
+      </body>
+    </html>
+  );
 }

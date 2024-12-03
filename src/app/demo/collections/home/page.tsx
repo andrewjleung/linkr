@@ -6,12 +6,12 @@ import { DemoLinksProvider } from "@/components/links-provider";
 import OpenGraphProvider from "@/components/opengraph-provider";
 
 export default function CollectionsHomePage() {
-	return (
-		<DemoLinksProvider>
-			<OpenGraphProvider ogs={[]}>
-				<Links />
-				<CreateLinkForm />
-			</OpenGraphProvider>
-		</DemoLinksProvider>
-	);
+  return (
+    <DemoLinksProvider>
+      <OpenGraphProvider ogs={[]}>
+        <Links />
+        <CreateLinkForm />
+      </OpenGraphProvider>
+    </DemoLinksProvider>
+  );
 }
