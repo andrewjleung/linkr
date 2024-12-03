@@ -9,7 +9,7 @@ import {
 } from "@/hooks/use-optimistic-links";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { orderForReorderedElement } from "@/lib/order";
-import databaseLinkStore from "@/repository/database-link-store";
+import databaseLinkStore from "@/repository/database-link-repository";
 import type { LinkRepository } from "@/repository/link-repository";
 import { useCallback } from "react";
 
@@ -58,6 +58,7 @@ export function DemoLinksProvider({
 				},
 				editOptimisticLink: linkRepository.editLink,
 				moveOptimisticLink: linkRepository.moveLink,
+				undoLinkDeletion: linkRepository.undoLinkDeletion,
 			};
 		},
 		[],

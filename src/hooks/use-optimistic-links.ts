@@ -8,14 +8,16 @@ import type {
 	LinkRepository,
 	LinkUpdate,
 } from "@/repository/link-repository";
-import { deleteLinkOp } from "@/state/operations";
 import type { SuccessResult } from "open-graph-scraper";
 // @ts-ignore
 import { createContext, startTransition, useOptimistic } from "react";
+import { toast } from "sonner";
 import { match } from "ts-pattern";
-import type { LinkStoreApi } from "./use-link-store";
 import { useParentCollection } from "./use-parent-collection";
-import { useUndoableOperations } from "./use-undoable-operations";
+import {
+	type UndoableOperation,
+	useUndoableOperations,
+} from "./use-undoable-operations";
 
 const DEFAULT_LINKS_CONTEXT: OptimisticLinks = {
 	optimisticLinks: [],
@@ -24,6 +26,7 @@ const DEFAULT_LINKS_CONTEXT: OptimisticLinks = {
 	async reorderOptimisticLinks() {},
 	async editOptimisticLink() {},
 	async moveOptimisticLink() {},
+	async undoLinkDeletion() {},
 };
 
 export const LinksContext = createContext<OptimisticLinks>(
@@ -61,6 +64,7 @@ export type OptimisticLinks = {
 		id: Link["id"],
 		parentId: Collection["id"] | null,
 	) => Promise<void>;
+	undoLinkDeletion: (id: Link["id"]) => Promise<void>;
 };
 
 function handleAdd(
@@ -185,7 +189,15 @@ export function useOptimisticLinks(
 	async function removeOptimisticLink(id: number) {
 		startTransition(() => updateOptimisticLinks({ type: "delete", id }));
 		await linkRepository.removeLink(id);
-		push(deleteLinkOp(id));
+		const deleteLinkOp: UndoableOperation = {
+			type: "delete-link",
+			linkId: id,
+			undo: async () => {
+				await linkRepository.undoLinkDeletion(id);
+				toast.success("Undid link deletion");
+			},
+		};
+		push(deleteLinkOp);
 	}
 
 	async function reorderOptimisticLinks(
@@ -231,22 +243,5 @@ export function useOptimisticLinks(
 		reorderOptimisticLinks,
 		editOptimisticLink,
 		moveOptimisticLink,
-	};
-}
-
-export function wrapLinkStore(store: LinkStoreApi): OptimisticLinks {
-	const state = store.getState();
-
-	return {
-		optimisticLinks: state.links().map((l) => ({
-			type: "concrete",
-			id: l.id,
-			link: l,
-		})),
-		addOptimisticLink: state.addLink,
-		removeOptimisticLink: state.removeLink,
-		reorderOptimisticLinks: state.reorderLink,
-		editOptimisticLink: state.editLink,
-		moveOptimisticLink: state.moveLink,
 	};
 }

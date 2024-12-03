@@ -1,4 +1,3 @@
-import { undoLinkDeletion } from "@/app/actions";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	ContextMenu,
@@ -42,7 +41,8 @@ function LinkMenu({
 	onSelect: (selected: boolean) => void;
 	children: React.ReactNode;
 }) {
-	const { removeOptimisticLink, moveOptimisticLink } = useContext(LinksContext);
+	const { removeOptimisticLink, moveOptimisticLink, undoLinkDeletion } =
+		useContext(LinksContext);
 	const { optimisticCollections } = useContext(CollectionsContext);
 
 	const [editLinkFormOpen, setEditLinkFormOpen] = useState(false);

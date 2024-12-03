@@ -1,6 +1,4 @@
-import { undoUnsafeCollectionDeletion } from "@/app/actions";
 import { RenameCollectionForm } from "@/components/collection-form";
-import LoadingIndicator from "@/components/loading-indicator";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -86,12 +84,7 @@ function ConcreteCollection({ collection }: { collection: Collection }) {
 
 		await unsafeRemoveCollection(collection.id);
 
-		toast.success("Collection has been deleted.", {
-			action: {
-				label: "Undo",
-				onClick: () => undoUnsafeCollectionDeletion(collection.id),
-			},
-		});
+		toast.success("Collection has been deleted.");
 	}
 
 	function onRename() {

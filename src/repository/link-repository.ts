@@ -34,6 +34,7 @@ export type LinkRepository = {
 		id: Link["id"],
 		newParent: Collection["id"] | null,
 	) => Promise<void>;
+	undoLinkDeletion: (id: number) => Promise<void>;
 };
 
 export type CollectionStore = {

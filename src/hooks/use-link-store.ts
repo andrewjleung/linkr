@@ -106,6 +106,17 @@ export const createLinkStore = (parentCollectionId: number | null) =>
 				};
 			});
 		},
+		undoLinkDeletion: async (
+			...args: Parameters<LinkRepository["undoLinkDeletion"]>
+		) => {
+			useUnderlyingLinkStore.setState((state) => {
+				return {
+					links: setLink(state.links, args[0], {
+						deleted: false,
+					}),
+				};
+			});
+		},
 	}));
 
 export type LinkStoreApi = ReturnType<typeof createLinkStore>;

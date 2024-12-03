@@ -3,6 +3,7 @@ import {
 	deleteLink,
 	editLink,
 	moveLink,
+	undoLinkDeletion,
 	updateLinkOrder,
 } from "@/app/actions";
 import type { Link } from "@/database/types";
@@ -17,11 +18,12 @@ function discard<U extends unknown[], R>(fn: (...args: U) => Promise<R>) {
 
 export default function databaseLinkStore(links: Link[]): LinkRepository {
 	return {
-		links: links,
+		links: () => links,
 		addLink: discard(createLink),
 		removeLink: discard(deleteLink),
 		reorderLink: discard(updateLinkOrder),
 		editLink: discard(editLink),
 		moveLink: discard(moveLink),
+		undoLinkDeletion: discard(undoLinkDeletion),
 	};
 }

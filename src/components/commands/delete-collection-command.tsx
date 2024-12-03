@@ -1,4 +1,3 @@
-import { undoUnsafeCollectionDeletion } from "@/app/actions";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -36,12 +35,7 @@ export function DeleteCollectionCommand({
 		if (parentId !== null) {
 			await unsafeRemoveCollection(parentId);
 
-			toast.success("Collection has been deleted.", {
-				action: {
-					label: "Undo",
-					onClick: () => undoUnsafeCollectionDeletion(parentId),
-				},
-			});
+			toast.success("Collection has been deleted.");
 		}
 	}
 

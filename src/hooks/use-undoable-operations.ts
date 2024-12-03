@@ -1,51 +1,60 @@
-import {
-	HISTORY_LENGTH,
-	type Operation,
-	type UndoableOperation,
-	undoableOperationsAtom,
-} from "@/state/operations";
-import { useAtom } from "jotai";
-import { useCallback } from "react";
+import type { Link } from "@/database/types";
+import { useCallback, useState } from "react";
 import { useKeyPress } from "./use-keyboard";
+
+export const HISTORY_LENGTH = 50;
+
+export type Operation = DeleteLink;
+export type UndoableOperation = Operation & {
+	undo: () => Promise<void>;
+};
+
+export type DeleteLink = {
+	type: "delete-link";
+	linkId: Link["id"];
+};
 
 type UndoableOperations = {
 	push: (op: UndoableOperation) => void;
-	undo: () => Promise<Operation | null>;
+	undo: () => Promise<void>;
 };
 
 export function useUndoableOperations(): UndoableOperations {
-	const [undoableOperations, setUndoableOperations] = useAtom(
-		undoableOperationsAtom,
-	);
+	const [undoableOperations, setUndoableOperations] = useState<
+		UndoableOperation[]
+	>([]);
+
+	console.log(undoableOperations);
 
 	const push: UndoableOperations["push"] = useCallback(
 		(op: UndoableOperation) => {
-			if (undoableOperations.length >= HISTORY_LENGTH) {
-				setUndoableOperations((ops) => {
+			setUndoableOperations((ops) => {
+				if (ops.length >= HISTORY_LENGTH) {
 					const [_, ...rest] = ops;
 					return [...rest, op];
-				});
-			}
+				}
 
-			setUndoableOperations((ops) => [...ops, op]);
+				return [...ops, op];
+			});
 		},
-		[setUndoableOperations, undoableOperations.length],
+		[],
 	);
 
-	const undo: UndoableOperations["undo"] = useCallback(() => {
-		const op = undoableOperations.pop();
-
-		if (op === undefined) {
-			return Promise.resolve(null);
+	const undo: UndoableOperations["undo"] = useCallback(async () => {
+		if (undoableOperations.length < 1) {
+			return;
 		}
 
-		return op.undo();
+		const op = undoableOperations[undoableOperations.length - 1];
+		setUndoableOperations((ops) => ops.slice(0, ops.length - 1));
+
+		op.undo();
 	}, [undoableOperations]);
 
-	useKeyPress({ shiftKey: false, metaKey: true, key: "z" }, (event) => {
-		event.preventDefault();
-		undo();
-	});
+	// useKeyPress({ shiftKey: false, metaKey: false, key: "z" }, (event) => {
+	// 	event.preventDefault();
+	// 	undo();
+	// });
 
 	return {
 		push,
