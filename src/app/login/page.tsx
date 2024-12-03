@@ -53,6 +53,12 @@ export default function LoginPage() {
 							<div className="mt-4 text-center text-sm">
 								Login is restricted to specific users.
 							</div>
+							<Link
+								href="/demo/collections/home"
+								className="mt-4 text-center text-sm"
+							>
+								Demo
+							</Link>
 						</div>
 					</div>
 					<footer className="absolute flex justify-center bottom-0 left-0 w-full text-neutral-500 p-6">
