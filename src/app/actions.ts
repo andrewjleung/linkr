@@ -11,6 +11,7 @@ import type { Edit, ImportedLink } from "@/services/import-service";
 import { kv } from "@vercel/kv";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 // TODO: DRY this up...
@@ -20,7 +21,6 @@ type Action<T extends Array<P>, R, P> = (...params: T) => Promise<R>;
 
 async function loggedIn(): Promise<boolean> {
 	const client = createClient();
-
 	const {
 		data: { user },
 		error,
@@ -29,9 +29,20 @@ async function loggedIn(): Promise<boolean> {
 	return error === null && user !== null && user.id === env.NEXT_PUBLIC_USER_ID;
 }
 
+async function isDemo(): Promise<boolean> {
+	const headersList = headers();
+	const referer = headersList.get("referer");
+
+	return referer?.includes("demo") || false;
+}
+
 const createProtectedAction =
 	<T extends Array<P>, R, P>(action: Action<T, R, P>) =>
 	async (...params: T) => {
+		if (await isDemo()) {
+			return;
+		}
+
 		const li = await loggedIn();
 		if (!li) {
 			return;
