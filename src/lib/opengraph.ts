@@ -33,6 +33,10 @@ export function cacheKey(id: number): string {
 }
 
 export async function getOgs(links: Link[]): Promise<[number, Og][]> {
+  if (links.length < 1) {
+    return [];
+  }
+
   const cachedOgs = await kv.mget<MaybeOg[]>(links.map((l) => cacheKey(l.id)));
 
   const linksAndResults = await zipMapAsync(
