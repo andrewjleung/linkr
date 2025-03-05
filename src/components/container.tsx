@@ -17,13 +17,16 @@ import { DatabaseCollectionsProvider } from "./collections-provider";
 
 export async function Container({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
-  const { data, error } = await supabase.auth.getSession();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
-  if (error || !data?.session?.user) {
+  if (error || !user) {
     redirect("/login");
   }
 
-  if (data.session.user.id !== env.NEXT_PUBLIC_USER_ID) {
+  if (user.id !== env.NEXT_PUBLIC_USER_ID) {
     redirect("/login");
   }
 
