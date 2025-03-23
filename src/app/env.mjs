@@ -8,6 +8,7 @@ export const env = createEnv({
    * Will throw if you access these variables on the client.
    */
   server: {
+    CRON_SECRET: z.string(),
     DATABASE_URL: z.string().url(),
     DRIZZLE_DATABASE_URL: z.string().url(),
     DB_HOST: z.string(),
@@ -38,6 +39,7 @@ export const env = createEnv({
    * 💡 You'll get type errors if not all variables from `server` & `client` are included here.
    */
   runtimeEnv: {
+    CRON_SECRET: process.env.CRON_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     DRIZZLE_DATABASE_URL: process.env.DRIZZLE_DATABASE_URL,
     DB_HOST: process.env.DB_HOST,
