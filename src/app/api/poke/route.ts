@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     .from(links)
     .where(eq(links.deleted, false));
 
-  return new Response(`Linkr is live with ${linksCount} links.`, {
+  return new Response(`Linkr is live with ${linksCount[0].count} links.`, {
     status: 400,
   });
 }
