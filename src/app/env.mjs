@@ -21,6 +21,7 @@ export const env = createEnv({
     GITHUB_OAUTH_CLIENT_SECRET: z.string(),
     HTTP_BASIC_AUTH: z.string(),
     NEXT_PUBLIC_USER_ID: z.string(),
+    UNKEY_API_ID: z.string(),
   },
   /*
    * Environment variables available on the client (and server).
@@ -52,5 +53,6 @@ export const env = createEnv({
     GITHUB_OAUTH_CLIENT_SECRET: process.env.GITHUB_OAUTH_CLIENT_SECRET,
     HTTP_BASIC_AUTH: process.env.HTTP_BASIC_AUTH,
     NEXT_PUBLIC_USER_ID: process.env.NEXT_PUBLIC_USER_ID,
+    UNKEY_API_ID: process.env.UNKEY_API_ID,
   },
 });
