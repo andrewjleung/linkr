@@ -1,7 +1,8 @@
 import "server-only";
 
 import { kv } from "@vercel/kv";
-import ogs, { type SuccessResult } from "open-graph-scraper/types";
+import type { SuccessResult } from "open-graph-scraper/types";
+import ogs from "open-graph-scraper";
 import type { links as linksSchema } from "@/database/schema";
 
 type Og = Pick<
