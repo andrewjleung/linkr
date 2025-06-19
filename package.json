@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "pnpm biome lint ./src",
-    "db-push": "drizzle-kit push"
+    "db-push": "drizzle-kit push",
+    "up-shadcnui": "npx shadcn@latest add -a -y -o"
   },
   "dependencies": {
     "@auth/supabase-adapter": "^1.4.1",
@@ -63,6 +64,7 @@
     "eslint": "8.43.0",
     "eslint-config-next": "14.2.5",
     "framer-motion": "^10.18.0",
+    "input-otp": "^1.4.2",
     "jotai": "^2.9.0",
     "lucide-react": "^0.376.0",
     "next": "14.2.5",
@@ -73,10 +75,11 @@
     "postcss": "8.4.24",
     "postgres": "^3.4.4",
     "react": "18.3.1",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.7.0",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.52.1",
     "react-resizable-panels": "^2.0.20",
+    "recharts": "^2.15.3",
     "server-only": "^0.0.1",
     "sonner": "^1.5.0",
     "tailwind-merge": "^1.14.0",

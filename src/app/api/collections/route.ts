@@ -5,7 +5,7 @@ import { withUnkey } from "@unkey/nextjs";
 import { and, asc, eq, isNotNull } from "drizzle-orm";
 
 export const GET = withUnkey(
-  async (req) => {
+  async (_req) => {
     const results = await db
       .select()
       .from(collections)
