@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+@theme {
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @layer base {

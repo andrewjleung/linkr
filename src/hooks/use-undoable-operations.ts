@@ -1,5 +1,5 @@
-import type { Link } from "@/database/types";
 import { useCallback, useState } from "react";
+import type { Link } from "@/database/types";
 import { useKeyPress } from "./use-keyboard";
 
 export const HISTORY_LENGTH = 50;

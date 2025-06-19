@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useClipboard() {
   const [clipboard, setClipboard] = useState<string | undefined>(undefined);

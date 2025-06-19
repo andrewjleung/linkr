@@ -1,10 +1,10 @@
 import { Readable } from "node:stream";
-import { db } from "@/database/database";
-import { collections, links } from "@/database/schema";
-import type { Collection, LinkInsert } from "@/database/types";
 import { parse } from "csv-parse";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { db } from "@/database/database";
+import { collections, links } from "@/database/schema";
+import type { Collection, LinkInsert } from "@/database/types";
 import "server-only";
 import { z } from "zod";
 

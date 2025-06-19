@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -192,12 +192,12 @@ function OptimisticLinkComponent({
     <HoverCard>
       <HoverCardTrigger asChild>
         <Link href={link.url}>
-          <Card className="group relative border-none shadow-none ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800">
+          <Card className="py-0 dark:bg-black group relative border-none shadow-none ring-offset-white transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-800 ease-in-out">
             {/*<div className="absolute left-2 text-xs text-neutral-300 dark:text-neutral-700">
 							{link.order || "no order"}
 						</div> */}
-            <CardHeader className="p-3">
-              <CardTitle className="flex flex-row items-center justify-stretch gap-4">
+            <CardContent className="p-3">
+              <div className="flex flex-row items-center justify-stretch gap-4">
                 {showIcon ? (
                   <Avatar className="h-5 w-5">
                     <AvatarImage
@@ -209,7 +209,7 @@ function OptimisticLinkComponent({
                     </AvatarFallback>
                   </Avatar>
                 ) : null}
-                <span className="flex-2 line-clamp-1 text-sm">
+                <span className="flex-[0_1_fit-content] line-clamp-1 text-sm">
                   {title || displayUrl}
                 </span>
                 {title === null ? null : (
@@ -237,8 +237,8 @@ function OptimisticLinkComponent({
                     </span>
                   </>
                 ) : null}
-              </CardTitle>
-            </CardHeader>
+              </div>
+            </CardContent>
           </Card>
         </Link>
       </HoverCardTrigger>

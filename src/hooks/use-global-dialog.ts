@@ -1,6 +1,6 @@
-import { openedFormAtom } from "@/state";
 import { useAtom } from "jotai";
 import type { Dispatch, SetStateAction } from "react";
+import { openedFormAtom } from "@/state";
 
 type FormKind =
   | "create-link-form"

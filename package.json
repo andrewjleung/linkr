@@ -7,7 +7,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "pnpm biome lint ./src",
+    "lint": "biome check .",
     "db-push": "drizzle-kit push",
     "up-shadcnui": "npx shadcn@latest add -a -y -o"
   },
@@ -96,6 +96,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.0.0",
     "@types/object-hash": "^3.0.6",
     "@types/prettier": "^3.0.0",
     "drizzle-kit": "^0.31.1",

@@ -1,4 +1,4 @@
-import type { links, collections } from "./schema";
+import type { collections, links } from "./schema";
 
 type Insert<T extends { createdAt: Date; updatedAt: Date }> = Omit<
   T,

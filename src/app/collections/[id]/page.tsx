@@ -14,17 +14,17 @@ export const metadata: Metadata = {
   description: "A home for your links.",
 };
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const parentId = Number(params.id);
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
-  await validateCollection(parentId);
+  await validateCollection(Number(id));
 
   const links = await db
     .select()
     .from(linksSchema)
     .where(
       and(
-        eq(linksSchema.parentCollectionId, parentId),
+        eq(linksSchema.parentCollectionId, Number(id)),
         eq(linksSchema.deleted, false),
       ),
     )

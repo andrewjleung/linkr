@@ -1,8 +1,8 @@
-import { env } from "@/env";
-import { db } from "@/database/database";
-import { collections } from "@/database/schema";
 import { withUnkey } from "@unkey/nextjs";
 import { and, asc, eq, isNotNull } from "drizzle-orm";
+import { db } from "@/database/database";
+import { collections } from "@/database/schema";
+import { env } from "@/env";
 
 export const GET = withUnkey(
   async (_req) => {

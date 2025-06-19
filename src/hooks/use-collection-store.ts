@@ -1,8 +1,8 @@
+import { create, createStore, useStore } from "zustand";
 import type { Collection } from "@/database/types";
 import { ORDER_BUFFER } from "@/lib/order";
 import type { CollectionRepository } from "@/repository/collection-repository";
 import { COLLECTION_DATA } from "@/repository/demo-data";
-import { create, createStore, useStore } from "zustand";
 import { createLinkStore } from "./use-link-store";
 
 function editAtIndex<T>(collection: T[], i: number, t: Partial<T>) {
