@@ -27,10 +27,6 @@ export default function LoginPage() {
     })();
   }, [router]);
 
-  function onClick() {
-    login();
-  }
-
   return (
     <AuroraBackground className="z-0">
       <AnimatePresence>
@@ -48,7 +44,7 @@ export default function LoginPage() {
               </div>
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Button onClick={onClick} className="w-full">
+                  <Button onClick={login} className="w-full">
                     Login with GitHub
                   </Button>
                 </div>

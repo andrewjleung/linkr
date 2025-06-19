@@ -5,7 +5,7 @@ import { db } from "@/database/database";
 import { collections, links } from "@/database/schema";
 import type { CollectionInsert, LinkInsert } from "@/database/types";
 import { cacheKey } from "@/lib/opengraph";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { importFromRaindrop, importLinks } from "@/services/import-service";
 import type { Edit, ImportedLink } from "@/services/import-service";
 import { kv } from "@vercel/kv";
@@ -20,7 +20,7 @@ const ORDER_BUFFER = 100;
 type Action<T extends Array<P>, R, P> = (...params: T) => Promise<R>;
 
 async function loggedIn(): Promise<boolean> {
-  const client = createClient();
+  const client = await createClient();
   const {
     data: { user },
     error,

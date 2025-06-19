@@ -15,7 +15,7 @@ import { useDemo } from "@/hooks/use-demo";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import { openedFormAtom, showSidebarAtom } from "@/state";
 import { useAtom } from "jotai";
 import {
