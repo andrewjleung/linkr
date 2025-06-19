@@ -10,16 +10,16 @@ export async function GET(request: Request) {
   const next = searchParams.get("next") ?? "/collections/home";
 
   if (code) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(
       env.NEXT_PUBLIC_SUPABASE_URL,
       env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       {
         cookies: {
-          get(name: string) {
+          getAll(name: string) {
             return cookieStore.get(name)?.value;
           },
-          set(name: string, value: string, options: CookieOptions) {
+          setAll(name: string, value: string, options: CookieOptions) {
             cookieStore.set({ name, value, ...options });
           },
           remove(name: string, options: CookieOptions) {
