@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useContext, useRef } from "react";
 import {
   Command,
   CommandDialog,
@@ -13,8 +15,6 @@ import {
 } from "@/components/ui/command";
 import { LinksContext } from "@/hooks/use-optimistic-links";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { useContext, useRef } from "react";
 
 export function LinkSearcher({ className }: { className?: string }) {
   const { optimisticLinks } = useContext(LinksContext);

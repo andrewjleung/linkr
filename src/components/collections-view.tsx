@@ -1,9 +1,9 @@
 "use client";
 
+import { useAtom } from "jotai";
 import { CreateCollectionForm } from "@/components/collection-form";
 import { Collections } from "@/components/collections";
 import { showSidebarAtom } from "@/state";
-import { useAtom } from "jotai";
 
 export function CollectionsView() {
   const [showSidebar] = useAtom(showSidebarAtom);

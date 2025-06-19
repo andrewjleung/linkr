@@ -1,10 +1,9 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { useAtom } from "jotai";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { openedFormAtom } from "@/state";
-import { useAtom } from "jotai";
 
 export function CommandMenuButton({ className }: { className?: string }) {
   const [, setOpenedForm] = useAtom(openedFormAtom);

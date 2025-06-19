@@ -1,7 +1,8 @@
 "use client";
 
 import { Check, ChevronsUpDown, Home } from "lucide-react";
-
+import { usePathname, useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -23,8 +24,6 @@ import {
 } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
-import { usePathname, useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
 
 export function CollectionsPicker({ className }: { className?: string }) {
   const parentId = useParentCollection();
@@ -66,7 +65,6 @@ export function CollectionsPicker({ className }: { className?: string }) {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            role="combobox"
             aria-expanded={open}
             className="w-[200px] justify-between flex flex-row "
             aria-label={`Open collections picker, current collection is ${buttonText}`}

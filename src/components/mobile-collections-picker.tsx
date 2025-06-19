@@ -1,3 +1,6 @@
+import { useAtom } from "jotai";
+import { Folder } from "lucide-react";
+import { useContext } from "react";
 import { Button } from "@/components//ui/button";
 import {
   CollectionsContext,
@@ -6,9 +9,6 @@ import {
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
 import { openedFormAtom } from "@/state";
-import { useAtom } from "jotai";
-import { Folder } from "lucide-react";
-import { useContext } from "react";
 
 export function MobileCollectionsPicker({ className }: { className?: string }) {
   const parentId = useParentCollection();

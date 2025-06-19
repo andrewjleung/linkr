@@ -1,3 +1,10 @@
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  type DropResult,
+} from "@hello-pangea/dnd";
+import { useContext } from "react";
 import { CollectionComponent, HomeCollection } from "@/components/collection";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -6,13 +13,6 @@ import {
   OptimisticCollection,
   OptimisticCollections,
 } from "@/hooks/use-optimistic-collections";
-import {
-  DragDropContext,
-  Draggable,
-  type DropResult,
-  Droppable,
-} from "@hello-pangea/dnd";
-import { useContext } from "react";
 
 export function Collections() {
   const { optimisticCollections, reorderCollection } =

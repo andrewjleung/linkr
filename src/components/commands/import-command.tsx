@@ -1,6 +1,6 @@
-import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { Import } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { CommandItem } from "../ui/command";
 
 export function ImportCommand({

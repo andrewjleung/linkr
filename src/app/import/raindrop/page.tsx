@@ -1,5 +1,21 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { CheckedState } from "@radix-ui/react-checkbox";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Check,
+  ChevronsUpDown,
+  Info,
+  Loader,
+  SquareArrowOutUpRight,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useContext, useId, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { match } from "ts-pattern";
+import { z } from "zod";
 import { insertImports, parseRaindropImport } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,22 +51,6 @@ import type { ConcreteCollection } from "@/hooks/use-optimistic-collections";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import { cn } from "@/lib/utils";
 import type { Edit, ImportedLink } from "@/services/import-service";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { CheckedState } from "@radix-ui/react-checkbox";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  Check,
-  ChevronsUpDown,
-  Info,
-  Loader,
-  SquareArrowOutUpRight,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useContext, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { match } from "ts-pattern";
-import { z } from "zod";
 
 const fileSchema = z.instanceof(File, { message: "Required" });
 
@@ -258,6 +258,7 @@ function SelectLinks({
   setPageState: React.Dispatch<React.SetStateAction<PageState>>;
 }) {
   const linksByCollection = Object.groupBy(links, (il) => il.link.parent);
+  const id = useId();
 
   function onSubmitSelection() {
     setPageState("editing");
@@ -344,7 +345,7 @@ function SelectLinks({
           <ImportedCollections>
             <div className="flex flex-row items-center gap-3 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-3 py-2 rounded-lg">
               <Checkbox
-                id="select-all-checkbox"
+                id={`select-all-checkbox-${id}`}
                 checked={links.every((l) => selectedLinks.includes(l.id))}
                 onCheckedChange={onSelectAll}
               />
@@ -381,7 +382,10 @@ function SelectLinks({
 function EditComponent({
   collection,
   edit,
-}: { collection: string; edit: Edit }) {
+}: {
+  collection: string;
+  edit: Edit;
+}) {
   const { optimisticCollections } = useContext(CollectionsContext);
 
   return match(edit)
@@ -434,7 +438,7 @@ function EditableCollection({
   ) as ConcreteCollection[];
 
   return (
-    <div className="outline outline-1 px-4 py-2 rounded-lg dark:outline-neutral-800 outline-neutral-200 flex flex-row items-center gap-2">
+    <div className="outline px-4 py-2 rounded-lg dark:outline-neutral-800 outline-neutral-200 flex flex-row items-center gap-2">
       <div>
         <span className="line-clamp-1">{collection}</span>
         <span className="text-sm text-neutral-500">{size} links</span>
@@ -444,7 +448,6 @@ function EditableCollection({
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              role="combobox"
               aria-expanded={open}
               className="sm:w-96 w-64 justify-between"
             >

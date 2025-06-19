@@ -1,6 +1,6 @@
-import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { Moon, Sun, SunMoon } from "lucide-react";
 import { useTheme } from "next-themes";
+import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { CommandItem } from "../ui/command";
 
 export function ToggleThemeCommand({

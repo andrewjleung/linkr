@@ -1,6 +1,9 @@
-import { env } from "@/env";
-import { RenameCollectionForm } from "@/components/collection-form";
-import { CreateCollectionForm } from "@/components/collection-form";
+import { asc, eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
+import {
+  CreateCollectionForm,
+  RenameCollectionForm,
+} from "@/components/collection-form";
 import { CollectionsPicker } from "@/components/collections-picker";
 import { CommandMenu } from "@/components/command-menu";
 import { CommandMenuButton } from "@/components/command-menu-button";
@@ -10,9 +13,8 @@ import Providers from "@/components/state-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/database/database";
 import { collections as collectionsSchema } from "@/database/schema";
+import { env } from "@/env";
 import { createClient } from "@/utils/supabase/server";
-import { asc, eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import { DatabaseCollectionsProvider } from "./collections-provider";
 
 export async function Container({ children }: { children: React.ReactNode }) {

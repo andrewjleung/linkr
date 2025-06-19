@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import type { Collection } from "@/database/types";
 import { useCollectionStore } from "@/hooks/use-collection-store";
 import {
@@ -10,12 +11,14 @@ import {
 import { orderForReorderedElement } from "@/lib/order";
 import type { CollectionRepository } from "@/repository/collection-repository";
 import databaseCollectionStore from "@/repository/database-collection-repository";
-import { useCallback } from "react";
 
 export function DatabaseCollectionsProvider({
   collections,
   children,
-}: { collections: Collection[]; children: React.ReactNode }) {
+}: {
+  collections: Collection[];
+  children: React.ReactNode;
+}) {
   const collectionStore = databaseCollectionStore(collections);
   const oc = useOptimisticCollections(collectionStore);
 
@@ -28,7 +31,9 @@ export function DatabaseCollectionsProvider({
 
 export function DemoCollectionsProvider({
   children,
-}: { children: React.ReactNode }) {
+}: {
+  children: React.ReactNode;
+}) {
   const collectionRepository = useCollectionStore();
   const wrap = useCallback(
     (collectionRepository: CollectionRepository): OptimisticCollections => {

@@ -1,3 +1,6 @@
+import { FolderMinus } from "lucide-react";
+import { useContext, useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,9 +15,6 @@ import { CommandItem } from "@/components/ui/command";
 import type { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { FolderMinus } from "lucide-react";
-import { useContext, useState } from "react";
-import { toast } from "sonner";
 
 export function DeleteCollectionCommand({
   setOpen,

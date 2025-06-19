@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { openedFormAtom } from "@/state";
 import { useAtom } from "jotai";
 import { FolderPlus, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { openedFormAtom } from "@/state";
 import { MobileCollectionsPicker } from "./mobile-collections-picker";
 
 export function MobileFooter() {

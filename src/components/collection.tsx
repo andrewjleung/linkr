@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { useContext, useState } from "react";
+import { toast } from "sonner";
 import { RenameCollectionForm } from "@/components/collection-form";
 import {
   AlertDialog,
@@ -9,8 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { buttonVariants } from "@/components/ui/button";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -24,9 +26,6 @@ import {
 } from "@/hooks/use-optimistic-collections";
 import { useParentCollection } from "@/hooks/use-parent-collection";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useContext, useState } from "react";
-import { toast } from "sonner";
 
 export function HomeCollection() {
   const parentId = useParentCollection();

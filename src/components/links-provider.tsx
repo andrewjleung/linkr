@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import type { Link } from "@/database/types";
 import { useLinkStore } from "@/hooks/use-link-store";
 import {
@@ -11,7 +12,6 @@ import { useParentCollection } from "@/hooks/use-parent-collection";
 import { orderForReorderedElement } from "@/lib/order";
 import databaseLinkStore from "@/repository/database-link-repository";
 import type { LinkRepository } from "@/repository/link-repository";
-import { useCallback } from "react";
 
 export function DatabaseLinksProvider({
   links,
@@ -26,11 +26,7 @@ export function DatabaseLinksProvider({
   return <LinksContext.Provider value={ol}>{children}</LinksContext.Provider>;
 }
 
-export function DemoLinksProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function DemoLinksProvider({ children }: { children: React.ReactNode }) {
   const parentId = useParentCollection();
   const linkRepository = useLinkStore(parentId);
   const wrap = useCallback(

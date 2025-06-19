@@ -1,6 +1,6 @@
+import clsx from "clsx";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import clsx from "clsx";
 import "./globals.css";
 
 export const metadata = {

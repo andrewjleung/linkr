@@ -2,7 +2,9 @@ import { Container } from "@/components/container";
 
 export default function CollectionsLayout({
   children,
-}: { children: React.ReactNode }) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <Container>
       <div className="w-full">{children}</div>

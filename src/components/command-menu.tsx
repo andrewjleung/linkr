@@ -1,5 +1,19 @@
 "use client";
 
+import { useAtom } from "jotai";
+import {
+  Folder,
+  FolderPlus,
+  Home,
+  LogIn,
+  LogOut,
+  Plus,
+  SidebarClose,
+  SidebarOpen,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { toast } from "sonner";
 import {
   Command,
   CommandDialog,
@@ -15,22 +29,8 @@ import { useDemo } from "@/hooks/use-demo";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useKeyPress } from "@/hooks/use-keyboard";
 import { CollectionsContext } from "@/hooks/use-optimistic-collections";
-import { createClient } from "@/utils/supabase/client";
 import { openedFormAtom, showSidebarAtom } from "@/state";
-import { useAtom } from "jotai";
-import {
-  Folder,
-  FolderPlus,
-  Home,
-  LogIn,
-  LogOut,
-  Plus,
-  SidebarClose,
-  SidebarOpen,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useContext } from "react";
-import { toast } from "sonner";
+import { createClient } from "@/utils/supabase/client";
 import { DeleteCollectionCommand } from "./commands/delete-collection-command";
 import { ImportCommand } from "./commands/import-command";
 import { QuickAddCommand } from "./commands/quick-add-command";

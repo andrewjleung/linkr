@@ -1,6 +1,6 @@
+import { FolderEdit } from "lucide-react";
 import { useGlobalDialog } from "@/hooks/use-global-dialog";
 import { useParentCollection } from "@/hooks/use-parent-collection";
-import { FolderEdit } from "lucide-react";
 import { CommandItem } from "../ui/command";
 
 export function RenameCollectionCommand({

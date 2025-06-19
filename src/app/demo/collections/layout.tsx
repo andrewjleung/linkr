@@ -1,7 +1,11 @@
 "use client";
 
-import { RenameCollectionForm } from "@/components/collection-form";
-import { CreateCollectionForm } from "@/components/collection-form";
+import clsx from "clsx";
+import Link from "next/link";
+import {
+  CreateCollectionForm,
+  RenameCollectionForm,
+} from "@/components/collection-form";
 import { CollectionsPicker } from "@/components/collections-picker";
 import { DemoCollectionsProvider } from "@/components/collections-provider";
 import { CommandMenu } from "@/components/command-menu";
@@ -10,8 +14,6 @@ import { MobileFooter } from "@/components/mobile-footer";
 import Providers from "@/components/state-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useDemo } from "@/hooks/use-demo";
-import clsx from "clsx";
-import Link from "next/link";
 
 function DemoBanner({ className }: { className?: string }) {
   const { isDemo } = useDemo();
@@ -40,7 +42,9 @@ function DemoBanner({ className }: { className?: string }) {
 
 export default function CollectionsLayout({
   children,
-}: { children: React.ReactNode }) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <Providers>
       <DemoCollectionsProvider>
