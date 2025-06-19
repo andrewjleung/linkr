@@ -1,4 +1,4 @@
-import type { SuccessResult } from "open-graph-scraper";
+import type { SuccessResult } from "open-graph-scraper/types";
 // @ts-ignore
 import { createContext, startTransition, useOptimistic } from "react";
 import { toast } from "sonner";
