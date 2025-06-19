@@ -1,6 +1,6 @@
 "use client";
 
-import type { SuccessResult } from "open-graph-scraper";
+import type { SuccessResult } from "open-graph-scraper/types";
 import { createContext } from "react";
 import type { getOgs } from "@/lib/opengraph";
 
