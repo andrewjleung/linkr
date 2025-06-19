@@ -2,7 +2,7 @@ import type { Collection, CollectionInsert } from "@/database/types";
 
 export type CollectionAdd = {
   type: "add";
-  collection: Omit<CollectionInsert, "order">;
+  collection: Omit<CollectionInsert, "order" | "deleted">;
 };
 
 export type CollectionDelete = {

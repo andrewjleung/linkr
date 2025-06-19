@@ -2,7 +2,7 @@ import type { Collection, Link, LinkInsert } from "@/database/types";
 
 export type LinkAdd = {
   type: "add";
-  link: Omit<LinkInsert, "order">;
+  link: Omit<LinkInsert, "order" | "deleted">;
 };
 
 export type LinkDelete = {
