@@ -1,4 +1,4 @@
-import { env } from "@/app/env.mjs";
+import { env } from "@/env";
 import { db } from "@/database/database";
 import { collections, links } from "@/database/schema";
 import { withUnkey } from "@unkey/nextjs";

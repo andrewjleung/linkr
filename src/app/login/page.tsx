@@ -2,13 +2,13 @@
 
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { env } from "../env.mjs";
+import { env } from "@/env";
 import { login } from "./actions";
 
 export default function LoginPage() {

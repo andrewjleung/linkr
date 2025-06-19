@@ -1,4 +1,4 @@
-import { env } from "@/app/env.mjs";
+import { env } from "@/env";
 import { db } from "@/database/database";
 import { eq, count } from "drizzle-orm";
 import { links } from "@/database/schema";

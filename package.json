@@ -100,6 +100,7 @@
     "@types/prettier": "^3.0.0",
     "drizzle-kit": "^0.31.1",
     "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.12"
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "tw-animate-css": "^1.3.4"
   }
 }

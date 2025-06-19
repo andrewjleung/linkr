@@ -1,6 +1,5 @@
-import { env } from "@/app/env.mjs";
+import { env } from "@/env";
 import { createClient } from "@/lib/supabase/server";
-import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 

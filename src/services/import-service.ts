@@ -31,7 +31,7 @@ export type Collapse = {
 export type Keep = { type: "keep" };
 
 export async function importFromRaindrop(
-  file: ArrayBuffer,
+  file: Uint8Array,
 ): Promise<ImportedLink[]> {
   const parser = Readable.from(Buffer.from(file)).pipe(
     parse({ columns: true }),

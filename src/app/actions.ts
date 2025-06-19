@@ -1,6 +1,6 @@
 "use server";
 
-import { env } from "@/app/env.mjs";
+import { env } from "@/env";
 import { db } from "@/database/database";
 import { collections, links } from "@/database/schema";
 import type { CollectionInsert, LinkInsert } from "@/database/types";
@@ -30,7 +30,7 @@ async function loggedIn(): Promise<boolean> {
 }
 
 async function isDemo(): Promise<boolean> {
-  const headersList = headers();
+  const headersList = await headers();
   const referer = headersList.get("referer");
 
   return referer?.includes("demo") || false;

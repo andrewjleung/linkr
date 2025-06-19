@@ -1,4 +1,4 @@
-import { env } from "@/app/env.mjs";
+import { env } from "@/env";
 import { RenameCollectionForm } from "@/components/collection-form";
 import { CreateCollectionForm } from "@/components/collection-form";
 import { CollectionsPicker } from "@/components/collections-picker";
@@ -10,13 +10,13 @@ import Providers from "@/components/state-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/database/database";
 import { collections as collectionsSchema } from "@/database/schema";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { asc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { DatabaseCollectionsProvider } from "./collections-provider";
 
 export async function Container({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
     error,
