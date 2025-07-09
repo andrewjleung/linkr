@@ -124,6 +124,37 @@ export function CommandMenu() {
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
 
+          <CommandGroup heading="Commands">
+            {/* <QuickAddCommand setOpen={setOpen} /> */}
+            <CommandItem
+              onSelect={() => {
+                setOpenedForm("create-link-form");
+              }}
+              className="rounded-md"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              <span>New link</span>
+              <CommandShortcut>Q</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setOpenedForm("create-collection-form");
+              }}
+              className="rounded-md"
+            >
+              <FolderPlus className="mr-2 h-4 w-4" />
+              <span>New collection</span>
+              <CommandShortcut>⇧Q</CommandShortcut>
+            </CommandItem>
+            <RenameCollectionCommand setOpen={setOpen} />
+            <DeleteCollectionCommand setOpen={setOpen} />
+            {isDemo ? null : <ImportCommand setOpen={setOpen} />}
+            {isDemo ? null : <LogoutCommand setOpen={setOpen} />}
+            {isDemo ? <LoginCommand setOpen={setOpen} /> : null}
+          </CommandGroup>
+
+          <CommandSeparator />
+
           <CommandGroup heading="Collections">
             <CommandItem
               onSelect={() => {
@@ -155,37 +186,6 @@ export function CommandMenu() {
                   <span>{c.collection.name}</span>
                 </CommandItem>
               ))}
-          </CommandGroup>
-
-          <CommandSeparator />
-
-          <CommandGroup heading="Commands">
-            {/* <QuickAddCommand setOpen={setOpen} /> */}
-            <CommandItem
-              onSelect={() => {
-                setOpenedForm("create-link-form");
-              }}
-              className="rounded-md"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              <span>New link</span>
-              <CommandShortcut>Q</CommandShortcut>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => {
-                setOpenedForm("create-collection-form");
-              }}
-              className="rounded-md"
-            >
-              <FolderPlus className="mr-2 h-4 w-4" />
-              <span>New collection</span>
-              <CommandShortcut>⇧Q</CommandShortcut>
-            </CommandItem>
-            <RenameCollectionCommand setOpen={setOpen} />
-            <DeleteCollectionCommand setOpen={setOpen} />
-            {isDemo ? null : <ImportCommand setOpen={setOpen} />}
-            {isDemo ? null : <LogoutCommand setOpen={setOpen} />}
-            {isDemo ? <LoginCommand setOpen={setOpen} /> : null}
           </CommandGroup>
         </CommandList>
       </Command>
