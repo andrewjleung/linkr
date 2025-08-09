@@ -43,7 +43,7 @@ export async function Container({ children }: { children: React.ReactNode }) {
       <QCProvider>
         <DatabaseCollectionsProvider collections={collections}>
           <main className="relative flex min-h-screen flex-col">
-            <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800 justify-center">
+            <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800 flex justify-center">
               <div className="container px-8 h-16 max-w-5xl flex-row items-center hidden sm:flex">
                 <CollectionsPicker className="mx-auto hidden sm:mx-0 sm:block" />
                 <CommandMenuButton className="ml-auto hidden sm:block" />

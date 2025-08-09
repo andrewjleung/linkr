@@ -53,7 +53,7 @@
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
     "@unkey/api": "^0.36.0",
-    "@unkey/nextjs": "^0.18.9",
+    "@unkey/nextjs": "^2.0.0",
     "@vercel/kv": "^3.0.0",
     "autoprefixer": "10.4.21",
     "class-variance-authority": "^0.7.1",

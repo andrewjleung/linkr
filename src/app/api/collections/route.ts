@@ -18,9 +18,6 @@ export const GET = withUnkey(
     });
   },
   {
-    apiId: env.UNKEY_API_ID,
-    handleInvalidKey: (_req, _res) => {
-      return new Response("Unauthorized", { status: 401 });
-    },
+    rootKey: env.UNKEY_ROOT_KEY,
   },
 );
