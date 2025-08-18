@@ -49,7 +49,7 @@ export default function CollectionsLayout({
     <Providers>
       <DemoCollectionsProvider>
         <main className="relative flex min-h-screen flex-col">
-          <header className="sticky top-0 z-10 w-full border-b backdrop-blur dark:border-neutral-800 justify-center">
+          <header className="sticky flex-col top-0 z-10 w-full border-b backdrop-blur items-center dark:border-neutral-800 flex justify-center">
             <div className="container px-8 h-16 max-w-5xl flex-row items-center hidden sm:flex">
               <CollectionsPicker className="mx-auto hidden sm:mx-0 sm:block" />
               <CommandMenuButton className="ml-auto hidden sm:block" />
@@ -58,7 +58,7 @@ export default function CollectionsLayout({
               </div>
             </div>
 
-            <DemoBanner className="px-8 sm:border-t" />
+            <DemoBanner className="w-full px-8 sm:border-t" />
           </header>
 
           <div className="mx-auto flex h-full w-full max-w-5xl flex-1 gap-4 px-8 pt-8 mb-24">
