@@ -1,5 +1,4 @@
 import { asc, eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import {
   CreateCollectionForm,
   RenameCollectionForm,
@@ -13,22 +12,9 @@ import Providers from "@/components/state-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/database/database";
 import { collections as collectionsSchema } from "@/database/schema";
-import { env } from "@/env";
-import { createClient } from "@/utils/supabase/server";
 import { DatabaseCollectionsProvider } from "./collections-provider";
 
 export async function Container({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getClaims();
-
-  if (error || !data) {
-    redirect("/login");
-  }
-
-  if (data.claims.sub !== env.NEXT_PUBLIC_USER_ID) {
-    redirect("/login");
-  }
-
   const collections = await db
     .select()
     .from(collectionsSchema)

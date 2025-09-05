@@ -4,26 +4,25 @@ import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { env } from "@/env";
-import { createClient } from "@/utils/supabase/client";
 import { login } from "./actions";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const supabase = createClient();
-      const { data } = await supabase.auth.getClaims();
+  const onClickLogin = async () => {
+    setLoading(true);
+    const { error } = await login();
 
-      if (data?.claims.sub === env.NEXT_PUBLIC_USER_ID) {
-        router.replace("/collections/home");
-      }
-    })();
-  }, [router]);
+    if (error) {
+      setLoading(false);
+      toast.error(error);
+    }
+  };
 
   return (
     <AuroraBackground className="z-0">
@@ -38,16 +37,31 @@ export default function LoginPage() {
           <div className="flex items-center justify-center">
             <div className="mx-auto grid w-[350px] gap-6 z-10">
               <div className="grid gap-2 text-center">
-                <h1 className="text-3xl font-bold">Welcome to linkr 👋</h1>
+                <h1
+                  className={clsx("text-3xl font-bold", {
+                    "animate-fade-out": loading,
+                  })}
+                >
+                  Welcome to linkr 👋
+                </h1>
               </div>
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Button onClick={login} className="w-full">
-                    Login with GitHub
+                  <Button
+                    onClick={onClickLogin}
+                    className={clsx("w-full hover:cursor-pointer", {
+                      "animate-pulse": loading,
+                    })}
+                  >
+                    {loading ? "Logging you in..." : "Login with GitHub"}
                   </Button>
                 </div>
               </div>
-              <div className="text-center text-sm mt-4">
+              <div
+                className={clsx("text-center text-sm mt-4", {
+                  "animate-fade-out": loading,
+                })}
+              >
                 Login is restricted.
                 <Link
                   href="/demo/collections/home"

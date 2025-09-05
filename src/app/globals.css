@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 
 @theme {
+  --animate-fade-out: fadeOut 1.5s ease-in-out forwards;
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
 }
 
 @custom-variant dark (&:is(.dark *));

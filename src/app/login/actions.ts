@@ -15,6 +15,10 @@ const getURL = () => {
   return url;
 };
 
+interface LoginResponse {
+  error: null | string;
+}
+
 export async function login() {
   const supabase = await createClient();
 
@@ -26,10 +30,16 @@ export async function login() {
   });
 
   if (error) {
-    redirect("/error");
+    if (error?.message) {
+      return { error: `Login failed: ${error?.message}` };
+    }
+
+    return { error: "Login failed" };
   }
 
   if (data.url) {
     redirect(data.url);
   }
+
+  return { error: null };
 }
