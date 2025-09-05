@@ -21,12 +21,9 @@ type Action<T extends Array<P>, R, P> = (...params: T) => Promise<R>;
 
 async function loggedIn(): Promise<boolean> {
   const client = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await client.auth.getUser();
+  const { data, error } = await client.auth.getClaims();
 
-  return error === null && user !== null && user.id === env.NEXT_PUBLIC_USER_ID;
+  return error === null && data?.claims.sub === env.NEXT_PUBLIC_USER_ID;
 }
 
 async function isDemo(): Promise<boolean> {

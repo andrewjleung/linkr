@@ -17,11 +17,9 @@ export default function LoginPage() {
   useEffect(() => {
     (async () => {
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getClaims();
 
-      if (user?.id === env.NEXT_PUBLIC_USER_ID) {
+      if (data?.claims.sub === env.NEXT_PUBLIC_USER_ID) {
         router.replace("/collections/home");
       }
     })();
