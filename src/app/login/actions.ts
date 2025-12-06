@@ -19,7 +19,7 @@ interface LoginResponse {
   error: null | string;
 }
 
-export async function login() {
+export async function login(): Promise<LoginResponse> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
