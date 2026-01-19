@@ -4,6 +4,7 @@ import z from "zod/v4";
 import { db } from "@/database/database";
 import { collections, links } from "@/database/schema";
 import { env } from "@/env";
+import { revalidatePath } from "next/cache";
 
 // TODO: DRY this up...
 const ORDER_BUFFER = 100;
@@ -63,6 +64,8 @@ export const POST = withUnkey(
       .insert(links)
       .values({ ...link, order })
       .returning();
+
+    revalidatePath(`/collections/${link.parentCollectionId || "home"}`);
 
     return new Response(JSON.stringify(result), {
       status: 201,
