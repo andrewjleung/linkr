@@ -1,6 +1,6 @@
 "use server";
 
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -13,6 +13,8 @@ import { cacheKey } from "@/lib/opengraph";
 import type { Edit, ImportedLink } from "@/services/import-service";
 import { importFromRaindrop, importLinks } from "@/services/import-service";
 import { createClient } from "@/utils/supabase/server";
+
+const redis = Redis.fromEnv();
 
 // TODO: DRY this up...
 const ORDER_BUFFER = 100;
@@ -114,7 +116,7 @@ export const editLink = createProtectedAction(
       .where(eq(links.id, id));
     revalidatePath("/collections/home");
 
-    await kv.del(cacheKey(id));
+    await redis.del(cacheKey(id));
 
     return result;
   },

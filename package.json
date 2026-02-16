@@ -54,7 +54,7 @@
     "@typescript-eslint/parser": "^8.49.0",
     "@unkey/api": "^0.36.0",
     "@unkey/nextjs": "^2.0.0",
-    "@vercel/kv": "^3.0.0",
+    "@upstash/redis": "^1.36.2",
     "autoprefixer": "10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -1,9 +1,11 @@
 import "server-only";
 
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 import ogs from "open-graph-scraper";
 import type { SuccessResult } from "open-graph-scraper/types";
 import type { links as linksSchema } from "@/database/schema";
+
+const redis = Redis.fromEnv();
 
 type Og = Pick<
   SuccessResult["result"],
@@ -38,7 +40,9 @@ export async function getOgs(links: Link[]): Promise<[number, Og][]> {
     return [];
   }
 
-  const cachedOgs = await kv.mget<MaybeOg[]>(links.map((l) => cacheKey(l.id)));
+  const cachedOgs = await redis.mget<MaybeOg[]>(
+    links.map((l) => cacheKey(l.id)),
+  );
 
   const linksAndResults = await zipMapAsync(
     links,
@@ -52,7 +56,7 @@ export async function getOgs(links: Link[]): Promise<[number, Og][]> {
       const result = await ogs({ url: link.url });
 
       if (result.error) {
-        await kv.set(
+        await redis.set(
           cacheKey(link.id),
           { success: false },
           { ex: 60 * 60 * 24 },
@@ -69,7 +73,7 @@ export async function getOgs(links: Link[]): Promise<[number, Og][]> {
         },
       };
 
-      await kv.set(cacheKey(link.id), maybeOg, { ex: 60 * 60 * 24 });
+      await redis.set(cacheKey(link.id), maybeOg, { ex: 60 * 60 * 24 });
 
       return maybeOg;
     },
